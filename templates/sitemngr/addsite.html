@@ -1,0 +1,22 @@
+{% extends 'sitemngr/base.html' %}
+
+{% block content %}
+
+<center>
+
+<h1>Add site</h1>
+
+<br>
+{% if message %}
+    <div class="message"><p>{{ message }}</p></div><br>
+{% endif %}
+
+<p>Note: On this page, setting the date field does nothing, so don't bother - it's auto-filled.</p>
+<form action="" method="POST">
+{% csrf_token %}
+    {% include 'sitemngr/siteform.html' %}
+</form>
+    
+</center>
+
+{% endblock %}

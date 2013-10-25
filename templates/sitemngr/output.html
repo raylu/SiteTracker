@@ -1,0 +1,20 @@
+{% extends 'sitemngr/base.html' %}
+
+{% block content %}
+
+<h1>Output</h1>
+
+<br>
+
+<h3>Channel MotD</h3>
+<pre>
+    {{ motd|linebreaks }}
+</pre>
+<br><hr><br>
+<h3><a href="http://www.text2mindmap.com">Text2MindMap</a></h3>
+<h5>Note: You must insert tabs accordingly. I suck at recursion.</h4>
+<pre>
+    {{ mm|linebreaks }}
+</pre>
+
+{% endblock %}

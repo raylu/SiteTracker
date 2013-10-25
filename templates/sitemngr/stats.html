@@ -1,0 +1,21 @@
+{% extends 'sitemngr/base.html' %}
+
+{% block content %}
+
+<center>
+
+<h1>Stats</h1>
+
+<h4>Total number of sites: {{ numSites }}</h4>
+<h4>Total number of wormholes: {{ numWormholes }}</h4>
+<h4>Total number of edits: {{ numEdits }}</h4>
+<h4>Total number of contributors: {{ numContributors }}:</h4>
+<p>
+{% for c in allContributors %}
+    <span class="label label-info">{{ c.name }}</span> <span class="label label-success">{{ c.points }} additions</span><br>
+{% endfor %}
+</p>
+
+</center>
+
+{% endblock %}

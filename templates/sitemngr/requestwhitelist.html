@@ -1,0 +1,23 @@
+{% extends 'sitemngr/base.html' %}
+
+{% block content %}
+
+<center>
+
+<h1>Whitelist Request Form</h1>
+
+<br>
+{% if message %}
+    <div class="message"><p>{{ message }}</p></div><br>
+{% endif %}
+<form action="" method="POST">
+{% csrf_token %}
+    <label>Name:</label><input type="text" name="charname" value="{{ eveigb.charname }}"><br>
+    <label>Character in Alliance:</label><input type="text" name="alliancecharname"><br>
+    <label>Anything you wish to add:</label><textarea name="notes"></textarea><br>
+    <input type="submit" value="Submit">
+</form>
+
+</center>
+
+{% endblock %}

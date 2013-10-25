@@ -1,0 +1,76 @@
+{% extends 'sitemngr/base.html' %}
+
+{% block content %}
+
+<center>
+
+<table>
+    <tr>
+        <th>
+            Site/WH
+        </th>
+        <th>
+            Scan id
+        </th>
+        <th>
+            Date
+        </th>
+        <th>
+            Type
+        </th>
+        <th>
+            Open
+        </th>
+        <th>
+            Closed
+        </th>
+    </tr>
+    {% for s in sites %}
+    <tr>
+        <td>
+            Site
+        </td>
+        <td>
+            <a href="/sitemngr/viewsite/{{ s.pk }}">{{ s.scanid }}</a>
+        </td>
+        <td>
+            {{ s.date|date:'H:i, M d, y' }}
+        </td>
+        <td>
+            {{ s.type }}
+        </td>
+        <td>
+            {{ s.opened }}
+        </td>
+        <td>
+            {{ s.closed }}
+        </td>
+    </tr>
+    {% endfor %}
+    {% for w in wormholes %}
+    <tr>
+        <td>
+            WH
+        </td>
+        <td>
+            <a href="/sitemngr/viewwormhole/{{ w.pk }}">{{ w.scanid }}</a>
+        </td>
+        <td>
+            {{ w.date|date:'H:i, M d, y' }}
+        </td>
+        <td>
+            {{ w.type }}
+        </td>
+        <td>
+            {{ w.opened }}
+        </td>
+        <td>
+            {{ w.closed }}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+</center>
+
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'sitemngr/base.html' %}
+
+{% block content %}
+
+<center>
+
+<h1>IGB Data Collection Test</h1><br><br>
+
+{% if eveigb.is_igb and eveigb.trusted %}
+    <pre>
+    Serverip: {{ eveigb.serverip }}
+    charname: {{ eveigb.charname }}
+    charid: {{ eveigb.charid }}
+    corpname: {{ eveigb.corpname }}
+    corpid: {{ eveigb.corpid }}
+    regionname: {{ eveigb.regionname }}
+    constellationname: {{ eveigb.constellationname }}
+    solarsystemid: {{ eveigb.solarsystemid }}
+    solarsystemname: {{ eveigb.solarsystemname }}
+    shipid: {{ eveigb.shipid }}
+    shipname: {{ eveigb.shipname }}
+    shiptypeid: {{ eveigb.shiptypeid }}
+    shiptypename: {{ eveigb.shiptypename }}
+    corprole: {{ eveigb.corprole }}
+    allianceid: {{ eveigb.allianceid }}
+    stationname: {{ eveigb.stationname }}
+    stationid: {{ eveigb.stationid }}
+    warfactionid: {{ eveigb.warfactionid }}
+    is_on_station: {{ eveigb.is_on_station }}
+    is_factionwarfare: {{ eveigb.is_factionwarfare }}
+    has_alliance: {{ eveigb.has_alliance }}
+    has_corproles: {{ eveigb.has_corproles }}
+    </pre>
+{% else %}
+    <p>Something is not setup correctly on your end.</p>
+{% endif %}
+
+</center>
+
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'sitemngr/base.html' %}
+
+{% block content %}
+
+<center>
+
+<h1>Edit site #{{ site.id }}</h1>
+
+<br>
+{% if message %}
+    <div class="message"><p>{{ message }}</p></div><br>
+{% endif %}
+
+<form action="" method="POST">
+{% csrf_token %}
+    {% include 'sitemngr/siteform.html' %}
+</form>
+
+</center>
+
+{% endblock %}

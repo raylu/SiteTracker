@@ -1,0 +1,126 @@
+{% extends 'sitemngr/base.html' %}
+
+{% block content %}
+
+<center>
+
+<h3>Paste data from your system scanner here:</h3><br>
+<form action="" method="POST">
+{% csrf_token %}
+    <table style="border: none;">
+        <tr style="border: none;">
+            <td>
+                <label><b>System</b>:</label>
+            </td>
+            <td>
+                <input type="text" name="system" value="{{ eveigb.solarsystemname }}">
+            </td>
+        </tr>
+    </table><br>
+    <textarea name="pastedata" rows="20" id="ta_pastedata">{% if raw %}{{ raw }}{% endif %}</textarea><br>
+    <table style="border: none;">
+        <tr style="border: none;">
+            <td>
+                <label><b>After downtime?</b></label>
+            </td>
+            <td>
+                <input type="checkbox" name="downtime">
+            </td>
+        </tr>
+    </table><br>
+    <input type="submit" value="Parse"> 
+</form>
+
+<hr>
+
+<div class="row">
+    <div class="span4">
+        <h5>The following already exist in the database:</h5>
+        {% if present %}
+            <table>
+                <tr>
+                    <th>
+                        Scan ID
+                    </th>
+                    <th>
+                        Link
+                    </th>
+                </tr>
+                {% for p in present %}
+                <tr>
+                    <td>
+                        {{ p.scanid }}
+                    </td>
+                    <td>
+                        <a href="/sitemngr/lookup/{{ p.scanid }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>None</p>
+        {% endif %}
+    </div>
+    <div class="span4">
+        <h5>The following are not in your paste, but<br>are in the database for this system. Please review:</h5>
+        {% if notfound %}
+            <table>
+                <tr>
+                    <th>
+                        Scan ID
+                    </th>
+                    <th>
+                        Edit
+                    </th>
+                </tr>
+                {% for n in notfound %}
+                <tr>
+                    <td>
+                        {{ n.scanid }}
+                    </td>
+                    <td>
+                        <a href="/sitemngr/lookup/{{ n.scanid }}/?system={{ system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>None</p>
+        {% endif %}
+    </div>
+    <div class="span4">
+        <h5>The following are in your paste, but<br>are not in the database. Please add:</h5>
+        {% if findnew %}
+            <table>
+                <tr>
+                    <th>
+                        Scan ID
+                    </th>
+                    <th>
+                        Link to add
+                    </th>
+                </tr>
+                {% for f in findnew %}
+                <tr>
+                    <td>
+                        {{ f.scanid }}
+                    </td>
+                    <td>
+                        {% if f.isSite %}
+                            <a href="/sitemngr/addsite/?scanid={{ f.scanid }}&timenow={{ timenow }}&type={{ f.type }}&name={{ f.name }}&system={{ f.system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
+                        {% else %}
+                            <a href="/sitemngr/addwormhole/?scanid={{ f.scanid }}&timenow={{ timenow }}&system={{ f.system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>None</p>
+        {% endif %}
+    </div>
+</div>
+
+</center>
+
+{% endblock %}

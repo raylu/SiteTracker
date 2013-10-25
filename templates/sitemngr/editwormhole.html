@@ -1,0 +1,21 @@
+{% extends 'sitemngr/base.html' %}
+
+{% block content %}
+
+<center>
+
+<h1>Edit wormhole #{{ wormhole.id }}</h1>
+
+<br>
+{% if message %}
+    <div class="message"><p>{{ message }}</p></div><br>
+{% endif %}
+
+<form action="" method="POST">
+{% csrf_token %}
+    {% include 'sitemngr/wormholeform.html' %}
+</form>
+
+</center>
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'sitemngr/base.html' %}
+
+{% block content %}
+
+<center>
+
+{% if chains %}
+    {% for c in chains %}
+        Name: {{ c.name }}<br>
+        Start: {{ c.start }}<br>
+        End: {{ c.end }}<br>
+        Jumps:<br>
+        {{ c.jumps }}
+    {% endfor %}
+    <hr><br>
+{% endif %}
+
+</center>
+
+{% endblock %}

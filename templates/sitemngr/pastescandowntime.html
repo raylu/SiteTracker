@@ -1,0 +1,108 @@
+{% extends 'sitemngr/base.html' %}
+
+{% block content %}
+
+<center>
+
+{% if info %}
+    {{ info }}<br><br><br>
+{% endif %}
+
+<h3>Downtime ID Change</h3><br>
+
+<div class="row">
+    <div class="span4">
+        <h5>Current Site IDs</h5>
+        {% if sites %}
+            {% for s in sites %}
+                {{ s.scanid }}: {{ s.name }}<br>
+            {% endfor %}
+        {% else %}
+            <p>None</p>
+        {% endif %}
+    </div>
+    <div class="span4">
+        <h5>Current Wormhole IDs</h5>
+        {% if wormholes %}
+            {% for w in wormholes %}
+                {{ w.scanid }}: {{ w.start }} > {{ w.destination }}<br>
+            {% endfor %}
+        {% else %}
+            <p>None</p>
+        {% endif %}
+    </div>
+    <div class="span4">
+        <h5>New IDs</h5>
+        {% if newids %}
+            {% for n in newids %}
+                {{ n }}<br>
+            {% endfor %}
+        {% else %}
+            <p>None</p>
+        {% endif %}
+    </div>
+</div>
+
+<hr>
+
+<h4>Connect the systems!</h4>
+<form action="" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="afterdowntime" value="1">
+    <table>
+        <tr>
+            <th>
+                Old ID
+            </th>
+            <th>
+                New ID
+            </th>
+        </tr>
+        {% if sites %}
+            {% for s in sites %}
+                <tr>
+                    <td>
+                        <input type="text" value="{{ s }}" readonly>
+                    </td>
+                    <td>
+                       <select name="{{ s.scanid }}">
+                            <option>-IGNORE-</option>
+                            {% for n in newids %}
+                                 <option>{{ n }}</option>
+                            {% endfor %}
+                            <option>-CLOSE-</option>
+                        </select>
+                    </td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+        {% if wormholes %}
+            {% for w in wormholes %}
+                <tr>
+                    <td>
+                        <input type="text" value="{{ w.scanid }}" readonly>
+                    </td>
+                    <td>
+                        <select name="{{ w.scanid }}">
+                            <option>-IGNORE-</option>
+                            {% for n in newids %}
+                                 <option>{{ n }}</option>
+                            {% endfor %}
+                            <option>-CLOSE-</option>
+                        </select>
+                    </td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+        <tr>
+            <td>
+                <input type="submit" value="Store">
+            </td>
+            <td></td>
+        </tr>
+    </table>
+</form>
+
+</center>
+
+{% endblock %}

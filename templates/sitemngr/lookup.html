@@ -1,0 +1,18 @@
+{% extends 'sitemngr/base.html' %}
+
+{% block content %}
+
+<center>
+
+<h1>Lookup by Scanid</h1>
+
+<p>Nothing found.</p><br>
+<p>Do you want to <a href="/sitemngr/addsite/">add a site</a> or <a href="/sitemngr/addwormhole/">add a wormhole</a>?</p>
+<br><hr><br>
+<p><b>Note</b>: You can add the GET parameter for system to this url to lookup a site by its scanid.<br>
+<b>Example</b>: <span style="text-decoration: underline; color: blue;">/sitemngr/lookup/ROB/?system=J169456</span> will search for sig with id ROB in system J169456.<br>
+The app defaults to the first sig it finds with the scanid being search for, this is a way to refine your search.</p>
+
+</center>
+
+{% endblock %}

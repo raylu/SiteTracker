@@ -1,0 +1,120 @@
+{% include 'sitemngr/base.html' %}
+
+<center>
+
+{% if able %}
+    <h3>Paste data from your system scanner here:</h3><br>
+    <form action="" method="POST">
+    {% csrf_token %}
+        <table style="border: none;"><tr style="border: none;"><td><label><b>System</b>:</label></td><td><input type="text" name="system" {% if VALUE %}value="{{ VALUE }}"{% endif %}></td></tr></table><br>
+        <textarea name="pastedata" rows="20" id="ta_pastedata">{% if raw %}{{ raw }}{% endif %}</textarea><br>
+        <input type="submit" value="Parse"> 
+    </form>
+    
+    <hr>
+    
+    <h3><u>Results</u></h3>
+    
+    <div class="row">
+        <div class="span4">
+            <h4>Sites:</h4>
+            {% if sites %}
+                <table>
+                    <tr>
+                        <th>
+                            Scan ID
+                        </th>
+                        <th>
+                            Link
+                        </th>
+                        <th>
+                            Still open?
+                        </th>
+                    </tr>
+                    {% for s in sites %}
+                    <tr>
+                        <td>
+                            {{ s.scanid }}
+                        </td>
+                        <td>
+                            <a href="/sitemngr/viewsite/{{ s.id }}">Link</a>
+                        </td>
+                        <td>
+                            {% if s.closed %}False{% else %}True{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p>None</p>
+            {% endif %}
+        </div>
+        <div class="span4">
+            <h4>Wormholes:</h4>
+            {% if wormholes %}
+                <table>
+                    <tr>
+                        <th>
+                            Scan ID
+                        </th>
+                        <th>
+                            Link
+                        </th>
+                        <th>
+                            Still open?
+                        </th>
+                    </tr>
+                    {% for w in wormholes %}
+                    <tr>
+                        <td>
+                            {{ w.scanid }}
+                        </td>
+                        <td>
+                            <a href="/sitemngr/viewwormhole/{{ w.id }}">Link</a>
+                        </td>
+                        <td>
+                            {% if w.closed %}False{% else %}True{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p>None</p>
+            {% endif %}
+        </div>
+        <div class="span4">
+            <h4>Not recorded:</h4>
+            {% if other %}
+                <table>
+                    <tr>
+                        <th>
+                            Scan ID
+                        </th>
+                        <th>
+                            Create
+                        </th>
+                    </tr>
+                    {% for o in other %}
+                    <tr>
+                        <td>
+                            {{ o }}
+                        </td>
+                        <td>
+                            <a href="/sitemngr/add/">Link</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p>None</p>
+            {% endif %}
+        </div>
+    </div>
+        
+{% else %}
+    Viewing form not available.
+{% endif %}
+
+</center>
+
+{% include 'sitemngr/footer.html' %}

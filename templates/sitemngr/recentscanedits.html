@@ -1,0 +1,92 @@
+{% extends 'sitemngr/base.html' %}
+
+{% block content %}
+
+<center>
+
+<h1>Recent scanid Changes</h1>
+
+<div class="row">
+    <div class="span6">
+        <h3>Site</h3>
+        {% if sites %}
+            <table>
+                <tr>
+                    <th>
+                        Scanid
+                    </th>
+                    <th>
+                        Notes
+                    </th>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Location
+                    </th>
+                </tr>
+            {% for s in sites %}
+                <tr>
+                    <td>
+                        <a href="/sitemngr/viewsite/{{ s.id }}">{{ s.scanid }}</a>
+                    </td>
+                    <td>
+                        {{ s.notes }}
+                    </td>
+                    <td>
+                        {{ s.name }}
+                    </td>
+                    <td>
+                        <a href="/sitemngr/system/{{ s.where }}">{{ s.where }}</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </table>
+        {% else %}
+            <p>None</p>
+        {% endif %}
+    </div>
+    <div class="span6">
+        <h3>Wormhole</h3>
+        {% if wormholes %}
+        <table>
+                <tr>
+                    <th>
+                        Scanid
+                    </th>
+                    <th>
+                        Notes
+                    </th>
+                    <th>
+                        Start
+                    </th>
+                    <th>
+                        Destination
+                    </th>
+                </tr>
+            {% for w in wormholes %}
+                <tr>
+                    <td>
+                        <a href="/sitemngr/viewwormhole/{{ w.id }}">{{ w.scanid }}</a>
+                    </td>
+                    <td>
+                        {{ w.notes }}
+                    </td>
+                    <td>
+                        <a href="/sitemngr/system/{{ w.start }}">{{ w.start }}</a>
+                    </td>
+                    <td>
+                        <a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </table>
+        {% else %}
+            <p>None</p>
+        {% endif %}
+    </div>
+</div>
+
+</center>
+
+{% endblock %}

@@ -1,0 +1,93 @@
+<table>
+    <!-- Wormhole: creator, date, type, start, destination, time, status, opened, closed, notes -->
+    <tr>
+        <td>
+            <label>Creator:</label>
+        </td>
+        <td>
+            <input type="text" name="creator" value="{% if wormhole %}{{ wormhole.creator }}{% elif isForm %}{{ eveigb.charname }}{% endif %}" readonly>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>Date:</label>
+        </td>
+        <td>
+            <input type="text" name="date" value="{% if wormhole %}{{ wormhole.date|date:'H:i, M d, y' }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>Scan ID:</label>
+        </td>
+        <td>
+            <input type="text" name="scanid" value="{% if wormhole %}{{ wormhole.scanid }}{% elif g_scanid %}{{ g_scanid }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>Started in:</label>
+        </td>
+        <td>
+            <input type="text" name="start" value="{% if wormhole %}{{ wormhole.start }}{% elif g_system %}{{ g_system }}{% else %}{{ eveigb.solarsystemname }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>Leads to:</label>
+        </td>
+        <td>
+            <input type="text" name="destination" value="{% if wormhole %}{{ wormhole.destination }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>Last updated:</label>
+        </td>
+        <td>
+            <input type="text" name="time" value="{% if wormhole %}{{ wormhole.time }}{% elif timenow %}{{ timenow }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>Status at time above:</label>
+        </td>
+        <td>
+            <input type="text" name="status" value="{% if wormhole %}{{ wormhole.status }}{% else %}Fresh{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>Has the wormhole been opened:</label>
+        </td>
+        <td>
+            <input type="checkbox" name="opened" {% if wormhole and wormhole.opened %}checked="checked"{% endif %} {% if not isForm %}disabled="disabled"{% endif %}>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>Has the wormhole closed:</label>
+        </td>
+        <td>
+            <input type="checkbox" name="closed" {% if wormhole and wormhole.closed %}checked="checked"{% endif %} {% if not isForm %}disabled="disabled"{% endif %}>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>Notes:</label>
+        </td>
+        <td>
+            <textarea name="notes"{% if isForm %}{% else %} readonly{% endif %}>{% if wormhole %}{{ wormhole.notes }}{% endif %}</textarea>
+        </td>
+    </tr>
+    {% if isForm %}
+    <tr>
+        <td>
+            <label>{% if finish_msg %}{{ finish_msg }}{% endif %}</label>
+        </td>
+        <td>
+            <input type="submit" value="Store" />
+        </td>
+    </tr>
+    {% endif %}
+</table>

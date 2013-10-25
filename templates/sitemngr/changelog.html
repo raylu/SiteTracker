@@ -1,0 +1,76 @@
+{% extends 'sitemngr/base.html' %}
+
+{% block content %}
+
+<h1>Changelog</h1>
+
+<br><br>
+
+<h4>October 12, 2013</h4>
+<ul>
+	<li>Reordered model __unicode__ return strings to improve functionality of paste page </li>
+</ul>
+
+<h4>August 16, 2013</h4>
+<ul>
+    <li>Downtime paste page now shows more info about the scanids being changed</li>
+</ul>
+
+<h4>August 15, 2013</h4>
+<ul>
+    <li>Players can now request access for their out-of-alliance characters</li>
+</ul>
+
+<h4>August 13, 2013</h4>
+<ul>
+    <li>New 'no access' page for restricted viewing</li>
+    <li>Checkboxes are now disabled on viewing pages</li>
+    <li>Wormhol.es link on system page</li>
+    <li>Highlights the user's current system on the system overview and checkkills pages, if present</li>
+    <li>New settings page for users to customize their access</li>
+</ul>
+
+<h4>August 7, 2013</h4>
+<ul>
+    <li>New stats page</li>
+</ul>
+
+<h4>August 6, 2013</h4>
+<ul>
+    <li>Unopened sites section added to system overview page</li>
+    <li>IGNORE option for downtime scanning</li>
+    <li>CLOSE and IGNORE changed to -CLOSE- and -IGNORE- (respectively) to stand out better</li>
+    <li>ScanIDs in closedwormholes on system overview are now links to their respective edit pages</li>
+	<li>Editing a sig's scanid appends that change to its notes section</li>
+    <li>New page for viewing recent scanid changes</li>
+</ul>
+
+<h4>August 1, 2013</h4>
+<ul>
+    <li>CLOSE option added to downtime paste page to allow quickly marking a site as despawned from overnight</li>
+</ul>
+
+<h4>July 31, 2013</h4>
+<ul>
+    <li>Bootstrap responsive JS disabled</li>
+    <li>'Present' category on paste page works properly now</li>
+    <li>Open sites added to system overview page</li>
+    <li>Downtime support</li>
+</ul>
+
+<h4>July 30, 2013</h4>
+<ul>
+    <li>Wormhole type field hidden due to not being used in the alliance</li>
+    <li>On the system page looking at a w-space system, the wormhole's class is listed</li>
+    <li>New kill check page that checks all connected systems for kills in the last hour</li>
+</ul>
+
+<h4>July 29, 2013</h4>
+<ul>
+    <li>Changelog page</li>
+    <li>Nav menu has been moved to the top bar in the form of a dropdown menu</li>
+    <li>Edit links now open into new tabs in the browser</li>
+    <li>True/False testboxes are now checkboxes</li>
+</ul>
+
+{% endblock %}

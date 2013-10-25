@@ -1,0 +1,56 @@
+{% extends 'sitemngr/base.html' %}
+
+{% block content %}
+
+<center>
+
+<h1>Kill Check</h1>
+
+<br>
+
+<h4>For every system with an open wormhole,
+<br>the following systems are hot in the last hour:</h4>
+
+<p><b>Note</b> that this page takes a long time to load. Sorry. Also, if a system shows here<br>
+but doesn't list any ship or pod kills, then it's npc kills.</p>
+
+{% if reports %}
+    <table>
+        <tr>
+            <th>
+                SystemName
+            </th>
+            <th>
+                SystemID
+            </th>
+            <th>
+                Ship
+            </th>
+            <th>
+                Pod
+            </th>
+        </tr>
+        {% for r in reports %}
+        <tr>
+            <td>
+                {% if r.system == eveigb.solarsystemname %}<strong>Current system: {{ r.system }}</strong>{% else %}{{ r.system }}{% endif %}
+            </td>
+            <td>
+                {{ r.systemid }}
+            </td>
+            <td>
+                {{ r.ship }}
+            </td>
+            <td>
+                {{ r.pod }}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    None, looks quiet from here.
+{% endif %}
+
+</center>
+
+{% endblock %}

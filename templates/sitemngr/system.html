@@ -1,0 +1,191 @@
+{% extends 'sitemngr/base.html' %}
+
+{% block content %}
+
+<center>
+
+<h1>System info: {{ system }}{% if class %}, Class {{ class }}{% endif %}</h1>
+
+<h5><a href="http://wormhol.es/{{ system }}">Wormhol.es page</a></h5>
+
+<hr>
+
+<h3>Currently open Wormholes</h3>
+{% if openwormholes %}
+    <table>
+        <tr>
+            <th>
+                Scan id
+            </th>
+            <th>
+                Date entered
+            </th>
+            <th>
+                Last updated
+            </th>
+            <th>
+                From
+            </th>
+            <th>
+                Leads to
+            </th>
+        </tr>
+        {% for w in openwormholes %}
+			{% if w.opened %}
+			<tr class="open">
+			{% else %}
+			<tr class="closed">
+			{% endif %}
+                <td>
+                    <a href="/sitemngr/viewwormhole/{{ w.id }}">{{ w.scanid }}</a>
+                </td>
+                <td>
+                    {{ w.date|date:'H:i, M d, y' }}
+                </td>
+                <td>
+                    {{ w.time }}
+                </td>
+                <td>
+                    {% if system == w.start %}
+                       <i>{{ w.start }}</i>
+                    {% else %}
+                        <a href="/sitemngr/system/{{ w.start }}">{{ w.start }}</a>
+                    {% endif %}
+                </td>
+                <td>
+                {% if system == w.destination %}
+                        <i>{{ w.destination }}</i>
+                    {% else %}
+                        <a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>None</p>
+{% endif %}
+
+<br><hr>
+
+<h3>Currently open Sites</h3>
+{% if opensites %}
+    <table>
+        <tr>
+            <th>
+                Scan id
+            </th>
+            <th>
+                Date entered
+            </th>
+            <th>
+                Name
+            </th>
+        </tr>
+        {% for s in opensites %}
+			{% if s.isAnom %}
+			<tr class="anom">
+			{% elif s.opened %}
+			<tr class="open">
+			{% else %}
+			<tr class="closed">
+			{% endif %}
+                <td>
+                    <a href="/sitemngr/viewsite/{{ s.id }}">{{ s.scanid }}</a>
+                </td>
+                <td>
+                    {{ s.date|date:'H:i, M d, y' }}
+                </td>
+                <td>
+                    {{ s.name }}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>None</p>
+{% endif %}
+
+<br><hr>
+
+<h3>Unopened Sites</h3>
+{% if unopenedsites %}
+    <table>
+        <tr>
+            <th>
+                Scan id
+            </th>
+            <th>
+                Date entered
+            </th>
+            <th>
+                Name
+            </th>
+        </tr>
+        {% for s in unopenedsites %}
+			{% if s.isAnom %}
+			<tr class="anom">
+			{% elif s.opened %}
+			<tr class="open">
+			{% else %}
+			<tr class="closed">
+			{% endif %}
+                <td>
+                    <a href="/sitemngr/viewsite/{{ s.id }}">{{ s.scanid }}</a>
+                </td>
+                <td>
+                    {{ s.date|date:'H:i, M d, y' }}
+                </td>
+                <td>
+                    {{ s.name }}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>None</p>
+{% endif %}
+
+<br><hr>
+
+<h3>Closed wormholes in this system</h3>
+{% if closedwormholes %}
+    <table>
+        <tr>
+        <th>
+            Scan id
+        </th>
+        <th>
+            Date entered
+        </th>
+        <th>
+            Last updated
+        </th>
+        <th>
+            Leads to
+        </th>
+    </tr>
+    {% for w in closedwormholes %}
+        <tr>
+            <td>
+                <a href="/sitemngr/editwormhole/{{ w.id }}/">{{ w.scanid }}</a>
+            </td>
+            <td>
+                {{ w.date|date:'H:i, M d, y' }}
+            </td>
+            <td>
+                {{ w.time }}
+            </td>
+            <td>
+                <a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </table>
+{% else %}
+    <p>None</p>
+{% endif %}
+
+</center>
+
+{% endblock %}
