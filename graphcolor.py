@@ -3,6 +3,10 @@ from sitemngr.models import Wormhole
 from eve_db.models import MapSolarSystem
 from pygraphviz import *
 import httplib2
+from time import sleep
+from datetime import datetime
+import os
+import shutil
 
 cmap = {}
 cmap['HS'] = 'gold'
@@ -25,7 +29,7 @@ def get_color(system_name):
 		return 'black'
 	status = system.security_level
 	if status > 0.5:
-		return lmap['HS']
+		return cmap['HS']
 	elif status > 0.1:
 		return cmap['LS']
 	else:
@@ -57,3 +61,13 @@ def graph():
 		g.add_edge(w.start, w.destination)
 	g.layout()
 	g.draw('graph.png')
+
+def repeat():
+	file = os.path.join(os.getcwd() + '/graph.png')
+	destination = os.path.join(os.getcwd() + '/sitemngr/static/pictures/graph.png')
+	while 1:
+		graph()
+		sleep(5)
+		shutil.move(file, destination)
+		print 'Graphed and moved', datetime.now().strftime('%m/%d/%Y %H:%M:%S')
+		sleep(60*5)
