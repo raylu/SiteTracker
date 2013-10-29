@@ -1,4 +1,5 @@
 {% extends 'sitemngr/base.html' %}
+{% load staticfiles %}
 
 {% block content %}
 
@@ -11,6 +12,8 @@
         {% endfor %}
     </div>
 {% endif %}
+
+<img src="{% static 'pictures/graph.png' %}" alt="Current graph not found"></img>
 
 <h5><a href="/sitemngr/system/J132814">Nexus System Page</a></h5>
 

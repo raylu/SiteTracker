@@ -25,7 +25,7 @@ def index(request, note=None):
         return noaccess(request)
     sites = Site.objects.filter(closed=False)
     wormholes = Wormhole.objects.filter(closed=False)
-    notices = ['Open ids are green, closed are red. Anoms are all light blue, regardless.']
+    notices = ['New graphing feature  - updated every 5 minutes automatically.', 'Graph color scheme complete, see help page for full info.']
     if note and note is not None:
         notices.append(note)
     return render(request, 'sitemngr/index.html', {'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': getSettings(eveigb.charname).editsInNewTabs})
