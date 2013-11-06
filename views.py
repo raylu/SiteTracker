@@ -20,9 +20,9 @@ from eveigb import IGBHeaderParser
 import datetime
 import re
 import urllib2
-import evelink
 
-# Evelink setup
+# Evelink
+import evelink
 eve = evelink.eve.EVE()
 eveapi = evelink.api.API()
 evemap = evelink.map.Map(api=eveapi)
@@ -352,8 +352,10 @@ def paste(request):
     now = datetime.datetime.now()
     if request.method == 'POST':
         post = request.POST
+        # ====================================
+        # TODO: See suggestions
         if post.has_key('downtime') and post['downtime']:
-            # After paste and checking after downtime checkbox
+            # After paste and checking after downtime checkbox - prepare data for user to make changes after downtime
             sites = []
             wormholes = []
             newids = []
@@ -373,9 +375,12 @@ def paste(request):
                         newids.append(section[:3].upper())
             return render(request, 'sitemngr/pastescandowntime.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes,
                            'newids': newids, 'newTab': getSettings(eveigb.charname).editsInNewTabs})
+        # ====================================
         elif post.has_key('afterdowntime') and post['afterdowntime']:
             # After downtime paste page after submitting database changes
             for k, v in post.iteritems():
+                if ' ' in k:
+                    k = k.split(' ')[0]
                 if k == 'csrfmiddlewaretoken' or k == 'afterdowntime':
                     continue
                 if v == '-IGNORE-':
@@ -414,9 +419,10 @@ def paste(request):
                                      changedStart=False, changedDestination=False, changedTime=False, changedStatus=False,
                                      changedOpened=False, changedClosed=False, changedNotes=False)
                         change.save()
-            return index(request)
+            return index(request, note='%s %s' % (k, v))
         else:
             # Parse data to return to normal paste page
+            # TODO: Would like to move the bulk of the parsing code to a separate method
             siteTypes = ['Unstable Wormhole', 'Anomaly', 'Ore Site', 'Relic Site', 'Data Site', 'Gas Site', 'Cosmic Signature']
             present = []
             findnew = []
@@ -649,8 +655,8 @@ def stats(request):
     numContributors = len(con)
     conList = []
     con = sorted(con.items(), key=lambda kv: kv[1])
-    for a, b in con:
-        conList.append(Contributor(a, b))
+    for name, count in con:
+        conList.append(Contributor(name, count))
     return render(request, 'sitemngr/stats.html', {'displayname': get_display_name(eveigb, request), 'numSites': numSites,
                'numWormholes': numWormholes, 'numEdits': numEdits, 'numContributors': numContributors, 'allContributors': conList})
 
@@ -792,7 +798,7 @@ def get_display_name(eveigb, request):
 def canView(igb, request=None):
     """
         Returns True if the user can view that page by testing
-        if they are using the EVE IGB (Trusted mode) and in the appropriate alliance
+            if they are using the EVE IGB (Trusted mode) and in the appropriate alliance
     """
     if request is not None:
         if request.user is not None:
@@ -810,7 +816,7 @@ def canView(igb, request=None):
 def canViewWrongAlliance(igb):
     """
         Returns True if the user can view that page by testing
-        if they are using the EVE IGB (Trusted mode), but does not check alliance
+            if they are using the EVE IGB (Trusted mode), but does not check alliance
     """
     return igb is not None and igb.is_igb and igb.trusted
 
