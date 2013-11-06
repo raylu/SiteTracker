@@ -32,7 +32,10 @@ def index(request, note=None):
     return render(request, 'sitemngr/index.html', {'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': getSettings(eveigb.charname).editsInNewTabs, 'flag': note})
 
 def viewall(request):
-    """ View all closed sites """
+    """
+        View all closed sites
+        Index page, but with the closed objects instead of the open
+    """
     eveigb = IGBHeaderParser(request)
     if not canView(eveigb, request):
         return noaccess(request)
@@ -41,7 +44,10 @@ def viewall(request):
     return render(request, 'sitemngr/index.html', {'sites': sites, 'wormholes': wormholes, 'status': 'closed'})
 
 def add(request):
-    """ 'Landing' page for adding to the database """
+    """
+        Landing page for adding to the database - only used for clarification from
+            the user after using the paste page
+    """
     eveigb = IGBHeaderParser(request)
     if not canView(eveigb, request):
         return noaccess(request)
@@ -327,9 +333,8 @@ def addwormhole(request):
     return render(request, 'sitemngr/addwormhole.html', {
                  'isForm': True, 'finish_msg': 'Store new wormhole into the database:', 'g_scanid': g_scanid, 'g_system': g_system, 'g_name': g_name, 'timenow': now.strftime('%m/%d @ %H:%M')})
 
-
 # ==============================
-#     Automated functions
+#     Pastes
 # ==============================
 
 def paste(request):
@@ -466,6 +471,11 @@ def paste(request):
     # Base request - show the base pastescan page
     return render(request, 'sitemngr/pastescan.html', {'timenow': now, 'newTab': getSettings(eveigb.charname).editsInNewTabs})
 
+
+# ==============================
+#     Systems
+# ==============================
+
 def systemlanding(request):
     """ Return a list of a systems with active sites """
     eveigb = IGBHeaderParser(request)
@@ -509,6 +519,11 @@ def system(request, systemid):
     return render(request, 'sitemngr/system.html', {'system': systemid, 'openwormholes': openwormholes, 'closedwormholes': closedwormholes,
                             'class': clazz, 'headers': headers, 'opensites': opensites, 'unopenedsites': unopenedsites})
 
+
+# ==============================
+#     Reference lookup
+# ==============================
+
 def lookup(request, scanid):
     """ Lookup page for finding sites and wormholes by their scanid """
     eveigb = IGBHeaderParser(request)
@@ -544,102 +559,18 @@ def mastertable(request):
     wormholes = Wormhole.objects.all()
     return render(request, 'sitemngr/mastertable.html', {'sites': sites, 'wormholes': wormholes})
 
+
+# ==============================
+#     Data
+# ==============================
+
 def changelog(request):
     """ Site changelog """
     return render(request, 'sitemngr/changelog.html')
 
-def settings(request):
-    """ Settings page for viewing and changing user settings """
-    """ TODO: This page only works for in-game browser character settings """
-    eveigb = IGBHeaderParser(request)
-    if not canView(eveigb):
-        return noaccess(request)
-    message = None
-    try:
-        s = Settings.objects.get(user=eveigb.charname)
-    except Settings.DoesNotExist:
-        s = Settings(user=eveigb.charname, editsInNewTabs=True, storeMultiple=True)
-        s.save()
-    if request.method == 'POST':
-        p = request.POST
-        edit = False
-        store = False
-        if 'edit' in p:
-            edit = True
-        if 'store' in p:
-            store = True
-        s.editsInNewTabs = edit
-        s.storeMultiple = store
-        s.save()
-        message = 'Settings saved.'
-    edit = s.editsInNewTabs
-    store = s.storeMultiple
-    return render(request, 'sitemngr/settings.html', {'edit': edit, 'store': store, 'message': message})
-
-# ==============================
-#     IGB Data Test
-# ==============================
-
 def igbtest(request):
     """ Show all data that the in-game browser can send to a Trusted Site """
     return render(request, 'sitemngr/igbtest.html')
-
-# ==============================
-#     Output
-# ==============================
-
-def noaccess(request):
-    """ Shown when the viewer is restricted from viewing the page """
-    eveigb = IGBHeaderParser(request)
-    wrongAlliance = canViewWrongAlliance(eveigb)
-    return render(request, 'sitemngr/noaccess.html', {'wrongAlliance': wrongAlliance})
-
-def output(request):
-    """ Output current wormholes to text2mindmap format and for the channel MotD """
-    eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
-    wormholes = Wormhole.objects.filter(closed=False, start=appSettings.HOME_SYSTEM)
-    mm = str(appSettings.HOME_SYSTEM)
-    motd = str(appSettings.HOME_SYSTEM) + ' Intel Channel\n\nWormholes:\n'
-    for w in wormholes:
-        mm += w.printOutT2MM() + '\n'
-        motd += w.printOut() + '\n'
-    motd += '\nSignatures:\n'
-    for s in Site.objects.filter(closed=False, where=str(appSettings.HOME_SYSTEM)):
-        motd += s.printOut() + '\n'
-    return render(request, 'sitemngr/output.html', {'mm': mm, 'motd': motd})
-
-def checkkills(request):
-    """ Returns a readout of all ship and pod kills in and system with open sigs """
-    eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
-    reports = []
-    systems = []
-    for w in Wormhole.objects.filter(closed=False):
-        if w.start not in systems:
-            systems.append(w.start)
-        if w.destination not in systems:
-            systems.append(w.destination)
-    if len(systems) > 0:
-        retSys = []
-        for s in systems:
-            retSys.append(getSystemID(s))
-        kills = evemap.kills_by_system()[0]
-        for k in kills.iteritems():
-            if k[0] in retSys:
-                r = KillReport(system=getSystemName(k[0]), systemid=k[0], ship=k[1]['ship'], pod=k[1]['pod'])
-                reports.append(r)
-    return render(request, 'sitemngr/checkkills.html', {'systems': systems, 'reports': reports})
-
-def getSystemName(systemid):
-    """ Returns the common name for the system from the Eve API's systemid representation """
-    return eve.character_name_from_id(systemid)
-
-def getSystemID(systemname):
-    """ Returns the systemid for use in the Eve API corresponding to the systemname """
-    return eve.character_id_from_name(systemname)
 
 def recentscanedits(request):
     """ Returns a readout of all recent scanid changes """
@@ -661,9 +592,26 @@ def recentscanedits(request):
         if count == 21:
             break
     return render(request, 'sitemngr/recentscanedits.html', {'sites': sites, 'wormholes': wormholes})
+# ==============================
+#     Output
+# ==============================
+
+def output(request):
+    """ Output current data for the channel MotD """
+    eveigb = IGBHeaderParser(request)
+    if not canView(eveigb, request):
+        return noaccess(request)
+    wormholes = Wormhole.objects.filter(closed=False, start=appSettings.HOME_SYSTEM)
+    motd = str(appSettings.HOME_SYSTEM) + ' Intel Channel\n\nWormholes:\n'
+    for w in wormholes:
+        motd += w.printOut() + '\n'
+    motd += '\nSignatures:\n'
+    for s in Site.objects.filter(closed=False, where=str(appSettings.HOME_SYSTEM)):
+        motd += s.printOut() + '\n'
+    return render(request, 'sitemngr/output.html', {'motd': motd})
 
 def stats(request):
-    """ Returns some usage statistics """
+    """ Returns usage statistics """
     eveigb = IGBHeaderParser(request)
     if not canView(eveigb, request):
         return noaccess(request)
@@ -699,13 +647,40 @@ def stats(request):
     return render(request, 'sitemngr/stats.html', {'numSites': numSites,
                'numWormholes': numWormholes, 'numEdits': numEdits, 'numContributors': numContributors, 'allContributors': conList})
 
-class Contributor:
-    def __init__(self, name, points):
-        self.name = name
-        self.points = points
+def checkkills(request):
+    """ Returns a readout of all ship and pod kills in and system with open objects """
+    eveigb = IGBHeaderParser(request)
+    if not canView(eveigb, request):
+        return noaccess(request)
+    reports = []
+    systems = []
+    for w in Wormhole.objects.filter(closed=False):
+        if w.start not in systems:
+            systems.append(w.start)
+        if w.destination not in systems:
+            systems.append(w.destination)
+    if len(systems) > 0:
+        retSys = []
+        for s in systems:
+            retSys.append(getSystemID(s))
+        kills = evemap.kills_by_system()[0]
+        for k in kills.iteritems():
+            if k[0] in retSys:
+                r = KillReport(system=getSystemName(k[0]), systemid=k[0], ship=k[1]['ship'], pod=k[1]['pod'])
+                reports.append(r)
+    return render(request, 'sitemngr/checkkills.html', {'systems': systems, 'reports': reports})
+
+def viewhelp(request):
+    """ Help/instructions page """
+    eveigb = IGBHeaderParser(request)
+    return render(request, 'sitemngr/help.html', {'able': canView(eveigb, request)})
+
+# ==============================
+#     Accounts
+# ==============================
 
 def login_page(request):
-    """  """
+    """ A standard User login page """
     if request.method == 'POST':
         p = request.POST
         if p['username'] and p['password']:
@@ -721,9 +696,12 @@ def login_page(request):
     return render(request, 'sitemngr/login.html')
 
 def create_account(request):
-    """  """
+    """
+        Create an account on the server
+        Must be done from the in-game browser
+    """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
+    if not canView(eveigb):
         return noaccess(request)
     if User.objects.get(username__exact=eveigb.charname):
         return index(request, 'You already have an account on this server.')
@@ -735,18 +713,56 @@ def create_account(request):
             return index(request, 'Successfully created account on the server.')
     return index(request)
 
-# ==============================
-#     Help
-# ==============================
-
-def viewhelp(request):
-    """ Help/instructions page """
+def settings(request):
+    """ Settings page for viewing and changing user settings """
+    # TODO: This page only works for in-game browser character settings
     eveigb = IGBHeaderParser(request)
-    return render(request, 'sitemngr/help.html', {'able': canView(eveigb, request)})
+    if not canView(eveigb):
+        return noaccess(request)
+    message = None
+    try:
+        s = Settings.objects.get(user=eveigb.charname)
+    except Settings.DoesNotExist:
+        s = Settings(user=eveigb.charname, editsInNewTabs=True, storeMultiple=True)
+        s.save()
+    if request.method == 'POST':
+        p = request.POST
+        edit = False
+        store = False
+        if 'edit' in p:
+            edit = True
+        if 'store' in p:
+            store = True
+        s.editsInNewTabs = edit
+        s.storeMultiple = store
+        s.save()
+        message = 'Settings saved.'
+    edit = s.editsInNewTabs
+    store = s.storeMultiple
+    return render(request, 'sitemngr/settings.html', {'edit': edit, 'store': store, 'message': message})
 
 # ==============================
 #     Util
 # ==============================
+
+def getSystemName(systemid):
+    """ Returns the common name for the system from the Eve API's systemid representation """
+    return eve.character_name_from_id(systemid)
+
+def getSystemID(systemname):
+    """ Returns the systemid for use in the Eve API corresponding to the systemname """
+    return eve.character_id_from_name(systemname)
+
+class Contributor:
+    def __init__(self, name, points):
+        self.name = name
+        self.points = points
+
+def noaccess(request):
+    """ Shown when the viewer is restricted from viewing the page """
+    eveigb = IGBHeaderParser(request)
+    wrongAlliance = canViewWrongAlliance(eveigb)
+    return render(request, 'sitemngr/noaccess.html', {'wrongAlliance': wrongAlliance})
 
 def getBoolean(s):
     """ Returns True if the string represents a boolean equalling True """
