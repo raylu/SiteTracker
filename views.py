@@ -1,14 +1,19 @@
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from sitemngr.models import (
                              Site, SiteChange,
                              Wormhole, WormholeChange,
                              Chain, PasteData,
-                             Whitelisted, Settings,
-                             KillReport)
+                             Whitelisted, UpdateData,
+                             Settings, KillReport)
 from eveigb import IGBHeaderParser
 import datetime, re, httplib2
 import evelink
 import settings as appSettings
+from bs4 import BeautifulSoup as BSoup
+import urllib2
+from eve_db.models import InvType
 
 eve = evelink.eve.EVE()
 eveapi = evelink.api.API()
@@ -25,10 +30,10 @@ def index(request, note=None):
         return noaccess(request)
     sites = Site.objects.filter(closed=False)
     wormholes = Wormhole.objects.filter(closed=False)
-    notices = ['New graphing feature  - updated every 5 minutes automatically.', 'Graph color scheme complete, see help page for full info.']
+    notices = ['See the stats page for a pretty graph of all-time edit counts.']
     if note and note is not None:
         notices.append(note)
-    return render(request, 'sitemngr/index.html', {'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': getSettings(eveigb.charname).editsInNewTabs})
+    return render(request, 'sitemngr/index.html', {'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': getSettings(eveigb.charname).editsInNewTabs, 'flag': note})
 
 def viewall(request):
     """ View all closed sites """
@@ -259,10 +264,13 @@ def editwormhole(request, wormholeid):
             if appendNotes is not None:
                 wormhole.notes += appendNotes
             wormhole.save()
-            changed = WormholeChange(wormhole=wormhole, user=eveigb.charname, date=now, changedScanid=changedScanid, changedType=False,
+			# @Test
+            changed = WormholeChange(wormhole=wormhole, user=eveigb.charname if eveigb.charname is not '' else request.user.username, date=now, changedScanid=changedScanid, changedType=False,
                                  changedStart=changedStart, changedDestination=changedDestination, changedTime=changedTime, changedStatus=changedStatus,
                                  changedOpened=changedOpened, changedClosed=changedClosed, changedNotes=changedNotes)
             changed.save()
+            # upData = UpdateData(notes='')
+            # upData.save()
         return index(request)
     return render(request, 'sitemngr/viewwormhole.html', {'isForm': True,
           'wormhole': wormhole, 'finish_msg': 'Store changes back into the database'})
@@ -305,6 +313,8 @@ def addwormhole(request):
         wormhole = Wormhole(creator=eveigb.charname, date=now, scanid=s_scanid, type='null', start=s_start, destination=s_destination,
                             time=s_time, status=s_status, opened=s_opened, closed=s_closed, notes=s_notes)
         wormhole.save()
+        # upData = UpdateData(notes='')
+        # upData.save()
         if getSettings(eveigb.charname).storeMultiple:
             return render(request, 'sitemngr/addwormhole.html', {
                     'isForm': True, 'message': 'Successfully stored the data into the database.', 'finish_msg': 'Store new site into database:', 'timenow': now.strftime('%m/%d @ %H:%M')})
@@ -719,6 +729,55 @@ class Contributor:
     def __init__(self, name, points):
         self.name = name
         self.points = points
+
+def item_price(request):
+	""" Landing page for items """
+	return render(request, 'sitemngr/item_price.html')
+
+def item_price_actual(request, item_name):
+	""" Get eve-central Jita price for an item name """
+	item_name = item_name.replace(' ', '_')
+	url = 'http://api.eve-central.com/api/marketstat?usesystem=30000142&typeid=%s' % get_item_id(item_name)
+	soup = BSoup(urllib2.urlopen(url).read())
+	return soup.evec_api.marketstat.type.buy.avg.string
+
+def get_item_id(item_name):
+	""" Item id from item name """
+	try:
+		InvType.objects.get(name=item_name).id
+	except InvType.DoesNotExist:
+		return -1
+
+def login_page(request):
+    """  """
+    if request.method == 'POST':
+        p = request.POST
+        if p['username'] and p['password']:
+            user = authenticate(username=p['username'], password=p['password'])
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    return index(request, 'Successfully logged in')
+                else:
+                    return index(request, 'This account is disabled')
+            else:
+                return index(requet, 'An error occurred when logging in')
+    return render(request, 'sitemngr/login.html')
+
+def create_account(request):
+    """  """
+    eveigb = IGBHeaderParser(request)
+    if not canView(eveigb):
+        return noaccess(request)
+    if User.objects.get(username__exact=eveigb.charname):
+        return index(request, 'You already have an account on this server.')
+    if request.method == 'POST':
+        p = request.POST
+        if p['password']:
+            user = User.objects.create_user(username=eveigb.charname, password=p['password'])
+            user.save()
+            return index(request, 'Successfully created account on the server.')
+    return index(request)
 
 # ==============================
 #     Help

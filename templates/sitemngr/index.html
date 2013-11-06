@@ -1,9 +1,24 @@
 {% extends 'sitemngr/base.html' %}
 {% load staticfiles %}
 
+{% block javascript %}
+<script>
+	$(document).ready(function()
+	{
+		$('#graph').hide();
+	});
+</script>
+{% endblock %}
+
 {% block content %}
 
 <center>
+
+{% if flag %}
+    <div class="message">
+		{{ flag }}<br>
+    </div>
+{% endif %}
 
 {% if notices %}
     <div class="message">
@@ -13,7 +28,11 @@
     </div>
 {% endif %}
 
-<img src="{% static 'pictures/graph.png' %}" alt="Current graph not found"></img>
+<br>
+<button onclick="$('#graph').toggle();">Toggle graph</button>
+<div id="graph" style="border: 1px solid gray;">
+	<img src="{% static 'pictures/graph.png' %}" alt="Current graph not found"></img>
+</div>
 
 <h5><a href="/sitemngr/system/J132814">Nexus System Page</a></h5>
 

@@ -1,0 +1,30 @@
+{% extends 'sitemngr/base.html' %}
+
+{% block javascript %}
+<script type="text/javascript">
+	function fetchPrice() {
+		// $('#price_out').val('Ha!');
+		alert($('#iname').text());
+	}
+</script>
+{% endblock %}
+
+{% block content %}
+
+<center>
+
+<input type="text" id="iname" value="Celeo">
+
+<br>
+
+<button onclick="fetchPrice();">Fetch</button>
+
+<br>
+
+<!-- <textarea name="price_out">Price</textarea> -->
+
+<div id="price_out"></div>
+
+</center>
+
+{% endblock %}

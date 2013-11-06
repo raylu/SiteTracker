@@ -154,6 +154,10 @@ class Whitelisted(models.Model):
     active = models.BooleanField(default=False)
     notes = models.TextField(blank=True, null=True)
 
+class UpdateData(models.Model):
+	""" Should update graphs? """
+	note = models.TextField(blank=True, null=True)
+
 # ========================
 
 class PasteData:

@@ -26,6 +26,9 @@
             var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
         })();
     </script>
+	<script src="{% static 'bootstrap/js/jquery.js' %}"></script>
+	<script src="{% static 'bootstrap/js/bootstrap-dropdown.js' %}"></script>
+	<script src="{% static 'bootstrap/js/bootstrap-tooltip.js' %}"></script>
     {% block javascript %}{% endblock %}
     {% block extraHead %}{% endblock %}
 </head>
@@ -54,7 +57,6 @@
                         <li><a href="/sitemngr/paste">Paste scan data</a></li>
                         <li><a href="/sitemngr/output">Output current data</a></li>
                         <li><a href="/sitemngr/system">Browse by system</a></li>
-                        <!-- <li><a href="/sitemngr/chains">Planned routes</a></li> -->
                         <li class="divider"></li>
                         <li class="nav-header">Extra Features</li>
                         <li><a href="/sitemngr/checkkills">Check kills in connected systems</a></li>
@@ -69,15 +71,15 @@
                         <li><a href="http://auth.talkinlocal.org/">Back to TIL</a></li>
                         <li><a href="http://www.ellatha.com/eve/wormholelist.asp">Wormhole Types</a></li>
                         <li><a href="http://wormhol.es/">Wormhol.es</a></li>
-                        <!-- <li><a href="https://github.com/Celeo/SiteManager">Site code</a></li> -->
                     </ul>
                     <li><a href="/sitemngr/settings/">User Settings</a></li>
+					<li><a href="/sitemngr/login/">Login</a></li>
                 </ul>
                 <ul class="nav pull-right">
                     {% if eveigb.is_igb and eveigb.trusted %}
                         <li><a>Welcome, {{ eveigb.charname }}</a></li>
                     {% else %}
-                        <li><a onclick="CCPEVE.requestTrust('http://tracker.talkinlocal.org/sitemngr/*');">Click here to 'Trust' site for viewing access.</a></li>
+                        <li><a onclick="CCPEVE.requestTrust('http://tracker.talkinlocal.org/sitemngr/*');">Click to trust</a></li>
                     {% endif %}
                 </ul>
             </div>
@@ -98,9 +100,6 @@
 </footer>
 
 </div>
-<script src="{% static 'bootstrap/js/jquery.js' %}"></script>
-<script src="{% static 'bootstrap/js/bootstrap-dropdown.js' %}"></script>
-<script src="{% static 'bootstrap/js/bootstrap-tooltip.js' %}"></script>
 {% block loadLaterJavascript %}{% endblock %}
 
 </body>

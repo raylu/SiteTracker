@@ -1,5 +1,5 @@
 import re
-from sitemngr.models import Wormhole
+from sitemngr.models import Wormhole, UpdateData
 from eve_db.models import MapSolarSystem
 from pygraphviz import *
 import httplib2
@@ -62,12 +62,22 @@ def graph():
 	g.layout()
 	g.draw('graph.png')
 
+def should_update():
+	# u_list = UpdateData.objects.all()
+	# if len(u_list) > 0:
+		# for u in u_list:
+			# u.delete()
+		# return True
+	# return False
+	return True
+	
 def repeat():
 	file = os.path.join(os.getcwd() + '/graph.png')
 	destination = os.path.join(os.getcwd() + '/sitemngr/static/pictures/graph.png')
 	while 1:
-		graph()
-		sleep(5)
-		shutil.move(file, destination)
-		print 'Graphed and moved', datetime.now().strftime('%m/%d/%Y %H:%M:%S')
-		sleep(60*5)
+		if should_update():
+			graph()
+			sleep(5)
+			shutil.move(file, destination)
+			print 'Graphed and moved', datetime.now().strftime('%m/%d/%Y %H:%M:%S')
+			sleep(60*5)
