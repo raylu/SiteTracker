@@ -1,13 +1,14 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
-from sitemngr.models import (
-                             Site, SiteChange,
+from sitemngr.models import (Site, SiteChange,
                              Wormhole, WormholeChange,
                              PasteData, Whitelisted,
                              Settings, KillReport)
 from eveigb import IGBHeaderParser
-import datetime, re, httplib2
+import datetime
+import re
+import urllib2
 import evelink
 import settings as appSettings
 
@@ -26,16 +27,13 @@ def index(request, note=None):
         return noaccess(request)
     sites = Site.objects.filter(closed=False)
     wormholes = Wormhole.objects.filter(closed=False)
-    notices = ['See the stats page for a pretty graph of all-time edit counts.']
+    notices = ['See the stats page for a graph of all-time edit counts.']
     if note and note is not None:
         notices.append(note)
     return render(request, 'sitemngr/index.html', {'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': getSettings(eveigb.charname).editsInNewTabs, 'flag': note})
 
 def viewall(request):
-    """
-        View all closed sites
-        Index page, but with the closed objects instead of the open
-    """
+    """ Index page, but with the closed objects instead of the open """
     eveigb = IGBHeaderParser(request)
     if not canView(eveigb, request):
         return noaccess(request)
@@ -507,17 +505,19 @@ def system(request, systemid):
         if not w in openwormholes:
             openwormholes.append(w)
     closedwormholes = Wormhole.objects.filter(start=systemid, closed=True)
-    clazz = None
-    headers = None
+    clazz = 0
     if re.match(r'J\d{6}', systemid):
-        try:
-            http = httplib2.Http()
-            headers, body = http.request('http://www.ellatha.com/eve/WormholeSystemview.asp?key={0}'.format(systemid.replace('J', '')))
-            clazz = body.split('<td bgcolor="#FFFFFF" width="20%"><b>Class:</b>&nbsp;</td>')[1].strip().split('</tr>')[0].split('>')[1][0]
-        except:
-            pass
+        contents = urllib2.urlopen('http://www.ellatha.com/eve/WormholeSystemview.asp?key={0}'.format(systemid.replace('J', ''))).read().split('\n')
+        nextLine = False
+        for line in contents:
+            if 'Class:' in line:
+                nextLine = True
+                continue
+            if nextLine:
+                clazz = line.split('&')[0][-1]
+                break
     return render(request, 'sitemngr/system.html', {'system': systemid, 'openwormholes': openwormholes, 'closedwormholes': closedwormholes,
-                            'class': clazz, 'headers': headers, 'opensites': opensites, 'unopenedsites': unopenedsites})
+                            'class': clazz, 'opensites': opensites, 'unopenedsites': unopenedsites})
 
 
 # ==============================
@@ -583,15 +583,16 @@ def recentscanedits(request):
     for s in SiteChange.objects.filter(changedScanid=True).order_by('-id'):
         sites.append(s.site)
         count += 1
-        if count == 21:
+        if count == int(appSettings.RECENT_EDITS_LIMIT) + 1:
             break
     count = 0
     for w in WormholeChange.objects.filter(changedScanid=True).order_by('-id'):
         wormholes.append(w.wormhole)
         count += 1
-        if count == 21:
+        if count == int(appSettings.RECENT_EDITS_LIMIT) + 1:
             break
     return render(request, 'sitemngr/recentscanedits.html', {'sites': sites, 'wormholes': wormholes})
+
 # ==============================
 #     Output
 # ==============================
