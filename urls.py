@@ -23,9 +23,6 @@ urlpatterns = patterns('',
    url(r'^checkkills/', 'sitemngr.views.checkkills'),
    url(r'^stats/', 'sitemngr.views.stats'),
    url(r'^settings/', 'sitemngr.views.settings'),
-   url(r'^whitelist/request/', 'sitemngr.views.requestwhitelist'),
-   url(r'^item_price/(\w+)', 'sitemngr.views.item_price_actual'),
-   url(r'^item_price/', 'sitemngr.views.item_price'),
    url(r'^login/', 'sitemngr.views.login_page'),
    url(r'^create_account/', 'sitemngr.views.create_account')
 )

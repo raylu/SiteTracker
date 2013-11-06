@@ -155,8 +155,8 @@ class Whitelisted(models.Model):
     notes = models.TextField(blank=True, null=True)
 
 class UpdateData(models.Model):
-	""" Should update graphs? """
-	note = models.TextField(blank=True, null=True)
+    """ Should update graphs? """
+    note = models.TextField(blank=True, null=True)
 
 # ========================
 

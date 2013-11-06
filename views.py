@@ -4,16 +4,12 @@ from django.shortcuts import render, get_object_or_404
 from sitemngr.models import (
                              Site, SiteChange,
                              Wormhole, WormholeChange,
-                             Chain, PasteData,
-                             Whitelisted, UpdateData,
+                             PasteData, Whitelisted,
                              Settings, KillReport)
 from eveigb import IGBHeaderParser
 import datetime, re, httplib2
 import evelink
 import settings as appSettings
-from bs4 import BeautifulSoup as BSoup
-import urllib2
-from eve_db.models import InvType
 
 eve = evelink.eve.EVE()
 eveapi = evelink.api.API()
@@ -264,7 +260,7 @@ def editwormhole(request, wormholeid):
             if appendNotes is not None:
                 wormhole.notes += appendNotes
             wormhole.save()
-			# @Test
+            # @Test
             changed = WormholeChange(wormhole=wormhole, user=eveigb.charname if eveigb.charname is not '' else request.user.username, date=now, changedScanid=changedScanid, changedType=False,
                                  changedStart=changedStart, changedDestination=changedDestination, changedTime=changedTime, changedStatus=changedStatus,
                                  changedOpened=changedOpened, changedClosed=changedClosed, changedNotes=changedNotes)
@@ -341,14 +337,14 @@ def paste(request):
         Allow players to paste data from their system scanner into a
         textarea and submit for automatic review.
     """
-    """ No access unless in-game """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb):
+    if not canView(eveigb, request):
         return noaccess(request)
     now = datetime.datetime.now()
     if request.method == 'POST':
         post = request.POST
         if post.has_key('downtime') and post['downtime']:
+            # After paste and checking after downtime checkbox
             sites = []
             wormholes = []
             newids = []
@@ -364,11 +360,12 @@ def paste(request):
                 for section in line.split('\t'):
                     if section is None:
                         pass
-                    elif re.match(r'[a-zA-Z]{3}-\d{1,3}', section):
+                    elif re.match(r'^[a-zA-Z]{3}-\d{3}$', section):
                         newids.append(section[:3].upper())
-            return render(request, 'sitemngr/pastescandowntime.html', {'able': canView(eveigb), 'sites': sites, 'wormholes': wormholes,
+            return render(request, 'sitemngr/pastescandowntime.html', {'sites': sites, 'wormholes': wormholes,
                            'newids': newids, 'newTab': getSettings(eveigb.charname).editsInNewTabs})
         elif post.has_key('afterdowntime') and post['afterdowntime']:
+            # After downtime paste page after submitting database changes
             for k, v in post.iteritems():
                 if k == 'csrfmiddlewaretoken' or k == 'afterdowntime':
                     continue
@@ -384,7 +381,7 @@ def paste(request):
                                     changedClosed=True, changedNotes=False)
                         c.save()
                     else:
-                        s.notes += 'Scanid: {0} >> {1}'.format(s.scanid, v)
+                        s.notes += ' Scanid: {0} >> {1}'.format(s.scanid, v)
                         s.scanid = v
                         s.save()
                         c = SiteChange(site=s, date=now, user=eveigb.charname, changedName=False, changedScanid=True,
@@ -410,7 +407,8 @@ def paste(request):
                         c.save()
             return index(request)
         else:
-            siteTypes = ['Combat Site', 'Unstable Wormhole', 'Anomaly', 'Ore Site', 'Relic Site', 'Data Site', 'Gas Site']
+            # Parse data to return to normal paste page
+            siteTypes = ['Unstable Wormhole', 'Anomaly', 'Ore Site', 'Relic Site', 'Data Site', 'Gas Site', 'Cosmic Signature']
             present = []
             findnew = []
             notfound = []
@@ -436,7 +434,7 @@ def paste(request):
                             newP.isSite = False
                         elif section == 'Cosmic Signature':
                             continue
-                        elif re.match(r'[a-zA-Z]{3}-\d{1,3}', section):
+                        elif re.match(r'^[a-zA-Z]{3}-\d{1,3}$', section):
                         # {
                             section = section.upper()
                             if isSite(section[:3]):
@@ -451,7 +449,7 @@ def paste(request):
                                     notfound.remove(w)
                                     found = True
                                     present.append(w)
-                            if found == False:
+                            if not found:
                                 newP.scanid = section[:3]
                         # }
                         elif section in siteTypes:
@@ -459,12 +457,13 @@ def paste(request):
                         else:
                             newP.name = section
                     # }
-                    if found == False:
+                    if not found:
                         findnew.append(newP)
                 # }
                 return render(request, 'sitemngr/pastescan.html', {'raw': post['pastedata'],
                                'present': present, 'notfound': notfound, 'findnew': findnew, 'timenow': now, 'system': system, 'newTab': getSettings(eveigb.charname).editsInNewTabs})
-            # } 
+            # }
+    # Base request - show the base pastescan page
     return render(request, 'sitemngr/pastescan.html', {'timenow': now, 'newTab': getSettings(eveigb.charname).editsInNewTabs})
 
 def systemlanding(request):
@@ -549,18 +548,9 @@ def changelog(request):
     """ Site changelog """
     return render(request, 'sitemngr/changelog.html')
 
-# TODO: Finish
-def chains(request):
-    """ System chains via wormholes and k-space jumps (trip planner) """
-    eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
-    chains = Chain.objects.all()
-    return render(request, 'sitemngr/chains.html', {'chains': chains})
-
 def settings(request):
     """ Settings page for viewing and changing user settings """
-    """ No access unless in-game """
+    """ TODO: This page only works for in-game browser character settings """
     eveigb = IGBHeaderParser(request)
     if not canView(eveigb):
         return noaccess(request)
@@ -585,22 +575,6 @@ def settings(request):
     edit = s.editsInNewTabs
     store = s.storeMultiple
     return render(request, 'sitemngr/settings.html', {'edit': edit, 'store': store, 'message': message})
-
-def requestwhitelist(request):
-    """ Request whitelisting for characters outside the alliance """
-    """ No access unless in-game """
-    eveigb = IGBHeaderParser(request)
-    if not canViewWrongAlliance(eveigb):
-        return noaccess(request)
-    message = None
-    if request.method == 'POST':
-        p = request.POST
-        if 'charname' in p and 'alliancecharname' in p:
-            now = datetime.datetime.now()
-            w = Whitelisted(name=p['charname'], inAllianceName=p['alliancecharname'], notes=p['notes'], addedDate=now)
-            w.save()
-            message = 'Request added.'
-    return render(request, 'sitemngr/requestwhitelist.html', {'message': message})
 
 # ==============================
 #     IGB Data Test
@@ -730,24 +704,6 @@ class Contributor:
         self.name = name
         self.points = points
 
-def item_price(request):
-	""" Landing page for items """
-	return render(request, 'sitemngr/item_price.html')
-
-def item_price_actual(request, item_name):
-	""" Get eve-central Jita price for an item name """
-	item_name = item_name.replace(' ', '_')
-	url = 'http://api.eve-central.com/api/marketstat?usesystem=30000142&typeid=%s' % get_item_id(item_name)
-	soup = BSoup(urllib2.urlopen(url).read())
-	return soup.evec_api.marketstat.type.buy.avg.string
-
-def get_item_id(item_name):
-	""" Item id from item name """
-	try:
-		InvType.objects.get(name=item_name).id
-	except InvType.DoesNotExist:
-		return -1
-
 def login_page(request):
     """  """
     if request.method == 'POST':
@@ -761,13 +717,13 @@ def login_page(request):
                 else:
                     return index(request, 'This account is disabled')
             else:
-                return index(requet, 'An error occurred when logging in')
+                return index(request, 'An error occurred when logging in')
     return render(request, 'sitemngr/login.html')
 
 def create_account(request):
     """  """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb):
+    if not canView(eveigb, request):
         return noaccess(request)
     if User.objects.get(username__exact=eveigb.charname):
         return index(request, 'You already have an account on this server.')
