@@ -1,18 +1,28 @@
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
+# Django
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
+
+# sitemngr
 from sitemngr.models import (Site, SiteChange,
                              Wormhole, WormholeChange,
                              PasteData, Whitelisted,
                              Settings, KillReport)
-from eveigb import IGBHeaderParser
+import settings as appSettings
+
+# eve_db
 from eve_db.models import MapSolarSystem
+
+# eveigb
+from eveigb import IGBHeaderParser
+
+# Python
 import datetime
 import re
 import urllib2
 import evelink
-import settings as appSettings
 
+# Evelink setup
 eve = evelink.eve.EVE()
 eveapi = evelink.api.API()
 evemap = evelink.map.Map(api=eveapi)
