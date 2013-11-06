@@ -76,10 +76,10 @@
 					<li><a href="/sitemngr/login/">Login</a></li>
                 </ul>
                 <ul class="nav pull-right">
-                    {% if eveigb.is_igb and eveigb.trusted %}
-                        <li><a>Welcome, {{ eveigb.charname }}</a></li>
-                    {% else %}
+                    {% if eveigb.is_igb and not eveigb.trusted %}
                         <li><a onclick="CCPEVE.requestTrust('http://tracker.talkinlocal.org/sitemngr/*');">Click to trust</a></li>
+                    {% else %}
+                        <li><a>Welcome, {{ displayname }}</a></li>
                     {% endif %}
                 </ul>
             </div>

@@ -133,7 +133,7 @@
 						<a href="/sitemngr/system/{{ w.start }}">{{ w.start }}</a>
 					</td>
 					<td>
-						{% if w.destination == 'Unknown' or w.destination == '' %}{{ w.destination }}{% else %}<a href="/sitemngr/system/{{ w.destination }}"{% endif %}>{{ w.destination }}</a>
+						{% if w.destination == 'Unknown' or w.destination == '' or w.destination == 'Closed' %}{{ w.destination }}{% else %}<a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>{% endif %}
 					</td>
 					<td>
 						{{ w.time }}

@@ -41,7 +41,7 @@ def index(request, note=None):
     notices = ['See the stats page for a graph of all-time edit counts.']
     if note and note is not None:
         notices.append(note)
-    return render(request, 'sitemngr/index.html', {'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': getSettings(eveigb.charname).editsInNewTabs, 'flag': note})
+    return render(request, 'sitemngr/index.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': getSettings(eveigb.charname).editsInNewTabs, 'flag': note})
 
 def viewall(request):
     """ Index page, but with the closed objects instead of the open """
@@ -50,7 +50,7 @@ def viewall(request):
         return noaccess(request)
     sites = Site.objects.filter(closed=True)
     wormholes = Wormhole.objects.filter(closed=True)
-    return render(request, 'sitemngr/index.html', {'sites': sites, 'wormholes': wormholes, 'status': 'closed'})
+    return render(request, 'sitemngr/index.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'status': 'closed'})
 
 def add(request):
     """
@@ -65,7 +65,7 @@ def add(request):
         g = request.GET
         if g.has_key('scanid') and g['scanid']:
             scanid = g['scanid']
-    return render(request, 'sitemngr/add.html', {'scanid': scanid})
+    return render(request, 'sitemngr/add.html', {'displayname': get_display_name(eveigb, request), 'scanid': scanid})
 
 # ==============================
 #     Site
@@ -78,7 +78,7 @@ def viewsite(request, siteid):
         return noaccess(request)
     site = get_object_or_404(Site, pk=siteid)
     changes = site.getChanges()
-    return render(request, 'sitemngr/viewsite.html', {'isForm': False, 'site': site, 'changes': changes})
+    return render(request, 'sitemngr/viewsite.html', {'displayname': get_display_name(eveigb, request), 'isForm': False, 'site': site, 'changes': changes})
 
 def editsite(request, siteid):
     """ Edit site page for changing data """
@@ -139,12 +139,12 @@ def editsite(request, siteid):
             if appendNotes is not None:
                 site.notes += appendNotes
             site.save()
-            change = SiteChange(site=site, date=now, user=eveigb.charname, changedName=changedName, changedScanid=changedScanid,
+            change = SiteChange(site=site, date=now, user=eveigb.charname if eveigb.charname is not '' else request.user.username, changedName=changedName, changedScanid=changedScanid,
                                 changedType=changedType, changedWhere=changedWhere, changedDate=changedDate, changedOpened=changedOpened,
                                 changedClosed=changedClosed, changedNotes=changedNotes)
             change.save()
         return index(request)
-    return render(request, 'sitemngr/editsite.html', {'isForm': True, 'site': site, 'finish_msg': 'Store changes back into the database:'})
+    return render(request, 'sitemngr/editsite.html', {'displayname': get_display_name(eveigb, request), 'isForm': True, 'site': site, 'finish_msg': 'Store changes back into the database:'})
 
 def addsite(request):
     """ Add a site to the databse """
@@ -182,7 +182,7 @@ def addsite(request):
         site = Site(name=s_name, scanid=s_scanid, type=s_type, where=s_where, creator=eveigb.charname, date=now, opened=s_opened, closed=s_closed, notes=s_notes)
         site.save()
         if getSettings(eveigb.charname).storeMultiple:
-            return render(request, 'sitemngr/addsite.html', {'isForm': True,
+            return render(request, 'sitemngr/addsite.html', {'displayname': get_display_name(eveigb, request), 'isForm': True,
                  'message': 'Successfully stored the data into the database.', 'finish_msg': 'Store new site into the database:', 'timenow': now.strftime('%m/%d @ %H:%M')})
         else:
             return index(request)
@@ -196,7 +196,7 @@ def addsite(request):
             g_type = g['type']
         if g.has_key('name') and g['name']:
             g_name = g['name']
-    return render(request, 'sitemngr/addsite.html', {
+    return render(request, 'sitemngr/addsite.html', {'request': request,
              'isForm': True, 'finish_msg': 'Store new site into the database:', 'g_scanid': g_scanid, 'g_system': g_system, 'g_type': g_type, 'g_name': g_name, 'timenow': now})
 
 # ==============================
@@ -210,7 +210,7 @@ def viewwormhole(request, wormholeid):
         return noaccess(request)
     wormhole = get_object_or_404(Wormhole, pk=wormholeid)
     changes = wormhole.getChanges()
-    return render(request, 'sitemngr/viewwormhole.html', {'isForm': False, 'wormhole': wormhole, 'changes': changes})
+    return render(request, 'sitemngr/viewwormhole.html', {'displayname': get_display_name(eveigb, request), 'isForm': False, 'wormhole': wormhole, 'changes': changes})
 
 def editwormhole(request, wormholeid):
     """ Edit wormhole page for changing data """
@@ -280,7 +280,7 @@ def editwormhole(request, wormholeid):
                                  changedOpened=changedOpened, changedClosed=changedClosed, changedNotes=changedNotes)
             changed.save()
         return index(request)
-    return render(request, 'sitemngr/viewwormhole.html', {'isForm': True,
+    return render(request, 'sitemngr/viewwormhole.html', {'displayname': get_display_name(eveigb, request), 'isForm': True,
           'wormhole': wormhole, 'finish_msg': 'Store changes back into the database'})
 
 def addwormhole(request):
@@ -324,7 +324,7 @@ def addwormhole(request):
         # upData = UpdateData(notes='')
         # upData.save()
         if getSettings(eveigb.charname).storeMultiple:
-            return render(request, 'sitemngr/addwormhole.html', {
+            return render(request, 'sitemngr/addwormhole.html', {'request': request,
                     'isForm': True, 'message': 'Successfully stored the data into the database.', 'finish_msg': 'Store new site into database:', 'timenow': now.strftime('%m/%d @ %H:%M')})
         else:
             return index(request)
@@ -336,7 +336,7 @@ def addwormhole(request):
             g_system = g['system']
         if g.has_key('name') and g['name']:
             g_name = g['name']
-    return render(request, 'sitemngr/addwormhole.html', {
+    return render(request, 'sitemngr/addwormhole.html', {'request': request,
                  'isForm': True, 'finish_msg': 'Store new wormhole into the database:', 'g_scanid': g_scanid, 'g_system': g_system, 'g_name': g_name, 'timenow': now.strftime('%m/%d @ %H:%M')})
 
 # ==============================
@@ -373,7 +373,7 @@ def paste(request):
                         pass
                     elif re.match(r'^[a-zA-Z]{3}-\d{3}$', section):
                         newids.append(section[:3].upper())
-            return render(request, 'sitemngr/pastescandowntime.html', {'sites': sites, 'wormholes': wormholes,
+            return render(request, 'sitemngr/pastescandowntime.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes,
                            'newids': newids, 'newTab': getSettings(eveigb.charname).editsInNewTabs})
         elif post.has_key('afterdowntime') and post['afterdowntime']:
             # After downtime paste page after submitting database changes
@@ -471,11 +471,11 @@ def paste(request):
                     if not found:
                         findnew.append(newP)
                 # }
-                return render(request, 'sitemngr/pastescan.html', {'raw': post['pastedata'],
+                return render(request, 'sitemngr/pastescan.html', {'displayname': get_display_name(eveigb, request), 'raw': post['pastedata'],
                                'present': present, 'notfound': notfound, 'findnew': findnew, 'timenow': now, 'system': system, 'newTab': getSettings(eveigb.charname).editsInNewTabs})
             # }
     # Base request - show the base pastescan page
-    return render(request, 'sitemngr/pastescan.html', {'timenow': now, 'newTab': getSettings(eveigb.charname).editsInNewTabs})
+    return render(request, 'sitemngr/pastescan.html', {'displayname': get_display_name(eveigb, request), 'timenow': now, 'newTab': getSettings(eveigb.charname).editsInNewTabs})
 
 
 # ==============================
@@ -495,7 +495,7 @@ def systemlanding(request):
     for w in Wormhole.objects.filter(closed=False):
         if (w.start in systems) == False:
                 systems.append(w.start)
-    return render(request, 'sitemngr/systemlanding.html', {'systems': systems, 'timenow': now})
+    return render(request, 'sitemngr/systemlanding.html', {'displayname': get_display_name(eveigb, request), 'systems': systems, 'timenow': now})
 
 def system(request, systemid):
     """
@@ -524,7 +524,7 @@ def system(request, systemid):
             if nextLine:
                 clazz = line.split('&')[0][-1]
                 break
-    return render(request, 'sitemngr/system.html', {'system': systemid, 'openwormholes': openwormholes, 'closedwormholes': closedwormholes,
+    return render(request, 'sitemngr/system.html', {'displayname': get_display_name(eveigb, request), 'system': systemid, 'openwormholes': openwormholes, 'closedwormholes': closedwormholes,
                             'class': clazz, 'opensites': opensites, 'unopenedsites': unopenedsites})
 
 
@@ -565,7 +565,7 @@ def mastertable(request):
         return noaccess(request)
     sites = Site.objects.all()
     wormholes = Wormhole.objects.all()
-    return render(request, 'sitemngr/mastertable.html', {'sites': sites, 'wormholes': wormholes})
+    return render(request, 'sitemngr/mastertable.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes})
 
 
 # ==============================
@@ -599,7 +599,7 @@ def recentscanedits(request):
         count += 1
         if count == int(appSettings.RECENT_EDITS_LIMIT) + 1:
             break
-    return render(request, 'sitemngr/recentscanedits.html', {'sites': sites, 'wormholes': wormholes})
+    return render(request, 'sitemngr/recentscanedits.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes})
 
 # ==============================
 #     Output
@@ -617,7 +617,7 @@ def output(request):
     motd += '\nSignatures:\n'
     for s in Site.objects.filter(closed=False, where=str(appSettings.HOME_SYSTEM)):
         motd += s.printOut() + '\n'
-    return render(request, 'sitemngr/output.html', {'motd': motd})
+    return render(request, 'sitemngr/output.html', {'displayname': get_display_name(eveigb, request), 'motd': motd})
 
 def stats(request):
     """ Returns usage statistics """
@@ -653,7 +653,7 @@ def stats(request):
     con = sorted(con.items(), key=lambda kv: kv[1])
     for a, b in con:
         conList.append(Contributor(a, b))
-    return render(request, 'sitemngr/stats.html', {'numSites': numSites,
+    return render(request, 'sitemngr/stats.html', {'displayname': get_display_name(eveigb, request), 'numSites': numSites,
                'numWormholes': numWormholes, 'numEdits': numEdits, 'numContributors': numContributors, 'allContributors': conList})
 
 def checkkills(request):
@@ -677,12 +677,12 @@ def checkkills(request):
             if k[0] in retSys:
                 r = KillReport(system=getSystemName(k[0]), systemid=k[0], ship=k[1]['ship'], pod=k[1]['pod'])
                 reports.append(r)
-    return render(request, 'sitemngr/checkkills.html', {'systems': systems, 'reports': reports})
+    return render(request, 'sitemngr/checkkills.html', {'displayname': get_display_name(eveigb, request), 'systems': systems, 'reports': reports})
 
 def viewhelp(request):
     """ Help/instructions page """
     eveigb = IGBHeaderParser(request)
-    return render(request, 'sitemngr/help.html', {'able': canView(eveigb, request)})
+    return render(request, 'sitemngr/help.html', {'displayname': get_display_name(eveigb, request), 'able': canView(eveigb, request)})
 
 # ==============================
 #     Accounts
@@ -748,7 +748,7 @@ def settings(request):
         message = 'Settings saved.'
     edit = s.editsInNewTabs
     store = s.storeMultiple
-    return render(request, 'sitemngr/settings.html', {'edit': edit, 'store': store, 'message': message})
+    return render(request, 'sitemngr/settings.html', {'displayname': get_display_name(eveigb, request), 'edit': edit, 'store': store, 'message': message})
 
 # ==============================
 #     Util
@@ -777,11 +777,19 @@ def noaccess(request):
     """ Shown when the viewer is restricted from viewing the page """
     eveigb = IGBHeaderParser(request)
     wrongAlliance = canViewWrongAlliance(eveigb)
-    return render(request, 'sitemngr/noaccess.html', {'wrongAlliance': wrongAlliance})
+    return render(request, 'sitemngr/noaccess.html', {'displayname': get_display_name(eveigb, request), 'wrongAlliance': wrongAlliance})
 
 def getBoolean(s):
     """ Returns True if the string represents a boolean equalling True """
     return s.lower() in ['true', 't', '1', 'yes', 'on']
+
+def get_display_name(eveigb, request):
+    if request.user is not None:
+        if request.user.is_active and request.user.is_authenticated:
+            return request.user.username
+    if eveigb.trusted:
+        return eveigb.charname
+    return 'someone'
 
 def canView(igb, request=None):
     """
