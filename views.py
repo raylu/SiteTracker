@@ -6,6 +6,7 @@ from sitemngr.models import (Site, SiteChange,
                              PasteData, Whitelisted,
                              Settings, KillReport)
 from eveigb import IGBHeaderParser
+from eve_db.models import MapSolarSystem
 import datetime
 import re
 import urllib2
@@ -264,13 +265,10 @@ def editwormhole(request, wormholeid):
             if appendNotes is not None:
                 wormhole.notes += appendNotes
             wormhole.save()
-            # @Test
             changed = WormholeChange(wormhole=wormhole, user=eveigb.charname if eveigb.charname is not '' else request.user.username, date=now, changedScanid=changedScanid, changedType=False,
                                  changedStart=changedStart, changedDestination=changedDestination, changedTime=changedTime, changedStatus=changedStatus,
                                  changedOpened=changedOpened, changedClosed=changedClosed, changedNotes=changedNotes)
             changed.save()
-            # upData = UpdateData(notes='')
-            # upData.save()
         return index(request)
     return render(request, 'sitemngr/viewwormhole.html', {'isForm': True,
           'wormhole': wormhole, 'finish_msg': 'Store changes back into the database'})
@@ -748,11 +746,17 @@ def settings(request):
 
 def getSystemName(systemid):
     """ Returns the common name for the system from the Eve API's systemid representation """
-    return eve.character_name_from_id(systemid)
+    try:
+        return MapSolarSystem.objects.get(id=systemid).name
+    except MapSolarSystem.DoesNotExist:
+        return 'null'
 
 def getSystemID(systemname):
     """ Returns the systemid for use in the Eve API corresponding to the systemname """
-    return eve.character_id_from_name(systemname)
+    try:
+        return MapSolarSystem.objects.get(name=systemname).id
+    except MapSolarSystem.DoesNotExist:
+        return 'null'
 
 class Contributor:
     def __init__(self, name, points):
