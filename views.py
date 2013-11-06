@@ -275,10 +275,10 @@ def editwormhole(request, wormholeid):
             if appendNotes is not None:
                 wormhole.notes += appendNotes
             wormhole.save()
-            changed = WormholeChange(wormhole=wormhole, user=eveigb.charname if eveigb.charname is not '' else request.user.username, date=now, changedScanid=changedScanid, changedType=False,
+            change = WormholeChange(wormhole=wormhole, user=eveigb.charname if eveigb.charname is not '' else request.user.username, date=now, changedScanid=changedScanid, changedType=False,
                                  changedStart=changedStart, changedDestination=changedDestination, changedTime=changedTime, changedStatus=changedStatus,
                                  changedOpened=changedOpened, changedClosed=changedClosed, changedNotes=changedNotes)
-            changed.save()
+            change.save()
         return index(request)
     return render(request, 'sitemngr/viewwormhole.html', {'displayname': get_display_name(eveigb, request), 'isForm': True,
           'wormhole': wormhole, 'finish_msg': 'Store changes back into the database'})
@@ -321,8 +321,6 @@ def addwormhole(request):
         wormhole = Wormhole(creator=eveigb.charname, date=now, scanid=s_scanid, type='null', start=s_start, destination=s_destination,
                             time=s_time, status=s_status, opened=s_opened, closed=s_closed, notes=s_notes)
         wormhole.save()
-        # upData = UpdateData(notes='')
-        # upData.save()
         if getSettings(eveigb.charname).storeMultiple:
             return render(request, 'sitemngr/addwormhole.html', {'request': request,
                     'isForm': True, 'message': 'Successfully stored the data into the database.', 'finish_msg': 'Store new site into database:', 'timenow': now.strftime('%m/%d @ %H:%M')})
@@ -362,11 +360,11 @@ def paste(request):
             paste = post['pastedata']
             system = post['system']
             allSites = Site.objects.filter(where=system, closed=False)
-            for s in allSites:
-                sites.append(s)
+            for site in allSites:
+                sites.append(site)
             allWormholes = Wormhole.objects.filter(start=system, closed=False)
-            for w in allWormholes:
-                wormholes.append(w)
+            for wormhole in allWormholes:
+                wormholes.append(wormhole)
             for line in paste.split('\n'):
                 for section in line.split('\t'):
                     if section is None:
@@ -383,39 +381,39 @@ def paste(request):
                 if v == '-IGNORE-':
                     continue
                 if isSite(k):
-                    s = getSite(k)
+                    site = getSite(k)
                     if v == '-CLOSE-':
-                        s.closed = True
-                        s.save()
-                        c = SiteChange(site=s, date=now, user=eveigb.charname, changedName=False, changedScanid=False,
+                        site.closed = True
+                        site.save()
+                        change = SiteChange(site=site, date=now, user=eveigb.charname, changedName=False, changedScanid=False,
                                     changedType=False, changedWhere=False, changedDate=False, changedOpened=False,
                                     changedClosed=True, changedNotes=False)
-                        c.save()
+                        change.save()
                     else:
-                        s.notes += ' Scanid: {0} >> {1}'.format(s.scanid, v)
-                        s.scanid = v
-                        s.save()
-                        c = SiteChange(site=s, date=now, user=eveigb.charname, changedName=False, changedScanid=True,
+                        site.notes += ' Scanid: {0} >> {1}'.format(site.scanid, v)
+                        site.scanid = v
+                        site.save()
+                        change = SiteChange(site=site, date=now, user=eveigb.charname, changedName=False, changedScanid=True,
                                     changedType=False, changedWhere=False, changedDate=False, changedOpened=False,
                                     changedClosed=False, changedNotes=False)
-                        c.save()
+                        change.save()
                 else:
-                    w = getWormhole(k)
+                    wormhole = getWormhole(k)
                     if v == '-CLOSE-':
-                        w.closed = True
-                        w.save()
-                        c = WormholeChange(wormhole=w, user=eveigb.charname, date=now, changedScanid=False, changedType=False,
+                        wormhole.closed = True
+                        wormhole.save()
+                        change = WormholeChange(wormhole=wormhole, user=eveigb.charname, date=now, changedScanid=False, changedType=False,
                                      changedStart=False, changedDestination=False, changedTime=False, changedStatus=False,
                                      changedOpened=False, changedClosed=True, changedNotes=False)
-                        c.save()
+                        change.save()
                     else:
-                        w.notes += 'Scanid: {0} >> {1}'.format(w.scanid, v)
-                        w.scanid = v
-                        w.save()
-                        c = WormholeChange(wormhole=w, user=eveigb.charname, date=now, changedScanid=True, changedType=False,
+                        wormhole.notes += 'Scanid: {0} >> {1}'.format(wormhole.scanid, v)
+                        wormhole.scanid = v
+                        wormhole.save()
+                        change = WormholeChange(wormhole=wormhole, user=eveigb.charname, date=now, changedScanid=True, changedType=False,
                                      changedStart=False, changedDestination=False, changedTime=False, changedStatus=False,
                                      changedOpened=False, changedClosed=False, changedNotes=False)
-                        c.save()
+                        change.save()
             return index(request)
         else:
             # Parse data to return to normal paste page
@@ -449,17 +447,17 @@ def paste(request):
                         # {
                             section = section.upper()
                             if isSite(section[:3]):
-                                s = getSite(section[:3])
-                                if s.where == system:
-                                    notfound.remove(s)
+                                site = getSite(section[:3])
+                                if site.where == system:
+                                    notfound.remove(site)
                                     found = True
-                                    present.append(s)
+                                    present.append(site)
                             elif isWormhole(section[:3]):
-                                w = getWormhole(section[:3])
-                                if w.start == system:
-                                    notfound.remove(w)
+                                wormhole = getWormhole(section[:3])
+                                if wormhole.start == system:
+                                    notfound.remove(wormhole)
                                     found = True
-                                    present.append(w)
+                                    present.append(wormhole)
                             if not found:
                                 newP.scanid = section[:3]
                         # }
@@ -489,12 +487,12 @@ def systemlanding(request):
         return noaccess(request)
     now = datetime.datetime.now()
     systems = []
-    for s in Site.objects.filter(closed=False):
-        if (s.where in systems) == False:
-            systems.append(s.where)
-    for w in Wormhole.objects.filter(closed=False):
-        if (w.start in systems) == False:
-                systems.append(w.start)
+    for site in Site.objects.filter(closed=False):
+        if (site.where in systems) == False:
+            systems.append(site.where)
+    for wormhole in Wormhole.objects.filter(closed=False):
+        if (wormhole.start in systems) == False:
+                systems.append(wormhole.start)
     return render(request, 'sitemngr/systemlanding.html', {'displayname': get_display_name(eveigb, request), 'systems': systems, 'timenow': now})
 
 def system(request, systemid):
@@ -542,20 +540,20 @@ def lookup(request, scanid):
         g = request.GET
         if g.has_key('system') and g['system']:
             system = g['system']
-    for s in Site.objects.all():
-        if s.scanid == scanid:
+    for site in Site.objects.all():
+        if site.scanid == scanid:
             if system is not None:
-                if s.where == system:
-                    return viewsite(request, s.id)
+                if site.where == system:
+                    return viewsite(request, site.id)
             else:
-                return viewsite(request, s.id)
-    for w in Wormhole.objects.all():
-        if w.scanid == scanid:
+                return viewsite(request, site.id)
+    for wormhole in Wormhole.objects.all():
+        if wormhole.scanid == scanid:
             if system is not None:
-                if w.start == system:
-                    return viewwormhole(request, w.id)
+                if wormhole.start == system:
+                    return viewwormhole(request, wormhole.id)
             else:
-                return viewwormhole(request, w.id)
+                return viewwormhole(request, wormhole.id)
     return render(request, 'sitemngr/lookup.html')
 
 def mastertable(request):
@@ -615,8 +613,8 @@ def output(request):
     for w in wormholes:
         motd += w.printOut() + '\n'
     motd += '\nSignatures:\n'
-    for s in Site.objects.filter(closed=False, where=str(appSettings.HOME_SYSTEM)):
-        motd += s.printOut() + '\n'
+    for site in Site.objects.filter(closed=False, where=str(appSettings.HOME_SYSTEM)):
+        motd += site.printOut() + '\n'
     return render(request, 'sitemngr/output.html', {'displayname': get_display_name(eveigb, request), 'motd': motd})
 
 def stats(request):
@@ -628,26 +626,26 @@ def stats(request):
     numWormholes = len(Wormhole.objects.all())
     numEdits = len(SiteChange.objects.all()) + len(WormholeChange.objects.all())
     con = {}
-    for s in Site.objects.all():
-        if s.creator in con:
-            con[s.creator] += 1
+    for site_change in Site.objects.all():
+        if site_change.creator in con:
+            con[site_change.creator] += 1
         else:
-            con[s.creator] = 1
-    for w in Wormhole.objects.all():
-        if w.creator in con:
-            con[w.creator] += 1
+            con[site_change.creator] = 1
+    for wormhole_change in Wormhole.objects.all():
+        if wormhole_change.creator in con:
+            con[wormhole_change.creator] += 1
         else:
-            con[w.creator] = 1
-    for s in SiteChange.objects.all():
-        if s.user in con:
-            con[s.user] += 1
+            con[wormhole_change.creator] = 1
+    for site_change in SiteChange.objects.all():
+        if site_change.user in con:
+            con[site_change.user] += 1
         else:
-            con[s.user] = 1
-    for w in WormholeChange.objects.all():
-        if w.user in con:
-            con[w.user] += 1
+            con[site_change.user] = 1
+    for wormhole_change in WormholeChange.objects.all():
+        if wormhole_change.user in con:
+            con[wormhole_change.user] += 1
         else:
-            con[w.user] = 1
+            con[wormhole_change.user] = 1
     numContributors = len(con)
     conList = []
     con = sorted(con.items(), key=lambda kv: kv[1])
@@ -663,15 +661,15 @@ def checkkills(request):
         return noaccess(request)
     reports = []
     systems = []
-    for w in Wormhole.objects.filter(closed=False):
-        if w.start not in systems:
-            systems.append(w.start)
-        if w.destination not in systems:
-            systems.append(w.destination)
+    for wormhole in Wormhole.objects.filter(closed=False):
+        if wormhole.start not in systems:
+            systems.append(wormhole.start)
+        if wormhole.destination not in systems:
+            systems.append(wormhole.destination)
     if len(systems) > 0:
         retSys = []
-        for s in systems:
-            retSys.append(getSystemID(s))
+        for system in systems:
+            retSys.append(getSystemID(system))
         kills = evemap.kills_by_system()[0]
         for k in kills.iteritems():
             if k[0] in retSys:
@@ -730,10 +728,10 @@ def settings(request):
         return noaccess(request)
     message = None
     try:
-        s = Settings.objects.get(user=eveigb.charname)
+        settings = Settings.objects.get(user=eveigb.charname)
     except Settings.DoesNotExist:
-        s = Settings(user=eveigb.charname, editsInNewTabs=True, storeMultiple=True)
-        s.save()
+        settings = Settings(user=eveigb.charname, editsInNewTabs=True, storeMultiple=True)
+        settings.save()
     if request.method == 'POST':
         p = request.POST
         edit = False
@@ -742,12 +740,12 @@ def settings(request):
             edit = True
         if 'store' in p:
             store = True
-        s.editsInNewTabs = edit
-        s.storeMultiple = store
-        s.save()
+        settings.editsInNewTabs = edit
+        settings.storeMultiple = store
+        settings.save()
         message = 'Settings saved.'
-    edit = s.editsInNewTabs
-    store = s.storeMultiple
+    edit = settings.editsInNewTabs
+    store = settings.storeMultiple
     return render(request, 'sitemngr/settings.html', {'displayname': get_display_name(eveigb, request), 'edit': edit, 'store': store, 'message': message})
 
 # ==============================
@@ -802,8 +800,8 @@ def canView(igb, request=None):
                 return True
     isWhitelisted = False
     try:
-        w = Whitelisted.objects.get(name=igb.charname)
-        if w is not None and w.active:
+        wormhole = Whitelisted.objects.get(name=igb.charname)
+        if wormhole is not None and wormhole.active:
             isWhitelisted = True
     except Whitelisted.DoesNotExist:
         pass
@@ -822,9 +820,9 @@ def isSite(scanid):
 
 def getSite(scanid):
     """ Returns site with scan id (or None) """
-    for s in Site.objects.all():
-        if s.scanid.lower() == scanid.lower():
-            return s
+    for site in Site.objects.all():
+        if site.scanid.lower() == scanid.lower():
+            return site
     return None
 
 def isWormhole(scanid):
@@ -833,16 +831,16 @@ def isWormhole(scanid):
 
 def getWormhole(scanid):
     """ Returns wormhole with scanid (or None) """
-    for w in Wormhole.objects.all():
-        if w.scanid.lower() == scanid.lower():
-            return w
+    for wormhole in Wormhole.objects.all():
+        if wormhole.scanid.lower() == scanid.lower():
+            return wormhole
     return None
 
 def getSettings(username):
     """ Returns the settings for a user """
     try:
-        s = Settings.objects.get(user=username)
+        settings = Settings.objects.get(user=username)
     except Settings.DoesNotExist:
-        s = Settings(user=username, editsInNewTabs=True, storeMultiple=True)
-        s.save()
-    return s
+        settings = Settings(user=username, editsInNewTabs=True, storeMultiple=True)
+        settings.save()
+    return settings
