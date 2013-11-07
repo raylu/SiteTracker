@@ -35,7 +35,7 @@
 
 <body>
 
-<div class="navbar navbar-inverse navbar-fixed-top">
+<div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
             <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -87,6 +87,7 @@
     </div>
 </div>
 
+<div class="shadowall">
 <div class="container">
 
 {% block content %}{% endblock %}
@@ -95,10 +96,15 @@
 
 <footer>
     <p>&copy; <a href="https://github.com/Celeo">Celeo</a> 2013</p>
-    <p>This website uses <a href="https://www.djangoproject.com/">Django</a> and <a href="http://twitter.github.io/bootstrap/">Bootstrap</a>.</p>
+    <p>
+        This website uses <a href="https://www.djangoproject.com/">Django</a>, <a href="http://twitter.github.io/bootstrap/">Bootstrap</a>,  
+        <a href="https://github.com/ayust/evelink">evelink</a>, <a href="https://github.com/gtaylor/django-eve-db">django-eve-db</a>, and 
+        <a href="https://github.com/jenslauterbach/django-eve-igb">django-eve-igb</a>.
+    </p>
     {% block extraFooter %}{% endblock %}
 </footer>
 
+</div>
 </div>
 {% block loadLaterJavascript %}{% endblock %}
 

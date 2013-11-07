@@ -8,34 +8,27 @@
     {{ info }}<br><br><br>
 {% endif %}
 
-<h3>Downtime ID Change</h3><br>
+<h3>Downtime ID Change - {{ system }}</h3><br>
 
 <div class="row">
-    <div class="span4">
-        <h5>Current Site IDs</h5>
+    <div class="span6">
+        <h5>Database Current</h5>
         {% if sites %}
             {% for s in sites %}
-                {{ s.scanid }}: {{ s.name }}<br>
+                {{ s.scanid }}: {{ s.name }} <b>{% if s.isAnom %}Anomaly{% else %}Signature{% endif %}</b><br>
             {% endfor %}
-        {% else %}
-            <p>None</p>
         {% endif %}
-    </div>
-    <div class="span4">
-        <h5>Current Wormhole IDs</h5>
         {% if wormholes %}
             {% for w in wormholes %}
-                {{ w.scanid }}: {{ w.start }} > {{ w.destination }}<br>
+                {{ w.scanid }}: {{ w.start }} > {{ w.destination }} <b>Wormhole</b><br>
             {% endfor %}
-        {% else %}
-            <p>None</p>
         {% endif %}
     </div>
-    <div class="span4">
-        <h5>New IDs</h5>
+    <div class="span6">
+        <h5>New from Paste</h5>
         {% if newids %}
             {% for n in newids %}
-                {{ n }}<br>
+                {{ n.scanid }} <b>{{ n.type }}</b> {{ n.name }}<br>
             {% endfor %}
         {% else %}
             <p>None</p>
@@ -43,9 +36,8 @@
     </div>
 </div>
 
-<hr>
+<hr style="width: 50%;">
 
-<h4>Connect the systems!</h4>
 <form action="" method="POST">
     {% csrf_token %}
     <input type="hidden" name="afterdowntime" value="1">
@@ -53,6 +45,9 @@
         <tr>
             <th>
                 Old ID
+            </th>
+            <th>
+                Type
             </th>
             <th>
                 New ID
@@ -63,6 +58,9 @@
                 <tr>
                     <td>
                         <input type="text" value="{{ s.scanid }} {{ s.name }}" readonly>
+                    </td>
+                    <td>
+                        {% if s.isAnom %}Anom{% else %}Sig{% endif %}
                     </td>
                     <td>
                        <select name="{{ s.scanid }}">
@@ -83,6 +81,9 @@
                         <input type="text" value="{{ w.scanid }}, {{ w.start }} > {{ w.destination }}" readonly>
                     </td>
                     <td>
+                        Worm
+                    </td>
+                    <td>
                         <select name="{{ w.scanid }}">
                             <option>-IGNORE-</option>
                             {% for n in newids %}
@@ -95,6 +96,7 @@
             {% endfor %}
         {% endif %}
         <tr>
+            <td></td>
             <td>
                 <input type="submit" value="Store">
             </td>

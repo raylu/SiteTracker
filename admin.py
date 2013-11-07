@@ -18,8 +18,8 @@ class WormholeChangeManager(admin.ModelAdmin):
     list_display = [ 'user', 'wormhole', 'date']
 
 class SettingsManager(admin.ModelAdmin):
-    fields = ['user', 'editsInNewTabs', 'storeMultiple']
-    list_display = ['user', 'editsInNewTabs', 'storeMultiple']
+    fields = ['user', 'editsInNewTabs', 'storeMultiple', 'userBackgroundImage']
+    list_display = ['user', 'editsInNewTabs', 'storeMultiple', 'userBackgroundImage']
 
 class WhitelistedManager(admin.ModelAdmin):
     fields = ['name', 'inAllianceName', 'addedDate', 'whitelistedBy', 'whitelistedDate', 'active', 'notes']

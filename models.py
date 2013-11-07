@@ -123,6 +123,7 @@ class Settings(models.Model):
     user = models.CharField(max_length=100)
     editsInNewTabs = models.BooleanField(default=True)
     storeMultiple = models.BooleanField(default=True)
+    userBackgroundImage = models.BooleanField(default=True)
     def __unicode__(self):
         return unicode(self.user)
 

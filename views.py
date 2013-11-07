@@ -41,7 +41,7 @@ def index(request, note=None):
     notices = ['See the stats page for a graph of all-time edit counts.']
     if note and note is not None:
         notices.append(note)
-    return render(request, 'sitemngr/index.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': getSettings(eveigb.charname).editsInNewTabs, 'flag': note})
+    return render(request, 'sitemngr/index.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage, 'flag': note})
 
 def viewall(request):
     """ Index page, but with the closed objects instead of the open """
@@ -341,6 +341,11 @@ def addwormhole(request):
 #     Pastes
 # ==============================
 
+class PasteMap():
+    def __init__(self, parent, possible):
+        self.parent = parent
+        self.possible = possible
+
 def paste(request):
     """
         Allow players to paste data from their system scanner into a
@@ -361,6 +366,7 @@ def paste(request):
             newids = []
             paste = post['pastedata']
             system = post['system']
+            paste_map = []
             allSites = Site.objects.filter(where=system, closed=False)
             for site in allSites:
                 sites.append(site)
@@ -373,8 +379,9 @@ def paste(request):
                         pass
                     elif re.match(r'^[a-zA-Z]{3}-\d{3}$', section):
                         newids.append(section[:3].upper())
+                        # TODO: Put more of the parsing code here, to properly map out the possibilities for pairing
             return render(request, 'sitemngr/pastescandowntime.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes,
-                           'newids': newids, 'newTab': getSettings(eveigb.charname).editsInNewTabs})
+                           'newids': newids, 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage, 'system': system, 'pastemap': paste_map})
         # ====================================
         elif post.has_key('afterdowntime') and post['afterdowntime']:
             # After downtime paste page after submitting database changes
@@ -476,10 +483,10 @@ def paste(request):
                         findnew.append(newP)
                 # }
                 return render(request, 'sitemngr/pastescan.html', {'displayname': get_display_name(eveigb, request), 'raw': post['pastedata'],
-                               'present': present, 'notfound': notfound, 'findnew': findnew, 'timenow': now, 'system': system, 'newTab': getSettings(eveigb.charname).editsInNewTabs})
+                               'present': present, 'notfound': notfound, 'findnew': findnew, 'timenow': now, 'system': system, 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage})
             # }
     # Base request - show the base pastescan page
-    return render(request, 'sitemngr/pastescan.html', {'displayname': get_display_name(eveigb, request), 'timenow': now, 'newTab': getSettings(eveigb.charname).editsInNewTabs})
+    return render(request, 'sitemngr/pastescan.html', {'displayname': get_display_name(eveigb, request), 'timenow': now, 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage})
 
 
 # ==============================
@@ -730,7 +737,7 @@ def settings(request):
     """ Settings page for viewing and changing user settings """
     # TODO: This page only works for in-game browser character settings
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb):
+    if not canView(eveigb, request):
         return noaccess(request)
     message = None
     try:
@@ -742,17 +749,22 @@ def settings(request):
         p = request.POST
         edit = False
         store = False
+        image = False
         if 'edit' in p:
             edit = True
         if 'store' in p:
             store = True
+        if 'image' in p:
+            image = True
         settings.editsInNewTabs = edit
         settings.storeMultiple = store
+        settings.userBackgroundImage = image
         settings.save()
         message = 'Settings saved.'
     edit = settings.editsInNewTabs
     store = settings.storeMultiple
-    return render(request, 'sitemngr/settings.html', {'displayname': get_display_name(eveigb, request), 'edit': edit, 'store': store, 'message': message})
+    image = settings.userBackgroundImage
+    return render(request, 'sitemngr/settings.html', {'displayname': get_display_name(eveigb, request), 'edit': edit, 'store': store, 'image': image, 'message': message})
 
 # ==============================
 #     Util

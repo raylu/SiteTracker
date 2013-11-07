@@ -2,9 +2,6 @@ body {
     padding-top: 60px;
     padding-bottom: 40px;
     background-color: #E6E6E6;
-    background-image: url(http://tracker.talkinlocal.org/static/pictures/background.png);
-    background-repeat: no-repeat;
-    background-attachment: fixed;
 }
 
 .shadowall {
@@ -89,16 +86,16 @@ input[type="text"] {
 }
 
 .anom {
-	background-color: rgb(51, 204, 255);
-	background-color: rgba(51, 204, 255, 0.3);
+    background-color: rgb(51, 204, 255);
+    background-color: rgba(51, 204, 255, 0.3);
 }
 
 .open {
-	background-color: rgb(41, 255, 41);
-	background-color: rgba(41, 255, 41, 0.3);
+    background-color: rgb(41, 255, 41);
+    background-color: rgba(41, 255, 41, 0.3);
 }
 
 .closed {
-	# background-color: rgb(255, 41, 41);
-	# background-color: rgba(255, 41, 41, 0.3);
+    # background-color: rgb(255, 41, 41);
+    # background-color: rgba(255, 41, 41, 0.3);
 }
