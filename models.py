@@ -174,8 +174,9 @@ class PasteData:
         return unicode(self.scanid)
 
 class PasteMatch:
-    def __init__(self, scanid, p_type, allowed):
+    def __init__(self, scanid, name, p_type, allowed):
         self.scanid = scanid
+        self.name = name
         self.p_type = p_type
         self.allowed = allowed
     def __unicode__(self):

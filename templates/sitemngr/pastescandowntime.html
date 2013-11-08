@@ -52,7 +52,7 @@
         {% for p in pastedata %}
             <tr>
                 <td>
-                    <input type="text" value="{{ p }}" readonly>
+                    <input type="text" value="{{ p }}: {{ p.name }}" readonly>
                 </td>
                 <td>
                     {{ p.p_type }}
