@@ -173,6 +173,14 @@ class PasteData:
     def __unicode__(self):
         return unicode(self.scanid)
 
+class PasteMatch:
+    def __init__(self, scanid, p_type, allowed):
+        self.scanid = scanid
+        self.p_type = p_type
+        self.allowed = allowed
+    def __unicode__(self):
+        return unicode(self.scanid)
+
 class KillReport:
     """ Dynamically constructed class sent to /sitemngr/checkkills """
     def __init__(self, system=settings.HOME_SYSTEM, systemid=settings.HOME_SYSTEM_ID, ship=0, pod=0):

@@ -26,13 +26,9 @@
     </div>
     <div class="span6">
         <h5>New from Paste</h5>
-        {% if newids %}
-            {% for n in newids %}
-                {{ n.scanid }} <b>{{ n.type }}</b> {{ n.name }}<br>
-            {% endfor %}
-        {% else %}
-            <p>None</p>
-        {% endif %}
+        {% for n in newids %} 
+            {{ n }}<br>
+        {% endfor %}
     </div>
 </div>
 
@@ -53,48 +49,25 @@
                 New ID
             </th>
         </tr>
-        {% if sites %}
-            {% for s in sites %}
-                <tr>
-                    <td>
-                        <input type="text" value="{{ s.scanid }} {{ s.name }}" readonly>
-                    </td>
-                    <td>
-                        {% if s.isAnom %}Anom{% else %}Sig{% endif %}
-                    </td>
-                    <td>
-                       <select name="{{ s.scanid }}">
-                            <option>-IGNORE-</option>
-                            {% for n in newids %}
-                                 <option>{{ n }}</option>
-                            {% endfor %}
-                            <option>-CLOSE-</option>
-                        </select>
-                    </td>
-                </tr>
-            {% endfor %}
-        {% endif %}
-        {% if wormholes %}
-            {% for w in wormholes %}
-                <tr>
-                    <td>
-                        <input type="text" value="{{ w.scanid }}, {{ w.start }} > {{ w.destination }}" readonly>
-                    </td>
-                    <td>
-                        Worm
-                    </td>
-                    <td>
-                        <select name="{{ w.scanid }}">
-                            <option>-IGNORE-</option>
-                            {% for n in newids %}
-                                 <option>{{ n }}</option>
-                            {% endfor %}
-                            <option>-CLOSE-</option>
-                        </select>
-                    </td>
-                </tr>
-            {% endfor %}
-        {% endif %}
+        {% for p in pastedata %}
+            <tr>
+                <td>
+                    <input type="text" value="{{ p }}" readonly>
+                </td>
+                <td>
+                    {{ p.p_type }}
+                </td>
+                <td>
+                    <select name="{{ p.scanid }}">
+                        <option>-IGNORE-</option>
+                        {% for allowed in p.allowed %}
+                            <option>{{ allowed }}</option>
+                        {% endfor %}
+                        <option>-CLOSE-</option>
+                    </select>
+                </td>
+            </tr>
+        {% endfor %}
         <tr>
             <td></td>
             <td>

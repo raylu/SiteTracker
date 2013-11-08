@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from sitemngr.models import (Site, SiteChange,
                              Wormhole, WormholeChange,
                              PasteData, Settings,
-                             KillReport)
+                             KillReport, PasteMatch)
 import settings as appSettings
 
 # eve_db
@@ -347,13 +347,14 @@ class PasteMap():
         self.possible = possible
 
 def p_get_all_data(line):
-    # TODO: Site name does not work
     siteTypes = ['Cosmic Signature', 'Data Site', 'Relic Site']
     anomTypes = ['Combat Site', 'Ore Site']  # 'Gas Site' ?
     wormholeTypes = ['Wormhole', 'Unstable Wormhole']
     data = {}
     data['issite'] = False
     data['iswormhole'] = False
+    data['name'] = ''
+    data['type'] = ''
     for section in line.split('\t'):
         if section is None:
             continue
@@ -396,17 +397,19 @@ def paste(request):
             newids = []
             paste = post['pastedata']
             system = post['system']
-            paste_map = []
+            for line in paste.split('\n'):
+                newids.append(p_get_all_data(line)['scanid'])
+            paste_data = []
             allSites = Site.objects.filter(where=system, closed=False)
             for site in allSites:
                 sites.append(site)
+                paste_data.append(PasteMatch(scanid=site.scanid, p_type='site' if not site.isAnom() else 'anom', allowed=newids))
             allWormholes = Wormhole.objects.filter(start=system, closed=False)
             for wormhole in allWormholes:
                 wormholes.append(wormhole)
-            for line in paste.split('\n'):
-                newids.append(p_get_all_data(line)['scanid'])
-            return render(request, 'sitemngr/pastescandowntime.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'system': system,
-                           'newids': newids, 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage, 'system': system, 'pastemap': paste_map})
+                paste_data.append(PasteMatch(scanid=wormhole.scanid, p_type='wormhole', allowed=newids))
+            return render(request, 'sitemngr/pastescandowntime.html', {'system': system, 'pastedata': paste_data, 'sites': sites, 'wormholes': wormholes, 'newids': newids, 
+                           'displayname': get_display_name(eveigb, request), 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage})
         elif post.has_key('afterdowntime') and post['afterdowntime']:
             # After downtime paste page after submitting database changes
             for k, v in post.iteritems():
