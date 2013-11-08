@@ -11,7 +11,7 @@
 <h3>Downtime ID Change - {{ system }}</h3><br>
 
 <div class="row">
-    <div class="span6">
+    <div class="span6" style="text-align: left;">
         <h5>Database Current</h5>
         {% if sites %}
             {% for s in sites %}
@@ -24,10 +24,10 @@
             {% endfor %}
         {% endif %}
     </div>
-    <div class="span6">
+    <div class="span6" style="text-align: right;">
         <h5>New from Paste</h5>
         {% for n in newids %} 
-            {{ n.id }}: <b>{{ n.what }}</b><br>
+            {{ n.id }}: {{ n.name }} <b>{{ n.what }}</b><br>
         {% endfor %}
     </div>
 </div>

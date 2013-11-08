@@ -1,3 +1,8 @@
+# Python
+import datetime
+import re
+import urllib2
+
 # Django
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User
@@ -16,12 +21,7 @@ from eve_db.models import MapSolarSystem
 # eveigb
 from eveigb import IGBHeaderParser
 
-# Python
-import datetime
-import re
-import urllib2
-
-# Evelink
+# evelink
 import evelink
 eve = evelink.eve.EVE()
 eveapi = evelink.api.API()
@@ -38,7 +38,7 @@ def index(request, note=None):
         return noaccess(request)
     sites = Site.objects.filter(closed=False)
     wormholes = Wormhole.objects.filter(closed=False)
-    notices = ['See the stats page for a graph of all-time edit counts.']
+    notices = ['The downtime paste page has been completely redone.']
     if note and note is not None:
         notices.append(note)
     return render(request, 'sitemngr/index.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage, 'flag': note})
@@ -355,31 +355,32 @@ def p_get_all_data(line):
         if section is None:
             continue
         if re.match(r'^[a-zA-Z]{3}-\d{3}$', section):
-            data['scanid'] = section[:3].upper()
+            data['scanid'] = section[:3].upper().replace('\r', '').replace('\n', '')
             continue
         if section in siteTypes:
             data['issite'] = True
-            data['type'] = section
+            data['type'] = section.replace('\r', '').replace('\n', '')
             continue
         if section in anomTypes:
             data['isanom'] = True
-            data['type'] = section
+            data['type'] = section.replace('\r', '').replace('\n', '')
             continue
         if section in wormholeTypes:
             data['iswormhole'] = True
-            data['type'] = section
+            data['type'] = section.replace('\r', '').replace('\n', '')
             continue
         if '%' in section or 'AU' in section:
             continue
-        data['name'] = section
+        data['name'] = section.replace('\r', '').replace('\n', '')
     return data
 
 class SpaceObject:
-    def __init__(self, i, what):
+    def __init__(self, i, what, name):
         self.id = i
         self.what = what
+        self.name = name
     def __unicode__(self):
-        return unicode('%s: %s' % (self.id, self.what))
+        return unicode('%s: %s %s' % (self.id, self.what, self.name))
 
 def paste(request):
     """
@@ -392,7 +393,6 @@ def paste(request):
     now = datetime.datetime.now()
     if request.method == 'POST':
         post = request.POST
-        # TODO: See suggestions
         if post.has_key('downtime') and post['downtime']:
             # After paste and checking after downtime checkbox - prepare data for user to make changes after downtime
             sites = []
@@ -401,37 +401,41 @@ def paste(request):
             new_anoms = []
             new_sites = []
             new_wormholes = []
+            names = {}
             paste = post['pastedata']
             system = post['system']
             for line in paste.split('\n'):
                 data = p_get_all_data(line)
                 if data['issite']:
                     new_sites.append(data['scanid'])
+                    names[data['scanid']] = data['name']
                 elif data['isanom']:
                     new_anoms.append(data['scanid'])
+                    names[data['scanid']] = data['name']
                 else:
                     new_wormholes.append(data['scanid'])
             paste_data = []
             allSites = Site.objects.filter(where=system, closed=False)
             for site in allSites:
                 sites.append(site)
+                exact_matches = []
+                for i, n in names.iteritems():
+                    if n == site.name:
+                        exact_matches.append(i)
                 if site.isAnom():
-                    paste_data.append(PasteMatch(scanid=site.scanid, p_type='anom', allowed=new_anoms))
+                    paste_data.append(PasteMatch(scanid=site.scanid, p_type='anom', allowed=[a + ': ' + names[a] for a in new_anoms] if len(exact_matches) == 0 else [e + ':' + names[e] for e in exact_matches]))
                 else:
-                    paste_data.append(PasteMatch(scanid=site.scanid, p_type='site', allowed=new_sites))
+                    paste_data.append(PasteMatch(scanid=site.scanid, p_type='site', allowed=[s + ': ' + names[s] for s in new_sites] if len(exact_matches) == 0 else [e + ':' + names[e] for e in exact_matches]))
             allWormholes = Wormhole.objects.filter(start=system, closed=False)
             for wormhole in allWormholes:
                 wormholes.append(wormhole)
                 paste_data.append(PasteMatch(scanid=wormhole.scanid, p_type='wormhole', allowed=new_wormholes))
             for s in new_sites:
-                newids.append(SpaceObject(s, 'site'))
+                newids.append(SpaceObject(s, 'Signature', names[s]))
             for a in new_anoms:
-                newids.append(SpaceObject(s, 'anom'))
+                newids.append(SpaceObject(a, 'Anomaly', names[s]))
             for w in new_wormholes:
-                newids.append(SpaceObject(s, 'wormhole'))
-            # newids.extend([s + ' site' for s in new_sites])
-            # newids.extend([a + ' anom' for a in new_anoms])
-            # newids.extend([w + ' wormhole' for w in new_wormholes])
+                newids.append(SpaceObject(w, 'Wormhole', ''))
             return render(request, 'sitemngr/pastescandowntime.html', {'system': system, 'pastedata': paste_data, 'sites': sites, 'wormholes': wormholes, 'newids': newids,
                            'displayname': get_display_name(eveigb, request), 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage})
         elif post.has_key('afterdowntime') and post['afterdowntime']:
