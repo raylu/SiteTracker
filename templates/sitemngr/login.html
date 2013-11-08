@@ -4,14 +4,34 @@
 
 <center>
 
-<h1>Login</h1>
+{% if note %}
+    <div class="message">
+        {{ note }}<br>
+    </div>
+    <hr>
+{% endif %}
 
-<form method="POST" action="/sitemngr/create_account/">
-{% csrf_token %}
-	<label>Username: </label><input type="text" name="username"><br>
-	<label>Password: </label><input type="password" name="password"><br>
-	<input type="submit" value="Submit">
-</form>
+<div class="row">
+    <div class="span6">
+        <h2>Login</h2>
+        <form method="POST" action="/sitemngr/login/">
+        {% csrf_token %}
+            <label>Username: </label><input type="text" name="username"><br>
+            <label>Password: </label><input type="password" name="password"><br>
+            <input type="submit" value="Login">
+        </form>
+    </div>
+    <div class="span6">
+        <h2>Create account</h2>
+        <form method="POST" action="/sitemngr/create_account/">
+        {% csrf_token %}
+            <label>Username: </label><input type="text" name="username" value="{{ eveigb.charname }}" readonly><br>
+            <label>Password: </label><input type="password" name="password"><br>
+            <input type="submit" value="Create account">
+        </form>
+    </div>
+</div>
+
 
 </center>
 

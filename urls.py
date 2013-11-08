@@ -24,5 +24,6 @@ urlpatterns = patterns('',
    url(r'^stats/', 'sitemngr.views.stats'),
    url(r'^settings/', 'sitemngr.views.settings'),
    url(r'^login/', 'sitemngr.views.login_page'),
+   url(r'^logout/', 'sitemngr.views.logout_page'),
    url(r'^create_account/', 'sitemngr.views.create_account')
 )

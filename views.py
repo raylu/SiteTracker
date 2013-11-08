@@ -1,13 +1,13 @@
 # Django
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 
 # sitemngr
 from sitemngr.models import (Site, SiteChange,
                              Wormhole, WormholeChange,
-                             PasteData, Whitelisted,
-                             Settings, KillReport)
+                             PasteData, Settings,
+                             KillReport)
 import settings as appSettings
 
 # eve_db
@@ -700,7 +700,7 @@ def viewhelp(request):
 #     Accounts
 # ==============================
 
-def login_page(request):
+def login_page(request, note=None):
     """ A standard User login page """
     if request.method == 'POST':
         p = request.POST
@@ -714,24 +714,33 @@ def login_page(request):
                     return index(request, 'This account is disabled')
             else:
                 return index(request, 'An error occurred when logging in')
-    return render(request, 'sitemngr/login.html')
+    return render(request, 'sitemngr/login.html', {'note': note})
+
+def logout_page(request):
+    """ If the user is logged into an account, they are logged off """
+    logout(request)
+    return index(request, 'You have been logged out.')
 
 def create_account(request):
     """
         Create an account on the server
         Must be done from the in-game browser
     """
-    eveigb = IGBHeaderParser(request)
-    if not canView(eveigb):
-        return noaccess(request)
-    if User.objects.get(username__exact=eveigb.charname):
-        return index(request, 'You already have an account on this server.')
     if request.method == 'POST':
+        eveigb = IGBHeaderParser(request)
+        if not canView(eveigb):
+            return noaccess(request)
+        try:
+            if User.objects.get(username__exact=eveigb.charname):
+                return index(request, 'You already have an account on this server.')
+        except User.DoesNotExist:
+            pass
         p = request.POST
         if p['password']:
             user = User.objects.create_user(username=eveigb.charname, password=p['password'])
             user.save()
             return index(request, 'Successfully created account on the server.')
+        return login_page(request, 'You must enter a password.')
     return index(request)
 
 def settings(request):
