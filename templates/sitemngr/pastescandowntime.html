@@ -27,7 +27,7 @@
     <div class="span6">
         <h5>New from Paste</h5>
         {% for n in newids %} 
-            {{ n }}<br>
+            {{ n.id }}: <b>{{ n.what }}</b><br>
         {% endfor %}
     </div>
 </div>

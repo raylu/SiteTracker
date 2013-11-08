@@ -341,17 +341,13 @@ def addwormhole(request):
 #     Pastes
 # ==============================
 
-class PasteMap():
-    def __init__(self, parent, possible):
-        self.parent = parent
-        self.possible = possible
-
 def p_get_all_data(line):
     siteTypes = ['Cosmic Signature', 'Data Site', 'Relic Site']
     anomTypes = ['Combat Site', 'Ore Site']  # 'Gas Site' ?
     wormholeTypes = ['Wormhole', 'Unstable Wormhole']
     data = {}
     data['issite'] = False
+    data['isanom'] = False
     data['iswormhole'] = False
     data['name'] = ''
     data['type'] = ''
@@ -378,6 +374,13 @@ def p_get_all_data(line):
         data['name'] = section
     return data
 
+class SpaceObject:
+    def __init__(self, i, what):
+        self.id = i
+        self.what = what
+    def __unicode__(self):
+        return unicode('%s: %s' % (self.id, self.what))
+
 def paste(request):
     """
         Allow players to paste data from their system scanner into a
@@ -395,20 +398,41 @@ def paste(request):
             sites = []
             wormholes = []
             newids = []
+            new_anoms = []
+            new_sites = []
+            new_wormholes = []
             paste = post['pastedata']
             system = post['system']
             for line in paste.split('\n'):
-                newids.append(p_get_all_data(line)['scanid'])
+                data = p_get_all_data(line)
+                if data['issite']:
+                    new_sites.append(data['scanid'])
+                elif data['isanom']:
+                    new_anoms.append(data['scanid'])
+                else:
+                    new_wormholes.append(data['scanid'])
             paste_data = []
             allSites = Site.objects.filter(where=system, closed=False)
             for site in allSites:
                 sites.append(site)
-                paste_data.append(PasteMatch(scanid=site.scanid, p_type='site' if not site.isAnom() else 'anom', allowed=newids))
+                if site.isAnom():
+                    paste_data.append(PasteMatch(scanid=site.scanid, p_type='anom', allowed=new_anoms))
+                else:
+                    paste_data.append(PasteMatch(scanid=site.scanid, p_type='site', allowed=new_sites))
             allWormholes = Wormhole.objects.filter(start=system, closed=False)
             for wormhole in allWormholes:
                 wormholes.append(wormhole)
-                paste_data.append(PasteMatch(scanid=wormhole.scanid, p_type='wormhole', allowed=newids))
-            return render(request, 'sitemngr/pastescandowntime.html', {'system': system, 'pastedata': paste_data, 'sites': sites, 'wormholes': wormholes, 'newids': newids, 
+                paste_data.append(PasteMatch(scanid=wormhole.scanid, p_type='wormhole', allowed=new_wormholes))
+            for s in new_sites:
+                newids.append(SpaceObject(s, 'site'))
+            for a in new_anoms:
+                newids.append(SpaceObject(s, 'anom'))
+            for w in new_wormholes:
+                newids.append(SpaceObject(s, 'wormhole'))
+            # newids.extend([s + ' site' for s in new_sites])
+            # newids.extend([a + ' anom' for a in new_anoms])
+            # newids.extend([w + ' wormhole' for w in new_wormholes])
+            return render(request, 'sitemngr/pastescandowntime.html', {'system': system, 'pastedata': paste_data, 'sites': sites, 'wormholes': wormholes, 'newids': newids,
                            'displayname': get_display_name(eveigb, request), 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage})
         elif post.has_key('afterdowntime') and post['afterdowntime']:
             # After downtime paste page after submitting database changes
