@@ -163,12 +163,13 @@ class UpdateData(models.Model):
 
 class PasteData:
     """ Dynamically constructed class sent to /sitemngr/addsite and  /sitemngr/addwormhole from /sitemngr/paste  """
-    def __init__(self, p_scanid='', p_system=str(settings.HOME_SYSTEM), p_name='', p_type='Anomoly', p_isSite=True):
+    def __init__(self, p_scanid='', p_system=str(settings.HOME_SYSTEM), p_name='', p_type='Anomoly', p_isSite=True, p_isWormhole=False):
         self.scanid = p_scanid
         self.system = p_system
         self.name = p_name
         self.type = p_type
         self.isSite = p_isSite
+        self.iswormhole = p_isWormhole
     def __unicode__(self):
         return unicode(self.scanid)
 

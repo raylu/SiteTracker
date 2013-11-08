@@ -346,6 +346,37 @@ class PasteMap():
         self.parent = parent
         self.possible = possible
 
+def p_get_all_data(line):
+    # TODO: Site name does not work
+    siteTypes = ['Cosmic Signature', 'Data Site', 'Relic Site']
+    anomTypes = ['Combat Site', 'Ore Site']  # 'Gas Site' ?
+    wormholeTypes = ['Wormhole', 'Unstable Wormhole']
+    data = {}
+    data['issite'] = False
+    data['iswormhole'] = False
+    for section in line.split('\t'):
+        if section is None:
+            continue
+        if re.match(r'^[a-zA-Z]{3}-\d{3}$', section):
+            data['scanid'] = section[:3].upper()
+            continue
+        if section in siteTypes:
+            data['issite'] = True
+            data['type'] = section
+            continue
+        if section in anomTypes:
+            data['isanom'] = True
+            data['type'] = section
+            continue
+        if section in wormholeTypes:
+            data['iswormhole'] = True
+            data['type'] = section
+            continue
+        if '%' in section or 'AU' in section:
+            continue
+        data['name'] = section
+    return data
+
 def paste(request):
     """
         Allow players to paste data from their system scanner into a
@@ -357,7 +388,6 @@ def paste(request):
     now = datetime.datetime.now()
     if request.method == 'POST':
         post = request.POST
-        # ====================================
         # TODO: See suggestions
         if post.has_key('downtime') and post['downtime']:
             # After paste and checking after downtime checkbox - prepare data for user to make changes after downtime
@@ -374,15 +404,9 @@ def paste(request):
             for wormhole in allWormholes:
                 wormholes.append(wormhole)
             for line in paste.split('\n'):
-                for section in line.split('\t'):
-                    if section is None:
-                        pass
-                    elif re.match(r'^[a-zA-Z]{3}-\d{3}$', section):
-                        newids.append(section[:3].upper())
-                        # TODO: Put more of the parsing code here, to properly map out the possibilities for pairing
-            return render(request, 'sitemngr/pastescandowntime.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes,
+                newids.append(p_get_all_data(line)['scanid'])
+            return render(request, 'sitemngr/pastescandowntime.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'system': system,
                            'newids': newids, 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage, 'system': system, 'pastemap': paste_map})
-        # ====================================
         elif post.has_key('afterdowntime') and post['afterdowntime']:
             # After downtime paste page after submitting database changes
             for k, v in post.iteritems():
@@ -429,62 +453,39 @@ def paste(request):
             return index(request, note='%s %s' % (k, v))
         else:
             # Parse data to return to normal paste page
-            # TODO: Would like to move the bulk of the parsing code to a separate method
-            siteTypes = ['Unstable Wormhole', 'Anomaly', 'Ore Site', 'Relic Site', 'Data Site', 'Gas Site', 'Cosmic Signature']
             present = []
             findnew = []
             notfound = []
             if 'pastedata' in post and post['pastedata'] and 'system' in post and post['system']:
-            # {
                 paste = post['pastedata']
                 system = post['system']
                 notfound.extend(Site.objects.filter(where=system, closed=False))
                 notfound.extend(Wormhole.objects.filter(start=system, closed=False))
                 for line in paste.split('\n'):
-                # {
-                    newP = PasteData(p_system=system)
                     found = False
-                    for section in line.split('\t'):
-                    # {
-                        if section is None:
-                            continue
-                        elif 'AU' in section:
-                            continue
-                        elif '%' in section:
-                            continue
-                        elif 'wormhole' in section.lower():
-                            newP.isSite = False
-                        elif section == 'Cosmic Signature':
-                            continue
-                        elif re.match(r'^[a-zA-Z]{3}-\d{1,3}$', section):
-                        # {
-                            section = section.upper()
-                            if isSite(section[:3]):
-                                site = getSite(section[:3])
-                                if site.where == system:
-                                    notfound.remove(site)
-                                    found = True
-                                    present.append(site)
-                            elif isWormhole(section[:3]):
-                                wormhole = getWormhole(section[:3])
-                                if wormhole.start == system:
-                                    notfound.remove(wormhole)
-                                    found = True
-                                    present.append(wormhole)
-                            if not found:
-                                newP.scanid = section[:3]
-                        # }
-                        elif section in siteTypes:
-                            newP.type = section
-                        else:
-                            newP.name = section
-                    # }
+                    newP = PasteData(p_system=system)
+                    data = p_get_all_data(line)
+                    newP.isSite = True if data['issite'] else False
+                    newP.isWormhole = True if data['iswormhole'] else False
+                    newP.scanid = data['scanid']
+                    newP.type = data['type']
+                    newP.name = data['name']
+                    if isSite(newP.scanid):
+                        site = getSite(newP.scanid)
+                        if site.where == system:
+                            notfound.remove(site)
+                            found = True
+                            present.append(site)
+                    elif isWormhole(newP.scanid):
+                        wormhole = getWormhole(newP.scanid)
+                        if wormhole.start == system:
+                            notfound.remove(wormhole)
+                            found = True
+                            present.append(wormhole)
                     if not found:
                         findnew.append(newP)
-                # }
                 return render(request, 'sitemngr/pastescan.html', {'displayname': get_display_name(eveigb, request), 'raw': post['pastedata'],
                                'present': present, 'notfound': notfound, 'findnew': findnew, 'timenow': now, 'system': system, 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage})
-            # }
     # Base request - show the base pastescan page
     return render(request, 'sitemngr/pastescan.html', {'displayname': get_display_name(eveigb, request), 'timenow': now, 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage})
 
@@ -735,7 +736,6 @@ def create_account(request):
 
 def settings(request):
     """ Settings page for viewing and changing user settings """
-    # TODO: This page only works for in-game browser character settings
     eveigb = IGBHeaderParser(request)
     if not canView(eveigb, request):
         return noaccess(request)
@@ -816,21 +816,14 @@ def canView(igb, request=None):
         if request.user is not None:
             if request.user.is_active:
                 return True
-    isWhitelisted = False
-    try:
-        wormhole = Whitelisted.objects.get(name=igb.charname)
-        if wormhole is not None and wormhole.active:
-            isWhitelisted = True
-    except Whitelisted.DoesNotExist:
-        pass
-    return igb is not None and igb.is_igb and igb.trusted and (igb.alliancename == appSettings.ALLIANCE_NAME or isWhitelisted)
+    return igb is not None and igb.is_igb and igb.trusted and igb.alliancename == appSettings.ALLIANCE_NAME
 
 def canViewWrongAlliance(igb):
     """
         Returns True if the user can view that page by testing
             if they are using the EVE IGB (Trusted mode), but does not check alliance
     """
-    return igb is not None and igb.is_igb and igb.trusted
+    return igb is not None and igb.is_igb and igb.trusted and igb.alliancename != appSettings.ALLIANCE_NAME
 
 def isSite(scanid):
     """ Returns True if the scanid represents a site object """

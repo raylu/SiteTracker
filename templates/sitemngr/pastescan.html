@@ -13,7 +13,7 @@
                 <label><b>System</b>:</label>
             </td>
             <td>
-                <input type="text" name="system" value="{{ eveigb.solarsystemname }}">
+                <input type="text" name="system" value="{% if system %}{{ system }}{% else %}{{ eveigb.solarsystemname }}{% endif %}">
             </td>
         </tr>
     </table><br>
@@ -106,10 +106,10 @@
                         {{ f.scanid }}
                     </td>
                     <td>
-                        {% if f.isSite %}
-                            <a href="/sitemngr/addsite/?scanid={{ f.scanid }}&timenow={{ timenow }}&type={{ f.type }}&name={{ f.name }}&system={{ f.system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
-                        {% else %}
+                        {% if f.isWormhole %}
                             <a href="/sitemngr/addwormhole/?scanid={{ f.scanid }}&timenow={{ timenow }}&system={{ f.system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
+                        {% else %}
+                            <a href="/sitemngr/addsite/?scanid={{ f.scanid }}&timenow={{ timenow }}&type={{ f.type }}&name={{ f.name }}&system={{ f.system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
                         {% endif %}
                     </td>
                 </tr>
