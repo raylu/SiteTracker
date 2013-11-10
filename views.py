@@ -196,7 +196,7 @@ def addsite(request):
             g_type = g['type']
         if g.has_key('name') and g['name']:
             g_name = g['name']
-    return render(request, 'sitemngr/addsite.html', {'request': request,
+    return render(request, 'sitemngr/addsite.html', {'request': request, 'displayname': get_display_name(eveigb, request),
              'isForm': True, 'finish_msg': 'Store new site into the database:', 'g_scanid': g_scanid, 'g_system': g_system, 'g_type': g_type, 'g_name': g_name, 'timenow': now})
 
 # ==============================
@@ -322,7 +322,7 @@ def addwormhole(request):
                             time=s_time, status=s_status, opened=s_opened, closed=s_closed, notes=s_notes)
         wormhole.save()
         if getSettings(eveigb.charname).storeMultiple:
-            return render(request, 'sitemngr/addwormhole.html', {'request': request,
+            return render(request, 'sitemngr/addwormhole.html', {'request': request, 'displayname': get_display_name(eveigb, request),
                     'isForm': True, 'message': 'Successfully stored the data into the database.', 'finish_msg': 'Store new site into database:', 'timenow': now.strftime('%m/%d @ %H:%M')})
         else:
             return index(request)
@@ -334,7 +334,7 @@ def addwormhole(request):
             g_system = g['system']
         if g.has_key('name') and g['name']:
             g_name = g['name']
-    return render(request, 'sitemngr/addwormhole.html', {'request': request,
+    return render(request, 'sitemngr/addwormhole.html', {'request': request, 'displayname': get_display_name(eveigb, request),
                  'isForm': True, 'finish_msg': 'Store new wormhole into the database:', 'g_scanid': g_scanid, 'g_system': g_system, 'g_name': g_name, 'timenow': now.strftime('%m/%d @ %H:%M')})
 
 # ==============================
@@ -619,11 +619,13 @@ def mastertable(request):
 
 def changelog(request):
     """ Site changelog """
-    return render(request, 'sitemngr/changelog.html')
+    eveigb = IGBHeaderParser(request)
+    return render(request, 'sitemngr/changelog.html', {'displayname': get_display_name(eveigb, request)})
 
 def igbtest(request):
     """ Show all data that the in-game browser can send to a Trusted Site """
-    return render(request, 'sitemngr/igbtest.html')
+    eveigb = IGBHeaderParser(request)
+    return render(request, 'sitemngr/igbtest.html', {'displayname': get_display_name(eveigb, request)})
 
 def recentscanedits(request):
     """ Returns a readout of all recent scanid changes """

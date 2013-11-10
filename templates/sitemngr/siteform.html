@@ -4,7 +4,7 @@
             <label>Creator</label>
         </td>
         <td>
-            <input type="text" name="creator" value="{% if site %}{{ site.creator }}{% else %}{% if isForm %}{{ eveigb.charname }}{% endif %}{% endif %}" readonly>
+            <input type="text" name="creator" value="{% if site %}{{ site.creator }}{% else %}{% if isForm %}{{ displayname }}{% endif %}{% endif %}" readonly>
         </td>
     </tr>
     <tr>
