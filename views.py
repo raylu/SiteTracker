@@ -275,9 +275,7 @@ def editwormhole(request, wormholeid):
             if appendNotes is not None:
                 wormhole.notes += appendNotes
             wormhole.save()
-            change = WormholeChange(wormhole=wormhole, user=eveigb.charname if eveigb.charname is not '' else request.user.username, date=now, changedScanid=changedScanid, changedType=False,
-                                 changedStart=changedStart, changedDestination=changedDestination, changedTime=changedTime, changedStatus=changedStatus,
-                                 changedOpened=changedOpened, changedClosed=changedClosed, changedNotes=changedNotes)
+            change = WormholeChange(wormhole=wormhole, user=eveigb.charname if eveigb.charname is not '' else request.user.username, date=now, changedScanid=changedScanid, changedType=False, changedStart=changedStart, changedDestination=changedDestination, changedTime=changedTime, changedStatus=changedStatus, changedOpened=changedOpened, changedClosed=changedClosed, changedNotes=changedNotes)
             change.save()
         return index(request)
     return render(request, 'sitemngr/viewwormhole.html', {'displayname': get_display_name(eveigb, request), 'isForm': True,
@@ -735,6 +733,7 @@ def viewhelp(request):
 #     Accounts
 # ==============================
 
+# TODO: 
 def login_page(request, note=None):
     """ A standard User login page """
     if request.method == 'POST':
@@ -746,9 +745,13 @@ def login_page(request, note=None):
                     login(request, user)
                     return index(request, 'Successfully logged in')
                 else:
-                    return index(request, 'This account is disabled')
+                    return render(request, 'sitemngr/login.html', {'note': 'This account is disabled'})
             else:
-                return index(request, 'An error occurred when logging in')
+                return render(request, 'sitemngr/login.html', {'note': 'An error occurred when logging in - check your username and password'})
+        else:
+            return index(request, 'You must enter both a username and a password.')
+    else:
+        note = 'Nope'
     return render(request, 'sitemngr/login.html', {'note': note})
 
 def logout_page(request):

@@ -53,7 +53,15 @@
             <label>Status at time above:</label>
         </td>
         <td>
-            <input type="text" name="status" value="{% if wormhole %}{{ wormhole.status }}{% else %}Fresh{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+            <!-- <input type="text" name="status" value="{% if wormhole %}{{ wormhole.status }}{% else %}Fresh{% endif %}" {% if isForm %}{% else %}readonly{% endif %}> -->
+            <select name="status">
+                <option>Fresh</option>
+                <option>< 50% mass</option>
+                <option>< 50% time</option>
+                <option>VoC</option>
+                <option>EoL</option>
+                <option>Unknown</option>
+            </select>
         </td>
     </tr>
     <tr>
@@ -61,7 +69,7 @@
             <label>Has the wormhole been opened:</label>
         </td>
         <td>
-            <input type="checkbox" name="opened" {% if wormhole and wormhole.opened %}checked="checked"{% endif %} {% if not isForm %}disabled="disabled"{% endif %}>
+            <input type="checkbox" name="opened" {% if wormhole and wormhole.opened %}checked="checked"{% endif %}{% if isForm and not wormhole %}checked="checked"{% endif %}{% if not isForm %} disabled="disabled"{% endif %}{% if not isForm %}{% endif %}>
         </td>
     </tr>
     <tr>
