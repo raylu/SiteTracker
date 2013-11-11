@@ -733,7 +733,6 @@ def viewhelp(request):
 #     Accounts
 # ==============================
 
-# TODO: 
 def login_page(request, note=None):
     """ A standard User login page """
     if request.method == 'POST':
