@@ -21,7 +21,7 @@
             <label>Scan ID:</label>
         </td>
         <td>
-            <input type="text" name="scanid" value="{% if wormhole %}{{ wormhole.scanid }}{% elif g_scanid %}{{ g_scanid }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+            <input type="text" id="t_scanid" name="scanid" value="{% if wormhole %}{{ wormhole.scanid }}{% elif g_scanid %}{{ g_scanid }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
         </td>
     </tr>
     <tr>

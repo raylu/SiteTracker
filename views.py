@@ -106,7 +106,7 @@ def editsite(request, siteid):
             if p['scanid'] != site.scanid:
                 changedScanid = True
                 appendNotes = 'Scanid: {0} >> {1}'.format(site.scanid, p['scanid'])
-                site.scanid = p['scanid']
+                site.scanid = p['scanid'].upper()
         if p.has_key('type') and p['type']:
             if p['type'] != site.type:
                 changedType = True
@@ -168,7 +168,7 @@ def addsite(request):
         if p.has_key('name') and p['name']:
             s_name = p['name']
         if p.has_key('scanid') and p['scanid']:
-            s_scanid = p['scanid']
+            s_scanid = p['scanid'].upper()
         if p.has_key('type') and p['type']:
             s_type = p['type']
         if p.has_key('where') and p['where']:
@@ -234,7 +234,7 @@ def editwormhole(request, wormholeid):
             if p['scanid'] != wormhole.scanid:
                 changedScanid = True
                 appendNotes = ' Scanid: {0} >> {1}'.format(wormhole.scanid, p['scanid'])
-                wormhole.scanid = p['scanid']
+                wormhole.scanid = p['scanid'].upper()
         if p.has_key('start') and p['start']:
             if p['start'] != wormhole.start:
                 changedStart = True
@@ -301,7 +301,7 @@ def addwormhole(request):
         s_closed = False
         s_notes = ''
         if p.has_key('scanid') and p['scanid']:
-            s_scanid = p['scanid']
+            s_scanid = p['scanid'].upper()
         if p.has_key('start') and p['start']:
             s_start = p['start']
         if p.has_key('destination') and p['destination']:
