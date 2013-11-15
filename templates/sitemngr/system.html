@@ -8,6 +8,14 @@
 
 <h5><a href="http://wormhol.es/{{ system }}">Wormhol.es page</a></h5>
 
+{% if kspace_jumps %}
+    <p>
+        {% for jump in kspace_jumps %}
+            Jumps to {{ jump.where }}: {{ jump.count }}<br>
+        {% endfor %}
+    </p>
+{% endif %}
+
 <hr>
 
 <h3>Currently open Wormholes</h3>

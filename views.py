@@ -533,12 +533,19 @@ def systemlanding(request):
     now = datetime.datetime.now()
     systems = []
     for site in Site.objects.filter(closed=False):
-        if (site.where in systems) == False:
+        if not site.where in systems:
             systems.append(site.where)
     for wormhole in Wormhole.objects.filter(closed=False):
-        if (wormhole.start in systems) == False:
+        if not wormhole.start in systems:
                 systems.append(wormhole.start)
+        if not wormhole.destination in systems:
+            systems.append(wormhole.destination)
     return render(request, 'sitemngr/systemlanding.html', {'displayname': get_display_name(eveigb, request), 'systems': systems, 'timenow': now})
+
+class JumpsTo:
+    def __init__(self, where, count):
+        self.where = where
+        self.count = count
 
 def system(request, systemid):
     """
@@ -548,15 +555,16 @@ def system(request, systemid):
     eveigb = IGBHeaderParser(request)
     if not canView(eveigb, request):
         return noaccess(request)
-    openwormholes = []
     opensites = Site.objects.filter(where=systemid, closed=False, opened=True)
-    openwormholes.extend(Wormhole.objects.filter(start=systemid, closed=False, opened=True))
     unopenedsites = Site.objects.filter(where=systemid, closed=False, opened=False)
+    openwormholes = []
+    openwormholes.extend(Wormhole.objects.filter(start=systemid, closed=False, opened=True))
     for w in Wormhole.objects.filter(destination=systemid, closed=False, opened=True):
         if not w in openwormholes:
             openwormholes.append(w)
     closedwormholes = Wormhole.objects.filter(start=systemid, closed=True)
     clazz = 0
+    kspace_jumps = []
     if re.match(r'J\d{6}', systemid):
         contents = urllib2.urlopen('http://www.ellatha.com/eve/WormholeSystemview.asp?key={0}'.format(systemid.replace('J', ''))).read().split('\n')
         nextLine = False
@@ -567,9 +575,27 @@ def system(request, systemid):
             if nextLine:
                 clazz = line.split('&')[0][-1]
                 break
+    else:
+        try:
+            MapSolarSystem.objects.get(name=systemid)
+            for hub in get_tradehubs():
+                kspace_jumps.append(JumpsTo(hub, get_jumps(systemid, hub)))
+        except MapSolarSystem.DoesNotExist:
+                pass
     return render(request, 'sitemngr/system.html', {'displayname': get_display_name(eveigb, request), 'system': systemid, 'openwormholes': openwormholes, 'closedwormholes': closedwormholes,
-                            'class': clazz, 'opensites': opensites, 'unopenedsites': unopenedsites})
+                            'class': clazz, 'opensites': opensites, 'unopenedsites': unopenedsites, 'kspace_jumps': kspace_jumps})
 
+def get_tradehubs():
+    return ['Jita', 'Rens', 'Dodixie', 'Amarr', 'Hek']
+
+def get_jumps(start, finish):
+    url = 'http://evemaps.dotlan.net/route/%s:%s' % (start, finish)
+    count = 0
+    contents = urllib2.urlopen(url).read()
+    for line in contents.split('\n'):
+        if '<td align="right">' in line:
+            count += 1
+    return count / 2
 
 # ==============================
 #     Reference lookup
