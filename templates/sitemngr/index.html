@@ -11,6 +11,8 @@ Index
 	$(document).ready(function()
 	{
 		$('#graph').hide();
+		$('#overlay').hide();
+		$('#overlay').load('http://tracker.talkinlocal.org/sitemngr/overlay/');
 	});
 </script>
 {% endblock %}
@@ -18,6 +20,7 @@ Index
 {% block content %}
 
 <center>
+
 
 {% if flag %}
     <div class="message">
@@ -35,13 +38,18 @@ Index
 {% endif %}
 
 <br>
-<button onclick="$('#graph').toggle();">Toggle graph</button>
+<button onclick="$('#graph').toggle(250);">Toggle graph</button>
+<button onclick="$('#overlay').toggle(250);">Show Overview</button>
+
 <div id="graph" style="border: 1px solid gray;">
 	<img src="{% static 'pictures/graph.png' %}" alt="Current graph not found"></img><br>
 	<p><strong>
     	HS = gold, LS = purple, NS = brown, C1 = blue, C2 = green,
         C3 = yellow, C4 = orange, C5 = red, C6 = black, not found = black
 	</strong></p>
+</div>
+<div style="width: 100%; border: 1px solid black; margin-bottom: 20px;" id="overlay">
+    <span style="color: gray; text-align: left;">Loading ...</span>
 </div>
 
 <h5><a href="/sitemngr/system/J132814">Nexus System Page</a></h5>

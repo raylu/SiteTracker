@@ -746,7 +746,7 @@ def checkkills(request):
         kills = evemap.kills_by_system()[0]
         for k in kills.iteritems():
             if k[0] in retSys:
-                r = KillReport(system=getSystemName(k[0]), systemid=k[0], ship=k[1]['ship'], pod=k[1]['pod'])
+                r = KillReport(system=getSystemName(k[0]), systemid=k[0], npc=k[1]['faction'], ship=k[1]['ship'], pod=k[1]['pod'])
                 reports.append(r)
     return render(request, 'sitemngr/checkkills.html', {'displayname': get_display_name(eveigb, request), 'systems': systems, 'reports': reports})
 
@@ -754,6 +754,46 @@ def viewhelp(request):
     """ Help/instructions page """
     eveigb = IGBHeaderParser(request)
     return render(request, 'sitemngr/help.html', {'displayname': get_display_name(eveigb, request), 'able': canView(eveigb, request)})
+
+def overlay(request):
+    eveigb = IGBHeaderParser(request)
+    if not canView(eveigb, request):
+        return noaccess(request)
+    c2_open = False
+    hs = False
+    jita_closest = None  # TODO: do
+    for wormhole in Wormhole.objects.filter(opened=True, closed=False, start='J132814'):
+        if not wormhole.destination.lower() in ['', ' ', 'closed', 'unopened', 'unknown']:
+            if re.match(r'^J\d{6}$', wormhole.destination) and get_wormhole_class(wormhole.destination) == 2:
+                c2_open = True
+            else:
+                try:
+                    system = MapSolarSystem.objects.get(name=system)
+                except MapSolarSystem.DoesNotExist:
+                    return 'black'
+                status = system.security_level
+                if status > 0.5:
+                    hs = True
+    kills_npc = kills_ship = kills_pod = 0
+    kills = evemap.kills_by_system()[0]
+    for k in kills.iteritems():
+        if str(k[0]) == appSettings.HOME_SYSTEM_ID:
+            kills_npc = k[1]['faction']
+            kills_ship = k[1]['ship']
+            kills_pod = k[1]['pod']
+    return render(request, 'sitemngr/overlay.html', {'c2_open': c2_open, 'hs': hs, 'jita_closest': jita_closest, 'kills_npc': kills_npc, 'kills_ship': kills_ship, 'kills_pod': kills_pod})
+
+def get_wormhole_class(system):
+    try:
+        url = 'http://www.ellatha.com/eve/WormholeSystemview.asp?key={}'.format(system.replace('J', ''))
+        contents = urllib2.urlopen(url).read().split('\n')
+        for line in contents:
+            if line.startswith('<td bgcolor="#F5F5F5">'):
+                if re.match(r'^\d$', line.split('>')[1][0]):
+                    return line.split('>')[1][0]
+    except:
+        pass
+    return 0
 
 # ==============================
 #     Accounts

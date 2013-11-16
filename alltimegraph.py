@@ -11,11 +11,11 @@ files = [f for f in listdir(dir) if isfile(join(dir, f)) ]
 
 edits = {}
 
-for file in files:
+for start in files:
     try:
-        f = open(join(dir, file), 'r')
+        f = open(join(dir, start), 'r')
     except TypeError:
-        print 'Could not load file', file
+        print 'Could not load start', start
     lines = [l.strip() for l in f]
     for line in lines:
         if not line:

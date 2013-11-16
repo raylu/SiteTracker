@@ -25,5 +25,6 @@ urlpatterns = patterns('',
    url(r'^settings/', 'sitemngr.views.settings'),
    url(r'^login/', 'sitemngr.views.login_page'),
    url(r'^logout/', 'sitemngr.views.logout_page'),
-   url(r'^create_account/', 'sitemngr.views.create_account')
+   url(r'^create_account/', 'sitemngr.views.create_account'),
+   url(r'^overlay/', 'sitemngr.views.overlay'),
 )

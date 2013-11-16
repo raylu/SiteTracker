@@ -15,8 +15,7 @@ Check Kills
 <h4>For every system with an open wormhole,
 <br>the following systems are hot in the last hour:</h4>
 
-<p><b>Note</b> that this page takes a long time to load. Sorry. Also, if a system shows here<br>
-but doesn't list any ship or pod kills, then it's npc kills.</p>
+<p><b>Note</b> that this page takes a long time to load. Sorry.</p>
 
 {% if reports %}
     <table>
@@ -26,6 +25,9 @@ but doesn't list any ship or pod kills, then it's npc kills.</p>
             </th>
             <th>
                 SystemID
+            </th>
+            <th>
+                NPC
             </th>
             <th>
                 Ship
@@ -41,6 +43,9 @@ but doesn't list any ship or pod kills, then it's npc kills.</p>
             </td>
             <td>
                 {{ r.systemid }}
+            </td>
+            <td>
+                {{ r.npc }}
             </td>
             <td>
                 {{ r.ship }}

@@ -184,9 +184,10 @@ class PasteMatch:
 
 class KillReport:
     """ Dynamically constructed class sent to /sitemngr/checkkills """
-    def __init__(self, system=settings.HOME_SYSTEM, systemid=settings.HOME_SYSTEM_ID, ship=0, pod=0):
+    def __init__(self, system=settings.HOME_SYSTEM, systemid=settings.HOME_SYSTEM_ID, npc=0, ship=0, pod=0):
         self.system = system
         self.systemid = systemid
+        self.npc = npc
         self.ship = ship
         self.pod = pod
     def __unicode__(self):
