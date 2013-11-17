@@ -42,7 +42,7 @@ def get_color(system_name):
 def get_color_wh(system_name):
 	level = 1
 	try:
-		url = 'http://www.ellatha.com/eve/WormholeSystemview.asp?key={}'.format(system.replace('J', ''))
+		url = 'http://www.ellatha.com/eve/WormholeSystemview.asp?key={}'.format(system_name.replace('J', ''))
 		contents = urllib2.urlopen(url).read().split('\n')
 		level = 0
 		for line in contents:

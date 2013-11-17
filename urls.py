@@ -27,4 +27,5 @@ urlpatterns = patterns('',
    url(r'^logout/', 'sitemngr.views.logout_page'),
    url(r'^create_account/', 'sitemngr.views.create_account'),
    url(r'^overlay/', 'sitemngr.views.overlay'),
+   url(r'^get_tradehub_jumps/([-a-zA-Z0-9 ]+)', 'sitemngr.views.get_tradehub_jumps')
 )

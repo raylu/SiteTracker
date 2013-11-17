@@ -2,6 +2,7 @@
 import datetime
 import re
 import urllib2
+from math import floor
 
 # Django
 from django.shortcuts import render, get_object_or_404
@@ -542,11 +543,6 @@ def systemlanding(request):
             systems.append(wormhole.destination)
     return render(request, 'sitemngr/systemlanding.html', {'displayname': get_display_name(eveigb, request), 'systems': systems, 'timenow': now})
 
-class JumpsTo:
-    def __init__(self, where, count):
-        self.where = where
-        self.count = count
-
 def system(request, systemid):
     """
         Show all wormholes into and out of this system.
@@ -564,7 +560,8 @@ def system(request, systemid):
             openwormholes.append(w)
     closedwormholes = Wormhole.objects.filter(start=systemid, closed=True)
     clazz = 0
-    kspace_jumps = []
+    security = None
+    is_kspace = None
     if re.match(r'J\d{6}', systemid):
         contents = urllib2.urlopen('http://www.ellatha.com/eve/WormholeSystemview.asp?key={0}'.format(systemid.replace('J', ''))).read().split('\n')
         nextLine = False
@@ -574,19 +571,22 @@ def system(request, systemid):
                 continue
             if nextLine:
                 clazz = line.split('&')[0][-1]
+                is_kspace = False
                 break
     else:
         try:
-            MapSolarSystem.objects.get(name=systemid)
-            for hub in get_tradehubs():
-                kspace_jumps.append(JumpsTo(hub, get_jumps(systemid, hub)))
+            security = floor(MapSolarSystem.objects.get(name=systemid).security_level * 10) / 10
+            is_kspace = True
         except MapSolarSystem.DoesNotExist:
                 pass
     return render(request, 'sitemngr/system.html', {'displayname': get_display_name(eveigb, request), 'system': systemid, 'openwormholes': openwormholes, 'closedwormholes': closedwormholes,
-                            'class': clazz, 'opensites': opensites, 'unopenedsites': unopenedsites, 'kspace_jumps': kspace_jumps})
+                            'class': clazz, 'security': security, 'kspace': is_kspace, 'opensites': opensites, 'unopenedsites': unopenedsites})
 
-def get_tradehubs():
-    return ['Jita', 'Rens', 'Dodixie', 'Amarr', 'Hek']
+def get_tradehub_jumps(request, system):
+    jumps = []
+    for hub in ['Jita', 'Rens', 'Dodixie', 'Amarr', 'Hek']:
+        jumps.append([hub, get_jumps(system, hub)])
+    return render(request, 'sitemngr/tradehubjumps.html', dict((x.lower(), y) for x, y in jumps))
 
 def get_jumps(start, finish):
     url = 'http://evemaps.dotlan.net/route/%s:%s' % (start, finish)
@@ -759,21 +759,22 @@ def overlay(request):
     eveigb = IGBHeaderParser(request)
     if not canView(eveigb, request):
         return noaccess(request)
+    data = ''
     c2_open = False
     hs = False
     jita_closest = None  # TODO: do
     for wormhole in Wormhole.objects.filter(opened=True, closed=False, start='J132814'):
         if not wormhole.destination.lower() in ['', ' ', 'closed', 'unopened', 'unknown']:
-            if re.match(r'^J\d{6}$', wormhole.destination) and get_wormhole_class(wormhole.destination) == 2:
-                c2_open = True
-            else:
-                try:
-                    system = MapSolarSystem.objects.get(name=system)
-                except MapSolarSystem.DoesNotExist:
-                    return 'black'
-                status = system.security_level
-                if status > 0.5:
-                    hs = True
+            if re.match(r'^J\d{6}$', wormhole.destination):
+                c2_open = get_wormhole_class(wormhole.destination) == '2'
+    for wormhole in Wormhole.objects.filter(opened=True, closed=False):
+        try:
+            system = MapSolarSystem.objects.get(name=wormhole.destination)
+        except MapSolarSystem.DoesNotExist:
+            continue
+        status = system.security_level
+        if status > 0.5:
+            hs = True
     kills_npc = kills_ship = kills_pod = 0
     kills = evemap.kills_by_system()[0]
     for k in kills.iteritems():
@@ -781,7 +782,7 @@ def overlay(request):
             kills_npc = k[1]['faction']
             kills_ship = k[1]['ship']
             kills_pod = k[1]['pod']
-    return render(request, 'sitemngr/overlay.html', {'c2_open': c2_open, 'hs': hs, 'jita_closest': jita_closest, 'kills_npc': kills_npc, 'kills_ship': kills_ship, 'kills_pod': kills_pod})
+    return render(request, 'sitemngr/overlay.html', {'c2_open': c2_open, 'hs': hs, 'jita_closest': jita_closest, 'kills_npc': kills_npc, 'kills_ship': kills_ship, 'kills_pod': kills_pod, 'data': data})
 
 def get_wormhole_class(system):
     try:

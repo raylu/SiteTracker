@@ -4,20 +4,29 @@
 System Info
 {% endblock %}
 
+{% block javascript %}
+    {% if kspace %}
+    <script>
+        $(document).ready(function()
+        {
+            $('#jumps').load('http://tracker.talkinlocal.org/sitemngr/get_tradehub_jumps/{{ system }}/');
+        });
+    </script>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
 
 <center>
 
-<h1>System info: {{ system }}{% if class %}, Class {{ class }}{% endif %}</h1>
+<h1>System info: {{ system }}{% if class %}, Class {{ class }}{% endif %}{% if security %}, {{ security }}{% endif %}</h1>
 
 <h5><a href="http://wormhol.es/{{ system }}">Wormhol.es page</a></h5>
 
-{% if kspace_jumps %}
-    <p>
-        {% for jump in kspace_jumps %}
-            Jumps to {{ jump.where }}: {{ jump.count }}<br>
-        {% endfor %}
-    </p>
+{% if kspace %}
+<div style="width: 100%; margin-bottom: 20px;" id="jumps">
+    <span style="color: gray; text-align: left;">Loading jumps to major tradehubs ...</span>
+</div>
 {% endif %}
 
 <hr>
