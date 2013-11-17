@@ -1,8 +1,8 @@
 <p>
-    Recent NPC kills in Nexus: <b>{% if kills_npc %}Yes: {{ kills_npc }}{% else %}No{% endif %}</b><br>
-    Recent Ships kills in Nexus: <b>{% if kills_ship %}Yes: {{ kills_ship }}{% else %}No{% endif %}</b><br>
-    Recent Pods kills in Nexus: <b>{% if kills_pod %}Yes: {{ kills_pod }}{% else %}No{% endif %}</b><br>
-    Is the C2 open: <b>{% if c2_open %}Yes{% else %}False{% endif %}</b><br>
-    Is there a HS in the database: <b>{% if hs %}Yes{% else %}False{% endif %}</b><br>
-    Closest k-space exit to Jita: <i>Not yet implemented</i><!-- <b>{% if jita_closest %}{{ jita_closest }}{% else %}Null{% endif %}</b> --><br>
+    Recent NPC kills in Nexus: {% if kills_npc %}<b>Yes: {{ kills_npc }}</b>{% else %}No{% endif %}<br>
+    Recent Ships kills in Nexus: {% if kills_ship %}<b>Yes: {{ kills_ship }}</b>{% else %}No{% endif %}<br>
+    Recent Pods kills in Nexus: {% if kills_pod %}<b>Yes: {{ kills_pod }}</b>{% else %}No{% endif %}<br>
+    Is the C2 open: {% if c2_open %}<b>Yes</b>{% else %}False{% endif %}<br>
+    Is there a HS in the database: {% if hs %}<b>Yes</b>{% else %}False{% endif %}<br>
+    Closest k-space exit to Jita: {% if jita_closest %}<b>{{ jita_closest }}</b>{% else %}Null{% endif %}<br>
 </p>

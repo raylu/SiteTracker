@@ -585,10 +585,10 @@ def system(request, systemid):
 def get_tradehub_jumps(request, system):
     jumps = []
     for hub in ['Jita', 'Rens', 'Dodixie', 'Amarr', 'Hek']:
-        jumps.append([hub, get_jumps(system, hub)])
+        jumps.append([hub, get_jumps_between(system, hub)])
     return render(request, 'sitemngr/tradehubjumps.html', dict((x.lower(), y) for x, y in jumps))
 
-def get_jumps(start, finish):
+def get_jumps_between(start, finish):
     url = 'http://evemaps.dotlan.net/route/%s:%s' % (start, finish)
     count = 0
     contents = urllib2.urlopen(url).read()
@@ -762,7 +762,15 @@ def overlay(request):
     data = ''
     c2_open = False
     hs = False
-    jita_closest = None  # TODO: do
+    jita_closest = None
+    least = 5000
+    for wormhole in Wormhole.objects.filter(opened=True, closed=False):
+        if not wormhole.destination.lower() in ['', ' ', 'closed', 'unopened', 'unknown']:
+            if not re.match(r'^J\d{6}$', wormhole.destination):
+                jumps = get_jumps_between('Jita', wormhole.destination)
+                if int(jumps) < least:
+                    least = int(jumps)
+                    jita_closest = wormhole.destination
     for wormhole in Wormhole.objects.filter(opened=True, closed=False, start='J132814'):
         if not wormhole.destination.lower() in ['', ' ', 'closed', 'unopened', 'unknown']:
             if re.match(r'^J\d{6}$', wormhole.destination):
