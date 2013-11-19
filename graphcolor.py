@@ -88,4 +88,4 @@ def repeat():
 			sleep(5)
 			move()
 			print 'Graphed and moved', datetime.now().strftime('%m/%d/%Y %H:%M:%S')
-			sleep(60 * 5)
+			sleep(60 * 2)

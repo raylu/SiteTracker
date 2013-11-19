@@ -595,7 +595,7 @@ def get_jumps_between(start, finish):
     for line in contents.split('\n'):
         if '<td align="right">' in line:
             count += 1
-    return count / 2
+    return (count - 1) / 2
 
 # ==============================
 #     Reference lookup
@@ -755,6 +755,7 @@ def viewhelp(request):
     eveigb = IGBHeaderParser(request)
     return render(request, 'sitemngr/help.html', {'displayname': get_display_name(eveigb, request), 'able': canView(eveigb, request)})
 
+# TODO: If player is in-game, use their location in k-space to find closest k-space jump into Nexus chain
 def overlay(request):
     eveigb = IGBHeaderParser(request)
     if not canView(eveigb, request):
@@ -764,25 +765,33 @@ def overlay(request):
     hs = False
     jita_closest = None
     least = 5000
+    current_system = eveigb.solarsystemname
+    # closest_in = None
+    # closest_jumps = 5000
+    if current_system:
+        pass
     for wormhole in Wormhole.objects.filter(opened=True, closed=False):
-        if not wormhole.destination.lower() in ['', ' ', 'closed', 'unopened', 'unknown']:
-            if not re.match(r'^J\d{6}$', wormhole.destination):
-                jumps = get_jumps_between('Jita', wormhole.destination)
-                if int(jumps) < least:
-                    least = int(jumps)
-                    jita_closest = wormhole.destination
-    for wormhole in Wormhole.objects.filter(opened=True, closed=False, start='J132814'):
         if not wormhole.destination.lower() in ['', ' ', 'closed', 'unopened', 'unknown']:
             if re.match(r'^J\d{6}$', wormhole.destination):
-                c2_open = get_wormhole_class(wormhole.destination) == '2'
-    for wormhole in Wormhole.objects.filter(opened=True, closed=False):
-        try:
-            system = MapSolarSystem.objects.get(name=wormhole.destination)
-        except MapSolarSystem.DoesNotExist:
-            continue
-        status = system.security_level
-        if status > 0.5:
-            hs = True
+                if wormhole.start == 'J132814':
+                    if not wormhole.destination.lower() in ['', ' ', 'closed', 'unopened', 'unknown']:
+                        if re.match(r'^J\d{6}$', wormhole.destination):
+                            if get_wormhole_class(wormhole.destination) == '2':
+                                c2_open = True
+                continue
+            if not is_system(wormhole.destination):
+                continue
+            jumps = get_jumps_between('Jita', wormhole.destination)
+            if int(jumps) < least:
+                least = int(jumps)
+                jita_closest = wormhole.destination
+            try:
+                obj = MapSolarSystem.objects.get(name=wormhole.destination)
+                status = obj.security_level
+                if status > 0.5:
+                    hs = True
+            except MapSolarSystem.DoesNotExist:
+                continue
     kills_npc = kills_ship = kills_pod = 0
     kills = evemap.kills_by_system()[0]
     for k in kills.iteritems():
@@ -791,6 +800,14 @@ def overlay(request):
             kills_ship = k[1]['ship']
             kills_pod = k[1]['pod']
     return render(request, 'sitemngr/overlay.html', {'c2_open': c2_open, 'hs': hs, 'jita_closest': jita_closest, 'kills_npc': kills_npc, 'kills_ship': kills_ship, 'kills_pod': kills_pod, 'data': data})
+
+def is_system(system):
+    """ Returns True if the string is the name of a system """
+    try:
+        MapSolarSystem.objects.get(name=system)
+        return True
+    except MapSolarSystem.DoesNotExist:
+        return False
 
 def get_wormhole_class(system):
     try:

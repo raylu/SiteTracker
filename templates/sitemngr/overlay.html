@@ -5,4 +5,7 @@
     Is the C2 open: {% if c2_open %}<b>Yes</b>{% else %}False{% endif %}<br>
     Is there a HS in the database: {% if hs %}<b>Yes</b>{% else %}False{% endif %}<br>
     Closest k-space exit to Jita: {% if jita_closest %}<b>{{ jita_closest }}</b>{% else %}Null{% endif %}<br>
+    {% if eveigb.is_igb and eveigb.trusted %}
+        You are in {{ current_system }}. The closest entrance into the chain is {{ closest_in }}, {{ closest_jumps }} jumps.<br>
+    {% endif %}
 </p>

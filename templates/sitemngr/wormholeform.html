@@ -53,15 +53,19 @@
             <label>Status at time above:</label>
         </td>
         <td>
-            <!-- <input type="text" name="status" value="{% if wormhole %}{{ wormhole.status }}{% else %}Fresh{% endif %}" {% if isForm %}{% else %}readonly{% endif %}> -->
-            <select name="status">
-                <option>Fresh</option>
-                <option>< 50% mass</option>
-                <option>< 50% time</option>
-                <option>VoC</option>
-                <option>EoL</option>
-                <option>Unknown</option>
-            </select>
+            {% if isForm %}
+                <select name="status">
+                    <option>{{ wormhole.status }}</option>
+                    <option>Fresh</option>
+                    <option>< 50% mass</option>
+                    <option>< 50% time</option>
+                    <option>VoC</option>
+                    <option>EoL</option>
+                    <option>Unknown</option>
+                </select>
+            {% else %}
+                <input type="text" value="{{ wormhole.status }}" readonly>
+            {% endif %}
         </td>
     </tr>
     <tr>
