@@ -55,7 +55,9 @@
         <td>
             {% if isForm %}
                 <select name="status">
-                    <option>{{ wormhole.status }}</option>
+					{% if wormhole %}
+						<option>{{ wormhole.status }}</option>
+					{% endif %}
                     <option>Fresh</option>
                     <option>< 50% mass</option>
                     <option>< 50% time</option>

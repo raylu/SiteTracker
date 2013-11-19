@@ -4,8 +4,12 @@
     Recent Pods kills in Nexus: {% if kills_pod %}<b>Yes: {{ kills_pod }}</b>{% else %}No{% endif %}<br>
     Is the C2 open: {% if c2_open %}<b>Yes</b>{% else %}False{% endif %}<br>
     Is there a HS in the database: {% if hs %}<b>Yes</b>{% else %}False{% endif %}<br>
-    Closest k-space exit to Jita: {% if jita_closest %}<b>{{ jita_closest }}</b>{% else %}Null{% endif %}<br>
+    Closest chain system to Jita: {% if jita_closest %}<b>{{ jita_closest }}</b>{% else %}Null{% endif %}<br>
     {% if eveigb.is_igb and eveigb.trusted %}
-        You are in {{ current_system }}. The closest entrance into the chain is {{ closest_in }}, {{ closest_jumps }} jumps.<br>
+        {% if is_in_chain_system %}
+            You are in <b>{{ current_system }}</b>, which is a system directly in the chain
+        {% elif is_in_kspace %}
+            You are in <b>{{ current_system }}</b>, and the closest entrance into the chain is <b>{{ closest_in }}</b>, <b>{{ closest_jumps }}</b> jumps
+        {% endif %}
     {% endif %}
 </p>

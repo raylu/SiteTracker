@@ -59,6 +59,7 @@ def graph():
 	g = AGraph(label='Overview')
 	wormholes = Wormhole.objects.filter(opened=True, closed=False)
 	nodes = []
+	nodes.append('J132814')
 	for w in wormholes:
 		if w.destination.lower() in ['', ' ', 'unopened', 'closed'] or w.start.lower() in ['', ' ', 'unopened', 'closed']:
 			continue

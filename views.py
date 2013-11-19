@@ -39,7 +39,7 @@ def index(request, note=None):
         return noaccess(request)
     sites = Site.objects.filter(closed=False)
     wormholes = Wormhole.objects.filter(closed=False)
-    notices = ['The downtime paste page has been completely redone.']
+    notices = ['The downtime paste page has been completely redone.', 'Click the Show Overview button right below this.']
     if note and note is not None:
         notices.append(note)
     return render(request, 'sitemngr/index.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage, 'flag': note})
@@ -755,7 +755,6 @@ def viewhelp(request):
     eveigb = IGBHeaderParser(request)
     return render(request, 'sitemngr/help.html', {'displayname': get_display_name(eveigb, request), 'able': canView(eveigb, request)})
 
-# TODO: If player is in-game, use their location in k-space to find closest k-space jump into Nexus chain
 def overlay(request):
     eveigb = IGBHeaderParser(request)
     if not canView(eveigb, request):
@@ -766,10 +765,23 @@ def overlay(request):
     jita_closest = None
     least = 5000
     current_system = eveigb.solarsystemname
-    # closest_in = None
-    # closest_jumps = 5000
+    is_in_kspace = current_system and not re.match(r'^J\d{6}$', current_system)
+    is_in_chain_system = False
+    chain_systems = [w.destination for w in Wormhole.objects.filter(opened=True, closed=False)]
+    chain_systems.extend(w.start for w in Wormhole.objects.filter(opened=True, closed=False))
     if current_system:
-        pass
+        if current_system in chain_systems:
+            is_in_chain_system = True
+    # TODO: test
+    closest_in = None
+    closest_jumps = 5000
+    if not is_in_chain_system:
+        for system in chain_systems:
+            if not re.match(r'^J\d{6}$', system):
+                jumps = get_jumps_between(system, current_system)
+                if jumps < closest_jumps:
+                    closest_in = system
+                    closest_jumps = jumps
     for wormhole in Wormhole.objects.filter(opened=True, closed=False):
         if not wormhole.destination.lower() in ['', ' ', 'closed', 'unopened', 'unknown']:
             if re.match(r'^J\d{6}$', wormhole.destination):
@@ -799,7 +811,9 @@ def overlay(request):
             kills_npc = k[1]['faction']
             kills_ship = k[1]['ship']
             kills_pod = k[1]['pod']
-    return render(request, 'sitemngr/overlay.html', {'c2_open': c2_open, 'hs': hs, 'jita_closest': jita_closest, 'kills_npc': kills_npc, 'kills_ship': kills_ship, 'kills_pod': kills_pod, 'data': data})
+    return render(request, 'sitemngr/overlay.html', {'current_system': current_system, 'is_in_kspace': is_in_kspace, 'is_in_chain_system': is_in_chain_system,
+                     'c2_open': c2_open, 'hs': hs, 'jita_closest': jita_closest, 'closest_in': closest_in, 'closest_jumps': closest_jumps,
+                     'kills_npc': kills_npc, 'kills_ship': kills_ship, 'kills_pod': kills_pod, 'data': data})
 
 def is_system(system):
     """ Returns True if the string is the name of a system """
