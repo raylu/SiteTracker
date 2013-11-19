@@ -57,6 +57,9 @@
                         <li><a href="/sitemngr/paste">Paste scan data</a></li>
                         <li><a href="/sitemngr/output">Output current data</a></li>
                         <li><a href="/sitemngr/system">Browse by system</a></li>
+                        {% if eveigb.is_igb and eveigb.trusted %}
+                            <li><a href="/sitemngr/system/{{ eveigb.solarsystemname }}">My current system</a></li>
+                        {% endif %}
                         <li class="divider"></li>
                         <li class="nav-header">Extra Features</li>
                         <li><a href="/sitemngr/checkkills">Check kills in connected systems</a></li>

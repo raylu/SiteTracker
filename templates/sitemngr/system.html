@@ -21,6 +21,16 @@ System Info
 
 <h1>System info: {{ system }}{% if class %}, Class {{ class }}{% endif %}{% if security %}, {{ security }}{% endif %}</h1>
 
+{% if eveigb.solarsystemname == system %}
+    <h3>You are currently in this system</h3>
+{% endif %}
+
+{% if is_in_chain %}
+    <h3>This system is directly in the chain</h3>
+{% else %}
+    <h3>Closest chain system to this is {{ closest_chain }}, {{ closest_jumps }} jumps</h3>
+{% endif %}
+
 <h5><a href="http://wormhol.es/{{ system }}">Wormhol.es page</a></h5>
 
 {% if kspace %}

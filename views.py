@@ -526,6 +526,8 @@ def paste(request):
 #     Systems
 # ==============================
 
+# TODO: Add killcount (javascript), add if is in chain, add closest jump to chain system
+# TODO: Loads slow
 def systemlanding(request):
     """ Return a list of a systems with active sites """
     eveigb = IGBHeaderParser(request)
@@ -579,16 +581,44 @@ def system(request, systemid):
             is_kspace = True
         except MapSolarSystem.DoesNotExist:
                 pass
+    is_in_chain = is_system_in_chain(systemid)
+    closest_chain = None
+    closest_jumps = 5000
+    if is_kspace:
+        for chain in get_chain_systems():
+            if not is_system_kspace(chain):
+                continue
+            jumps = get_jumps_between(chain, systemid)
+            if jumps < closest_jumps:
+                closest_jumps = jumps
+                closest_chain = chain
     return render(request, 'sitemngr/system.html', {'displayname': get_display_name(eveigb, request), 'system': systemid, 'openwormholes': openwormholes, 'closedwormholes': closedwormholes,
-                            'class': clazz, 'security': security, 'kspace': is_kspace, 'opensites': opensites, 'unopenedsites': unopenedsites})
+                            'class': clazz, 'security': security, 'kspace': is_kspace, 'opensites': opensites, 'unopenedsites': unopenedsites,
+                            'is_in_chain': is_in_chain, 'closest_chain': closest_chain, 'closest_jumps': closest_jumps})
+
+def is_system_in_chain(system):
+    """ Returns if the syetem is directly in the chain """
+    return system in get_chain_systems()
+
+def get_chain_systems():
+    """ Returns all systems directly in the chain """
+    chain_systems = [w.destination for w in Wormhole.objects.filter(opened=True, closed=False)]
+    chain_systems.extend([w.start for w in Wormhole.objects.filter(opened=True, closed=False)])
+    return chain_systems
+
+def is_system_kspace(system):
+    """ Returns if the system is in kspace """
+    return not re.match(r'^J\d{6}$', system)
 
 def get_tradehub_jumps(request, system):
+    """ Shows the number of jumps from each tradehub system """
     jumps = []
     for hub in ['Jita', 'Rens', 'Dodixie', 'Amarr', 'Hek']:
         jumps.append([hub, get_jumps_between(system, hub)])
     return render(request, 'sitemngr/tradehubjumps.html', dict((x.lower(), y) for x, y in jumps))
 
 def get_jumps_between(start, finish):
+    """ Polls Dotlan to calculate jumps between two systems """
     url = 'http://evemaps.dotlan.net/route/%s:%s' % (start, finish)
     count = 0
     contents = urllib2.urlopen(url).read()
@@ -772,7 +802,6 @@ def overlay(request):
     if current_system:
         if current_system in chain_systems:
             is_in_chain_system = True
-    # TODO: test
     closest_in = None
     closest_jumps = 5000
     if not is_in_chain_system:
