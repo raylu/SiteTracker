@@ -17,7 +17,7 @@ Paste
                 <label><b>System</b>:</label>
             </td>
             <td>
-                <input type="text" name="system" value="{% if system %}{{ system }}{% else %}{{ eveigb.solarsystemname }}{% endif %}">
+                <input type="text" name="system" value="{% if system %}{{ system }}{% elif eveigb.is_igb %}{{ eveigb.solarsystemname }}{% else %}J132814{% endif %}">
             </td>
         </tr>
     </table><br>

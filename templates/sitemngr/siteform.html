@@ -7,6 +7,7 @@
             <input type="text" name="creator" value="{% if site %}{{ site.creator }}{% else %}{% if isForm %}{{ displayname }}{% endif %}{% endif %}" readonly>
         </td>
     </tr>
+    {% if site %}
     <tr>
         <td>
             <label>Date:</label>
@@ -15,6 +16,7 @@
             <input type="text" name="date" value="{% if site %}{{ site.date|date:'H:i, M d, y' }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
         </td>
     </tr>
+    {% endif %}
     <tr>
         <td>
             <label>Scan ID:</label>

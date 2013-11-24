@@ -28,6 +28,8 @@ eve = evelink.eve.EVE()
 eveapi = evelink.api.API()
 evemap = evelink.map.Map(api=eveapi)
 
+# TODO: Error where username is being empty in objects
+
 # ==============================
 #     Index
 # ==============================
@@ -279,7 +281,7 @@ def editwormhole(request, wormholeid):
             change = WormholeChange(wormhole=wormhole, user=eveigb.charname if eveigb.charname is not '' else request.user.username, date=now, changedScanid=changedScanid, changedType=False, changedStart=changedStart, changedDestination=changedDestination, changedTime=changedTime, changedStatus=changedStatus, changedOpened=changedOpened, changedClosed=changedClosed, changedNotes=changedNotes)
             change.save()
         return index(request)
-    return render(request, 'sitemngr/viewwormhole.html', {'displayname': get_display_name(eveigb, request), 'isForm': True,
+    return render(request, 'sitemngr/editwormhole.html', {'displayname': get_display_name(eveigb, request), 'isForm': True,
           'wormhole': wormhole, 'finish_msg': 'Store changes back into the database'})
 
 def addwormhole(request):
@@ -505,13 +507,17 @@ def paste(request):
                     if isSite(newP.scanid):
                         site = getSite(newP.scanid)
                         if site.where == system:
-                            notfound.remove(site)
+                            # Should not have to call this
+                            if site in notfound:
+                                notfound.remove(site)
                             found = True
                             present.append(site)
                     elif isWormhole(newP.scanid):
                         wormhole = getWormhole(newP.scanid)
                         if wormhole.start == system:
-                            notfound.remove(wormhole)
+                            # Should not have to call this
+                            if wormhole in notfound:
+                                notfound.remove(wormhole)
                             found = True
                             present.append(wormhole)
                     if not found:
@@ -526,8 +532,7 @@ def paste(request):
 #     Systems
 # ==============================
 
-# TODO: Add killcount (javascript), add if is in chain, add closest jump to chain system
-# TODO: Loads slow
+# TODO: Add killcount (via JS)
 def systemlanding(request):
     """ Return a list of a systems with active sites """
     eveigb = IGBHeaderParser(request)
@@ -791,7 +796,7 @@ def overlay(request):
         return noaccess(request)
     data = ''
     c2_open = False
-    hs = False
+    hs = []
     jita_closest = None
     least = 5000
     current_system = eveigb.solarsystemname
@@ -830,7 +835,7 @@ def overlay(request):
                 obj = MapSolarSystem.objects.get(name=wormhole.destination)
                 status = obj.security_level
                 if status > 0.5:
-                    hs = True
+                    hs.append(wormhole.destination)
             except MapSolarSystem.DoesNotExist:
                 continue
     kills_npc = kills_ship = kills_pod = 0
@@ -840,7 +845,7 @@ def overlay(request):
             kills_npc = k[1]['faction']
             kills_ship = k[1]['ship']
             kills_pod = k[1]['pod']
-    return render(request, 'sitemngr/overlay.html', {'current_system': current_system, 'is_in_kspace': is_in_kspace, 'is_in_chain_system': is_in_chain_system,
+    return render(request, 'sitemngr/overlay.html', {'displayname': get_display_name(eveigb, request), 'current_system': current_system, 'is_in_kspace': is_in_kspace, 'is_in_chain_system': is_in_chain_system,
                      'c2_open': c2_open, 'hs': hs, 'jita_closest': jita_closest, 'closest_in': closest_in, 'closest_jumps': closest_jumps,
                      'kills_npc': kills_npc, 'kills_ship': kills_ship, 'kills_pod': kills_pod, 'data': data})
 
@@ -886,7 +891,7 @@ def login_page(request, note=None):
             return index(request, 'You must enter both a username and a password.')
     else:
         note = 'Nope'
-    return render(request, 'sitemngr/login.html', {'note': note})
+    return render(request, 'sitemngr/login.html', {'note': note, 'displayname': get_display_name(None, request)})
 
 def logout_page(request):
     """ If the user is logged into an account, they are logged off """
@@ -984,7 +989,7 @@ def get_display_name(eveigb, request):
     if request.user is not None:
         if request.user.is_active and request.user.is_authenticated:
             return request.user.username
-    if eveigb.trusted:
+    if eveigb and eveigb.trusted:
         return eveigb.charname
     return 'someone'
 

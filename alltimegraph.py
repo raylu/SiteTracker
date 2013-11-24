@@ -26,6 +26,8 @@ for start in files:
                 data = [data[0], 'Celeo Servasse']
             if data[1] == '':
                 data[1] = 'Celeo Servasse'
+            if data[1] == ' ':
+                data[1] = 'Celeo Servasse'
             if data[1] == 'Celeo':
                 data[1] = 'Celeo Servasse'
             if data[1] == 'DirTee Ore' or data[1] == 'Lord VoldemOre':
