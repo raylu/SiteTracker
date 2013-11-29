@@ -1,5 +1,5 @@
 # Python
-import datetime
+from datetime import datetime, timedelta
 import re
 import urllib2
 from math import floor
@@ -28,8 +28,6 @@ eve = evelink.eve.EVE()
 eveapi = evelink.api.API()
 evemap = evelink.map.Map(api=eveapi)
 
-# TODO: Error where username is being empty in objects
-
 # ==============================
 #     Index
 # ==============================
@@ -44,7 +42,23 @@ def index(request, note=None):
     notices = ['The downtime paste page has been completely redone.', 'Click the Show Overview button right below this.']
     if note and note is not None:
         notices.append(note)
-    return render(request, 'sitemngr/index.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage, 'flag': note})
+    now = datetime.utcnow()
+    last_update_diff = get_time_difference_formatted(get_last_update_time().replace(tzinfo=None), now)
+    return render(request, 'sitemngr/index.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage, 'flag': note, 'now': now, 'last_update_diff': last_update_diff})
+
+def get_time_difference_formatted(old, recent):
+    diff = recent - old
+    days = diff.days
+    m, s = divmod(diff.seconds, 60)
+    h, m = divmod(m, 60)
+    return '%s days, %s hours, %s minutes, and %s seconds' % (days, h, m, s)
+
+def get_last_update_time():
+    site = Site.objects.last().date
+    s_change = SiteChange.objects.last().date
+    wormhole = Wormhole.objects.last().date
+    w_change = WormholeChange.objects.last().date
+    return sorted([site, s_change, wormhole, w_change])[-1]
 
 def viewall(request):
     """ Index page, but with the closed objects instead of the open """
@@ -91,7 +105,7 @@ def editsite(request, siteid):
     site = get_object_or_404(Site, pk=siteid)
     if request.method == 'POST':
         p = request.POST
-        now = datetime.datetime.now()
+        now = datetime.now()
         changedName = False
         changedScanid = False
         changedType = False
@@ -142,7 +156,7 @@ def editsite(request, siteid):
             if appendNotes is not None:
                 site.notes += appendNotes
             site.save()
-            change = SiteChange(site=site, date=now, user=eveigb.charname if eveigb.charname is not '' else request.user.username, changedName=changedName, changedScanid=changedScanid,
+            change = SiteChange(site=site, date=now, user=get_display_name(eveigb, request), changedName=changedName, changedScanid=changedScanid,
                                 changedType=changedType, changedWhere=changedWhere, changedDate=changedDate, changedOpened=changedOpened,
                                 changedClosed=changedClosed, changedNotes=changedNotes)
             change.save()
@@ -158,7 +172,7 @@ def addsite(request):
     g_system = ''
     g_type = ''
     g_name = ''
-    now = datetime.datetime.now()
+    now = datetime.now()
     if request.method == 'POST':
         p = request.POST
         s_name = 'null'
@@ -182,7 +196,7 @@ def addsite(request):
             s_closed = getBoolean(p['closed'])
         if p.has_key('notes') and p['notes']:
             s_notes = p['notes']
-        site = Site(name=s_name, scanid=s_scanid, type=s_type, where=s_where, creator=eveigb.charname, date=now, opened=s_opened, closed=s_closed, notes=s_notes)
+        site = Site(name=s_name, scanid=s_scanid, type=s_type, where=s_where, creator=get_display_name(eveigb, request), date=now, opened=s_opened, closed=s_closed, notes=s_notes)
         site.save()
         if getSettings(eveigb.charname).storeMultiple:
             return render(request, 'sitemngr/addsite.html', {'displayname': get_display_name(eveigb, request), 'isForm': True,
@@ -223,7 +237,7 @@ def editwormhole(request, wormholeid):
     wormhole = get_object_or_404(Wormhole, pk=wormholeid)
     if request.method == 'POST':
         p = request.POST
-        now = datetime.datetime.now()
+        now = datetime.now()
         changedScanid = False
         changedStart = False
         changedDestination = False
@@ -278,7 +292,7 @@ def editwormhole(request, wormholeid):
             if appendNotes is not None:
                 wormhole.notes += appendNotes
             wormhole.save()
-            change = WormholeChange(wormhole=wormhole, user=eveigb.charname if eveigb.charname is not '' else request.user.username, date=now, changedScanid=changedScanid, changedType=False, changedStart=changedStart, changedDestination=changedDestination, changedTime=changedTime, changedStatus=changedStatus, changedOpened=changedOpened, changedClosed=changedClosed, changedNotes=changedNotes)
+            change = WormholeChange(wormhole=wormhole, user=get_display_name(eveigb, request), date=now, changedScanid=changedScanid, changedType=False, changedStart=changedStart, changedDestination=changedDestination, changedTime=changedTime, changedStatus=changedStatus, changedOpened=changedOpened, changedClosed=changedClosed, changedNotes=changedNotes)
             change.save()
         return index(request)
     return render(request, 'sitemngr/editwormhole.html', {'displayname': get_display_name(eveigb, request), 'isForm': True,
@@ -292,7 +306,7 @@ def addwormhole(request):
     g_scanid = ''
     g_system = ''
     g_name = ''
-    now = datetime.datetime.now()
+    now = datetime.now()
     if request.method == 'POST':
         p = request.POST
         s_scanid = 'null'
@@ -319,7 +333,7 @@ def addwormhole(request):
             s_closed = getBoolean(p['closed'])
         if p.has_key('notes') and p['notes']:
             s_notes = p['notes']
-        wormhole = Wormhole(creator=eveigb.charname, date=now, scanid=s_scanid, type='null', start=s_start, destination=s_destination,
+        wormhole = Wormhole(creator=get_display_name(eveigb, request), date=now, scanid=s_scanid, type='null', start=s_start, destination=s_destination,
                             time=s_time, status=s_status, opened=s_opened, closed=s_closed, notes=s_notes)
         wormhole.save()
         if getSettings(eveigb.charname).storeMultiple:
@@ -391,7 +405,7 @@ def paste(request):
     eveigb = IGBHeaderParser(request)
     if not canView(eveigb, request):
         return noaccess(request)
-    now = datetime.datetime.now()
+    now = datetime.now()
     if request.method == 'POST':
         post = request.POST
         if post.has_key('downtime') and post['downtime']:
@@ -538,7 +552,7 @@ def systemlanding(request):
     eveigb = IGBHeaderParser(request)
     if not canView(eveigb, request):
         return noaccess(request)
-    now = datetime.datetime.now()
+    now = datetime.now()
     systems = []
     for site in Site.objects.filter(closed=False):
         if not site.where in systems:

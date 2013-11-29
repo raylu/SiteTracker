@@ -54,6 +54,8 @@ Index
 
 <h5><a href="/sitemngr/system/J132814">Nexus System Page</a></h5>
 
+<h5>It is currently Eve time {{ now|date:'H:i:s, N j' }}. Last update: {{ last_update_diff }} ago</h5>
+
 <div class="row">
     <div class="span6">
         <h1>Index of {% if status and status == 'open' %}{% else %}closed {% endif %}sites</h1>
