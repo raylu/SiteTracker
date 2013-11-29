@@ -155,9 +155,12 @@ class Whitelisted(models.Model):
     active = models.BooleanField(default=False)
     notes = models.TextField(blank=True, null=True)
 
-class UpdateData(models.Model):
-    """ Should update graphs? """
-    note = models.TextField(blank=True, null=True)
+class PasteUpdated(models.Model):
+    """ Recording when someone uses the paste feature """
+    # Who made the paste
+    user = models.CharField(max_length=100)
+    # What time the paste was parsed
+    date = models.DateTimeField()
 
 # ========================
 

@@ -12,8 +12,8 @@ from django.contrib.auth import authenticate, login, logout
 # sitemngr
 from sitemngr.models import (Site, SiteChange,
                              Wormhole, WormholeChange,
-                             PasteData, Settings,
-                             KillReport, PasteMatch)
+                             PasteData, PasteUpdated,
+                             KillReport, PasteMatch, Settings)
 import settings as appSettings
 
 # eve_db
@@ -58,7 +58,8 @@ def get_last_update_time():
     s_change = SiteChange.objects.last().date
     wormhole = Wormhole.objects.last().date
     w_change = WormholeChange.objects.last().date
-    return sorted([site, s_change, wormhole, w_change])[-1]
+    paste = PasteUpdated.objects.last().date
+    return sorted([site, s_change, wormhole, w_change, paste])[-1]
 
 def viewall(request):
     """ Index page, but with the closed objects instead of the open """
@@ -361,6 +362,7 @@ def p_get_all_data(line):
     anomTypes = ['Combat Site', 'Ore Site']  # 'Gas Site' ?
     wormholeTypes = ['Wormhole', 'Unstable Wormhole']
     data = {}
+    data['scanid'] = ''
     data['issite'] = False
     data['isanom'] = False
     data['iswormhole'] = False
@@ -410,6 +412,7 @@ def paste(request):
         post = request.POST
         if post.has_key('downtime') and post['downtime']:
             # After paste and checking after downtime checkbox - prepare data for user to make changes after downtime
+            PasteUpdated(user=get_display_name(eveigb, request), date=datetime.now()).save()
             sites = []
             wormholes = []
             newids = []
@@ -455,6 +458,7 @@ def paste(request):
                            'displayname': get_display_name(eveigb, request), 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage})
         elif post.has_key('afterdowntime') and post['afterdowntime']:
             # After downtime paste page after submitting database changes
+            PasteUpdated(user=get_display_name(eveigb, request), date=datetime.now()).save()
             for k, v in post.iteritems():
                 if ' ' in k:
                     k = k.split(' ')[0]
@@ -501,6 +505,7 @@ def paste(request):
             return index(request)
         else:
             # Parse data to return to normal paste page
+            PasteUpdated(user=get_display_name(eveigb, request), date=datetime.now()).save()
             present = []
             findnew = []
             notfound = []
@@ -747,6 +752,7 @@ def stats(request):
     numSites = len(Site.objects.all())
     numWormholes = len(Wormhole.objects.all())
     numEdits = len(SiteChange.objects.all()) + len(WormholeChange.objects.all())
+    numPastes = len(PasteUpdated.objects.all())
     con = {}
     for site_change in Site.objects.all():
         if site_change.creator in con:
@@ -768,13 +774,18 @@ def stats(request):
             con[wormhole_change.user] += 1
         else:
             con[wormhole_change.user] = 1
+    for paste in PasteUpdated.objects.all():
+        if paste.user in con:
+            con[paste.user] += 1
+        else:
+            con[paste.user] = 1
     numContributors = len(con)
     conList = []
     con = sorted(con.items(), key=lambda kv: kv[1])
     for name, count in con:
         conList.append(Contributor(name, count))
     return render(request, 'sitemngr/stats.html', {'displayname': get_display_name(eveigb, request), 'numSites': numSites,
-               'numWormholes': numWormholes, 'numEdits': numEdits, 'numContributors': numContributors, 'allContributors': conList})
+               'numWormholes': numWormholes, 'numPastes': numPastes, 'numEdits': numEdits, 'numContributors': numContributors, 'allContributors': conList})
 
 def checkkills(request):
     """ Returns a readout of all ship and pod kills in and system with open objects """
