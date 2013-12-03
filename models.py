@@ -40,7 +40,7 @@ class Site(models.Model):
             back += ' (Closed, last updated: {0})'.format(self.date.strftime('%H:%M %m/%d'))
         return back
     def isAnom(self):
-        return self.name in ['Core Garrison', 'Core Stronghold', 'Oruze Osobnyk', 'Quarantine Area']
+        return self.name in ['Core Garrison', 'Core Stronghold', 'Oruze Osobnyk', 'Quarantine Area', 'Ordinary Perimeter Deposit']
 
 class SiteChange(models.Model):
     """ SiteChange object for keeping track of changes to sites """
