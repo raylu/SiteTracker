@@ -4,7 +4,7 @@ A Django app for managing anomalies and signatures in EVE Online for the OI alli
 
 ## Credits
 
-This application was coded by Matt Boulanger. All EVE Online and CCP references belong to CCP.
+All EVE Online and CCP references belong to CCP.
 
 ## License
 
