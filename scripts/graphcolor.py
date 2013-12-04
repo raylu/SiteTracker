@@ -71,6 +71,7 @@ def graph():
         g.add_edge(w.start, w.destination)
     g.layout()
     g.draw('/var/www/mysite/sitemngr/static/pictures/graph.png')
+    print 'Graphed', datetime.now().strftime('%m/%d/%Y %H:%M:%S')
 
 def should_update():
     return True
@@ -79,7 +80,6 @@ def repeat():
     while 1:
         if should_update():
             graph()
-            print 'Graphed', datetime.now().strftime('%m/%d/%Y %H:%M:%S')
             sleep(60 * 2)
 
 def run():

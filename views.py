@@ -29,13 +29,13 @@ eveapi = evelink.api.API()
 evemap = evelink.map.Map(api=eveapi)
 
 # scripts
-from scripts import graphcolor
+import graphcolor
 
 import threading
 
-dirty = False
+dirty = True
 
-def dirty():
+def set_dirty():
     global dirty
     dirty = True
    
@@ -46,10 +46,10 @@ def is_dirty():
 def tidy():
     global dirty
     dirty = False
-    # TODO: Graph ?
-    t = threading.Thread(target=graphcolor.run_once)
-    t.setDaemon(True)
-    t.start()
+    # t = threading.Thread(target=graphcolor.run_once)
+    # t.setDaemon(True)
+    # t.start()
+    graphcolor.run_once()
 
 # ==============================
 #     Index
@@ -66,6 +66,7 @@ def index(request, note=None):
     if is_dirty():
         notices.append('Dirty!')
         tidy()
+        notices.append('Cleaned!')
     now = datetime.utcnow()
     last_update_diff = None
     try:
@@ -201,6 +202,7 @@ def editsite(request, siteid):
                                 changedType=changedType, changedWhere=changedWhere, changedDate=changedDate, changedOpened=changedOpened,
                                 changedClosed=changedClosed, changedNotes=changedNotes)
             change.save()
+            set_dirty()
         return index(request)
     return render(request, 'sitemngr/editsite.html', {'displayname': get_display_name(eveigb, request), 'isForm': True, 'site': site, 'finish_msg': 'Store changes back into the database:'})
 
@@ -239,6 +241,7 @@ def addsite(request):
             s_notes = p['notes']
         site = Site(name=s_name, scanid=s_scanid, type=s_type, where=s_where, creator=get_display_name(eveigb, request), date=now, opened=s_opened, closed=s_closed, notes=s_notes)
         site.save()
+        set_dirty()
         if getSettings(eveigb.charname).storeMultiple:
             return render(request, 'sitemngr/addsite.html', {'displayname': get_display_name(eveigb, request), 'isForm': True,
                  'message': 'Successfully stored the data into the database.', 'finish_msg': 'Store new site into the database:', 'timenow': now.strftime('%m/%d @ %H:%M')})
@@ -335,6 +338,7 @@ def editwormhole(request, wormholeid):
             wormhole.save()
             change = WormholeChange(wormhole=wormhole, user=get_display_name(eveigb, request), date=now, changedScanid=changedScanid, changedType=False, changedStart=changedStart, changedDestination=changedDestination, changedTime=changedTime, changedStatus=changedStatus, changedOpened=changedOpened, changedClosed=changedClosed, changedNotes=changedNotes)
             change.save()
+            set_dirty()
         return index(request)
     return render(request, 'sitemngr/editwormhole.html', {'displayname': get_display_name(eveigb, request), 'isForm': True,
           'wormhole': wormhole, 'finish_msg': 'Store changes back into the database'})
@@ -377,6 +381,7 @@ def addwormhole(request):
         wormhole = Wormhole(creator=get_display_name(eveigb, request), date=now, scanid=s_scanid, type='null', start=s_start, destination=s_destination,
                             time=s_time, status=s_status, opened=s_opened, closed=s_closed, notes=s_notes)
         wormhole.save()
+        set_dirty()
         if getSettings(eveigb.charname).storeMultiple:
             return render(request, 'sitemngr/addwormhole.html', {'request': request, 'displayname': get_display_name(eveigb, request),
                     'isForm': True, 'message': 'Successfully stored the data into the database.', 'finish_msg': 'Store new site into database:', 'timenow': now.strftime('%m/%d @ %H:%M')})
@@ -542,6 +547,7 @@ def paste(request):
                                      changedStart=False, changedDestination=False, changedTime=False, changedStatus=False,
                                      changedOpened=False, changedClosed=False, changedNotes=False)
                         change.save()
+            set_dirty()
             return index(request)
         else:
             # Parse data to return to normal paste page
