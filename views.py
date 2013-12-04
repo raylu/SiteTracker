@@ -28,6 +28,29 @@ eve = evelink.eve.EVE()
 eveapi = evelink.api.API()
 evemap = evelink.map.Map(api=eveapi)
 
+# scripts
+from scripts import graphcolor
+
+import threading
+
+dirty = False
+
+def dirty():
+    global dirty
+    dirty = True
+   
+def is_dirty():
+    global dirty
+    return dirty
+
+def tidy():
+    global dirty
+    dirty = False
+    # TODO: Graph ?
+    t = threading.Thread(target=graphcolor.run_once)
+    t.setDaemon(True)
+    t.start()
+
 # ==============================
 #     Index
 # ==============================
@@ -40,10 +63,15 @@ def index(request, note=None):
     sites = Site.objects.filter(closed=False)
     wormholes = Wormhole.objects.filter(closed=False)
     notices = ['The downtime paste page has been completely redone.', 'Click the Show Overview button right below this.']
-    if note and note is not None:
-        notices.append(note)
+    if is_dirty():
+        notices.append('Dirty!')
+        tidy()
     now = datetime.utcnow()
-    last_update_diff = get_time_difference_formatted(get_last_update_time().replace(tzinfo=None), now)
+    last_update_diff = None
+    try:
+        last_update_diff = get_time_difference_formatted(get_last_update_time().replace(tzinfo=None), now)
+    except TypeError:
+        last_update_diff = '-never-'
     last_update_user = get_last_update_user()
     return render(request, 'sitemngr/index.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage, 'flag': note, 'now': now, 'last_update_diff': last_update_diff, 'last_update_user': last_update_user})
 
@@ -55,10 +83,14 @@ def get_time_difference_formatted(old, recent):
     return '%s days, %s hours, %s minutes, and %s seconds' % (days, h, m, s)
 
 def get_last_update_time():
+    if not get_last_update():
+        return '-never'
     return get_last_update().date
 
 def get_last_update_user():
     last = get_last_update()
+    if not last:
+        return '-no one-'
     return last.creator if isinstance(last, (Site, Wormhole, PasteUpdated)) else last.user
 
 def get_last_update():

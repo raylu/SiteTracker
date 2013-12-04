@@ -6,7 +6,6 @@ import urllib2
 from time import sleep
 from datetime import datetime
 import os
-import shutil
 
 cmap = {}
 cmap['HS'] = 'gold'
@@ -19,9 +18,6 @@ cmap['3'] = 'yellow'
 cmap['4'] = 'orange'
 cmap['5'] = 'red'
 cmap['6'] = 'black'
-
-start = os.path.join(os.getcwd() + '/graph.png')
-destination = os.path.join(os.getcwd() + '/sitemngr/static/pictures/graph.png')
 
 def get_color(system_name):
     system = None
@@ -74,22 +70,20 @@ def graph():
             continue
         g.add_edge(w.start, w.destination)
     g.layout()
-    g.draw('graph.png')
+    g.draw('/var/www/mysite/sitemngr/static/pictures/graph.png')
 
 def should_update():
     return True
-
-def move():
-    shutil.move(start, destination)
 
 def repeat():
     while 1:
         if should_update():
             graph()
-            sleep(5)
-            move()
-            print 'Graphed and moved', datetime.now().strftime('%m/%d/%Y %H:%M:%S')
+            print 'Graphed', datetime.now().strftime('%m/%d/%Y %H:%M:%S')
             sleep(60 * 2)
 
 def run():
     repeat()
+
+def run_once():
+    graph()
