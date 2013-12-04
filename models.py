@@ -25,6 +25,8 @@ class Site(models.Model):
     # True if the site is closed (done)
     closed = models.BooleanField(default=False)
     notes = models.TextField()
+    def __repr__(self):
+        return ''
     def __unicode__(self):
         return unicode('{0}-{1}-{2}'.format(self.id, self.scanid, self.where))
     def numberOfChanges(self):
@@ -125,7 +127,7 @@ class Settings(models.Model):
     storeMultiple = models.BooleanField(default=True)
     userBackgroundImage = models.BooleanField(default=True)
     def __unicode__(self):
-        return unicode(self.user)
+        return unicode('Settings for %s' % self.user)
 
 class Chain(models.Model):
     """
@@ -145,22 +147,14 @@ class Chain(models.Model):
     def __unicode__(self):
         return unicode('{0}-{1}-{2}'.format(self.name, self.start, self.end))
 
-class Whitelisted(models.Model):
-    """ Whitelisted character names for out-of-alliance alts """
-    name = models.CharField(max_length=100)
-    inAllianceName = models.CharField(max_length=100)
-    addedDate = models.DateTimeField('added', blank=True, null=True)
-    whitelistedBy = models.CharField(max_length=100, blank=True, null=True)
-    whitelistedDate = models.DateTimeField('whitelisted', blank=True, null=True)
-    active = models.BooleanField(default=False)
-    notes = models.TextField(blank=True, null=True)
-
 class PasteUpdated(models.Model):
     """ Recording when someone uses the paste feature """
     # Who made the paste
     user = models.CharField(max_length=100)
     # What time the paste was parsed
     date = models.DateTimeField()
+    def __unicode__(self):
+        return unicode('PasteUpdated by %s' % self.user)
 
 # ========================
 
