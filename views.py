@@ -1,5 +1,5 @@
 # Python
-from datetime import datetime, timedelta
+from datetime import datetime
 import re
 import urllib2
 from math import floor
@@ -44,7 +44,8 @@ def index(request, note=None):
         notices.append(note)
     now = datetime.utcnow()
     last_update_diff = get_time_difference_formatted(get_last_update_time().replace(tzinfo=None), now)
-    return render(request, 'sitemngr/index.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage, 'flag': note, 'now': now, 'last_update_diff': last_update_diff})
+    last_update_user = get_last_update_user()
+    return render(request, 'sitemngr/index.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage, 'flag': note, 'now': now, 'last_update_diff': last_update_diff, 'last_update_user': last_update_user})
 
 def get_time_difference_formatted(old, recent):
     diff = recent - old
@@ -54,11 +55,18 @@ def get_time_difference_formatted(old, recent):
     return '%s days, %s hours, %s minutes, and %s seconds' % (days, h, m, s)
 
 def get_last_update_time():
-    site = Site.objects.last().date
-    s_change = SiteChange.objects.last().date
-    wormhole = Wormhole.objects.last().date
-    w_change = WormholeChange.objects.last().date
-    paste = PasteUpdated.objects.last().date
+    return get_last_update().date
+
+def get_last_update_user():
+    last = get_last_update()
+    return last.creator if isinstance(last, (Site, Wormhole, PasteUpdated)) else last.user
+
+def get_last_update():
+    site = Site.objects.last()
+    s_change = SiteChange.objects.last()
+    wormhole = Wormhole.objects.last()
+    w_change = WormholeChange.objects.last()
+    paste = PasteUpdated.objects.last()
     return sorted([site, s_change, wormhole, w_change, paste])[-1]
 
 def viewall(request):
