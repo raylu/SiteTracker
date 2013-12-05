@@ -31,8 +31,6 @@ evemap = evelink.map.Map(api=eveapi)
 # scripts
 import graphcolor
 
-import threading
-
 dirty = True
 
 def set_dirty():
@@ -46,9 +44,6 @@ def is_dirty():
 def tidy():
     global dirty
     dirty = False
-    # t = threading.Thread(target=graphcolor.run_once)
-    # t.setDaemon(True)
-    # t.start()
     graphcolor.run_once()
 
 # ==============================
@@ -92,7 +87,7 @@ def get_last_update_user():
     last = get_last_update()
     if not last:
         return '-no one-'
-    return last.creator if isinstance(last, (Site, Wormhole, PasteUpdated)) else last.user
+    return last.creator if isinstance(last, (Site, Wormhole)) else last.user
 
 def get_last_update():
     site = Site.objects.last()
@@ -100,7 +95,21 @@ def get_last_update():
     wormhole = Wormhole.objects.last()
     w_change = WormholeChange.objects.last()
     paste = PasteUpdated.objects.last()
-    return sorted([site, s_change, wormhole, w_change, paste])[-1]
+    date = sorted([site.date, s_change.date, wormhole.date, w_change.date, paste.date])[-1]
+    # TODO: Clean this
+    try:
+        return Site.objects.get(date=date)
+    except Site.DoesNotExist:
+        try:
+            return Wormhole.objects.get(date=date)
+        except Wormhole.DoesNotExist:
+            try:
+                return SiteChange.objects.get(date=date)
+            except SiteChange.DoesNotExist:
+                try:
+                    return WormholeChange.objects.get(date=date)
+                except WormholeChange.DoesNotExist:
+                    return PasteUpdated.objects.get(date=date)
 
 def viewall(request):
     """ Index page, but with the closed objects instead of the open """
