@@ -211,7 +211,6 @@ def editsite(request, siteid):
                                 changedType=changedType, changedWhere=changedWhere, changedDate=changedDate, changedOpened=changedOpened,
                                 changedClosed=changedClosed, changedNotes=changedNotes)
             change.save()
-            set_dirty()
         return index(request)
     return render(request, 'sitemngr/editsite.html', {'displayname': get_display_name(eveigb, request), 'isForm': True, 'site': site, 'finish_msg': 'Store changes back into the database:'})
 
@@ -250,7 +249,6 @@ def addsite(request):
             s_notes = p['notes']
         site = Site(name=s_name, scanid=s_scanid, type=s_type, where=s_where, creator=get_display_name(eveigb, request), date=now, opened=s_opened, closed=s_closed, notes=s_notes)
         site.save()
-        set_dirty()
         if getSettings(eveigb.charname).storeMultiple:
             return render(request, 'sitemngr/addsite.html', {'displayname': get_display_name(eveigb, request), 'isForm': True,
                  'message': 'Successfully stored the data into the database.', 'finish_msg': 'Store new site into the database:', 'timenow': now.strftime('%m/%d @ %H:%M')})
