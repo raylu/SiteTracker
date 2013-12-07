@@ -59,9 +59,8 @@ def index(request, note=None):
     wormholes = Wormhole.objects.filter(closed=False)
     notices = ['The downtime paste page has been completely redone.', 'Click the Show Overview button right below this.']
     if is_dirty():
-        notices.append('Dirty!')
         tidy()
-        notices.append('Cleaned!')
+        notices.append('Graph updated!')
     now = datetime.utcnow()
     last_update_diff = None
     try:
@@ -837,8 +836,20 @@ def stats(request):
     con = sorted(con.items(), key=lambda kv: kv[1])
     for name, count in con:
         conList.append(Contributor(name, count))
+    avgTimePastes = 1
+    pasteTimeDiffs = []
+    pastes = PasteUpdated.objects.all()
+    totalPastes = len(pastes)
+    if totalPastes <= 2:
+        avgTimePastes = 'Not enough data'
+    else:
+        count = 0
+        while count <= totalPastes:
+            pasteTimeDiffs.append(pastes[count] - pastes[count + 1])
+            count += 2
     return render(request, 'sitemngr/stats.html', {'displayname': get_display_name(eveigb, request), 'numSites': numSites,
-               'numWormholes': numWormholes, 'numPastes': numPastes, 'numEdits': numEdits, 'numContributors': numContributors, 'allContributors': conList})
+               'numWormholes': numWormholes, 'numPastes': numPastes, 'numEdits': numEdits, 'numContributors': numContributors,
+               'allContributors': conList, 'avgTimePastes': avgTimePastes})
 
 def checkkills(request):
     """ Returns a readout of all ship and pod kills in and system with open objects """

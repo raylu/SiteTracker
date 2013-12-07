@@ -19,6 +19,18 @@ cmap['4'] = 'orange'
 cmap['5'] = 'red'
 cmap['6'] = 'black'
 
+emap = {}
+emap['Fresh'] = 'bold'
+emap['< 50% mass'] = 'dashes'
+emap['< 50% time'] = 'dashes'
+emap['VoC'] = 'dotted'
+emap['EoL'] = 'dotted'
+emap['Unknown'] = 'solid'
+
+def get_edge_type(start, destination):
+    wormhole = Wormhole.objects.get(start=start, destination=destination)
+    return emap[wormhole.status]
+
 def get_color(system_name):
     system = None
     if re.match(r'J\d{6}', system_name):
@@ -52,7 +64,8 @@ def get_color_wh(system_name):
     return 'black'
 
 def graph():
-    g = AGraph(label='Overview')
+    g = AGraph(label='Overview', landscape='false', directed=False, ranksep='0.2')
+    g.edge_attr.update(len='1.5', color='black')
     wormholes = Wormhole.objects.filter(opened=True, closed=False)
     nodes = []
     nodes.append('J132814')
@@ -64,11 +77,14 @@ def graph():
         if not w.destination in nodes:
             nodes.append(w.destination)
     for n in nodes:
+        if n == 'J132814':
+            g.add_node(n, color='red', fontcolor='red')
+            continue
         g.add_node(n, color=get_color(n))
     for w in wormholes:
         if w.destination.lower() in ['', ' ', 'unopened', 'closed'] or w.start.lower() in ['', ' ', 'unopened', 'closed']:
             continue
-        g.add_edge(w.start, w.destination)
+        g.add_edge(w.start, w.destination, style=get_edge_type(w.start, w.destination))
     g.layout()
     g.draw('/var/www/mysite/sitemngr/static/pictures/graph.png')
     print 'Graphed', datetime.now().strftime('%m/%d/%Y %H:%M:%S')
@@ -83,7 +99,8 @@ def repeat():
             sleep(60 * 2)
 
 def run():
-    repeat()
+    graph()
+    # repeat()
 
 def run_once():
     graph()
