@@ -838,18 +838,17 @@ def stats(request):
         conList.append(Contributor(name, count))
     avgTimePastes = 1
     pasteTimeDiffs = []
-    pastes = PasteUpdated.objects.all()
-    totalPastes = len(pastes)
-    if totalPastes <= 2:
-        avgTimePastes = 'Not enough data'
-    else:
-        count = 0
-        while count <= totalPastes:
-            pasteTimeDiffs.append(pastes[count] - pastes[count + 1])
-            count += 2
+    # pastes = PasteUpdated.objects.all()
+    # totalPastes = len(pastes)
+    # if totalPastes <= 2:
+        # avgTimePastes = 'Not enough data'
+    # else:
+        # count = 0
+        # while count <= totalPastes:
+            # pasteTimeDiffs.append(pastes[count] - pastes[count + 1])
+            # count += 2
     return render(request, 'sitemngr/stats.html', {'displayname': get_display_name(eveigb, request), 'numSites': numSites,
-               'numWormholes': numWormholes, 'numPastes': numPastes, 'numEdits': numEdits, 'numContributors': numContributors,
-               'allContributors': conList, 'avgTimePastes': avgTimePastes})
+               'numWormholes': numWormholes, 'numPastes': numPastes, 'numEdits': numEdits, 'numContributors': numContributors, 'allContributors': conList})
 
 def checkkills(request):
     """ Returns a readout of all ship and pod kills in and system with open objects """
