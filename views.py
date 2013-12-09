@@ -5,6 +5,7 @@ import urllib2
 from math import floor
 
 # Django
+from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -29,7 +30,11 @@ eveapi = evelink.api.API()
 evemap = evelink.map.Map(api=eveapi)
 
 # scripts
-import graphcolor
+useGraphing = True
+try:
+    import graphcolor
+except ImportError:
+    useGraphing = False
 
 dirty = True
 
@@ -44,7 +49,8 @@ def is_dirty():
 def tidy():
     global dirty
     dirty = False
-    graphcolor.run_once()
+    if useGraphing:
+        graphcolor.run_once()
 
 # ==============================
 #     Index
@@ -58,10 +64,12 @@ def index(request, note=None):
     sites = Site.objects.filter(closed=False)
     wormholes = Wormhole.objects.filter(closed=False)
     notices = ['The downtime paste page has been completely redone.', 'Click the Show Overview button right below this.']
+    # check if the wormhole objects and graph are out of sync
     if is_dirty():
         tidy()
         notices.append('Graph updated!')
     now = datetime.utcnow()
+    # get the last updated time and player
     last_update_diff = None
     try:
         last_update_diff = get_time_difference_formatted(get_last_update_time().replace(tzinfo=None), now)
@@ -71,6 +79,7 @@ def index(request, note=None):
     return render(request, 'sitemngr/index.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage, 'flag': note, 'now': now, 'last_update_diff': last_update_diff, 'last_update_user': last_update_user})
 
 def get_time_difference_formatted(old, recent):
+    """ Formats the difference between two datetime objects """
     diff = recent - old
     days = diff.days
     m, s = divmod(diff.seconds, 60)
@@ -78,24 +87,46 @@ def get_time_difference_formatted(old, recent):
     return '%s days, %s hours, %s minutes, and %s seconds' % (days, h, m, s)
 
 def get_last_update_time():
+    """ Returns the time of the most recent database change """
     if not get_last_update():
         return '-never'
     return get_last_update().date
 
 def get_last_update_user():
+    """ Returns the user to make the most recent database change """
     last = get_last_update()
     if not last:
         return '-no one-'
     return last.creator if isinstance(last, (Site, Wormhole)) else last.user
 
 def get_last_update():
+    """ Returns the object that has the most recent date """
+    # add the last of each type of data to the list
     site = Site.objects.last()
     s_change = SiteChange.objects.last()
     wormhole = Wormhole.objects.last()
     w_change = WormholeChange.objects.last()
     paste = PasteUpdated.objects.last()
-    date = sorted([site.date, s_change.date, wormhole.date, w_change.date, paste.date])[-1]
-    # TODO: Clean this
+    dates = []
+    # only add dates belonging to actual objects (prevents trying to get the data of a None object)
+    if site:
+        dates.append(site.date)
+    if s_change:
+        dates.append(s_change.date)
+    if wormhole:
+        dates.append(wormhole.date)
+    if w_change:
+        dates.append(w_change.date)
+    if paste:
+        dates.append(paste.date)
+    # get the most recent date
+    date = None
+    try:
+        date = sorted(dates)[-1]
+    except IndexError:
+        # if nothing was added to the list, i.e. new database
+        return None
+    # get the object whose date was selected
     try:
         return Site.objects.get(date=date)
     except Site.DoesNotExist:
@@ -202,10 +233,13 @@ def editsite(request, siteid):
             if p['notes'] != site.notes:
                 changedNotes = True
                 site.notes = p['notes']
+        # ensure that at least one piece of data was changed
         if changedName or changedScanid or changedType or changedWhere or changedDate or changedOpened or changedClosed or changedNotes:
             if appendNotes is not None:
                 site.notes += appendNotes
+            # save the changes made to the site object
             site.save()
+            # construct a change for this edit
             change = SiteChange(site=site, date=now, user=get_display_name(eveigb, request), changedName=changedName, changedScanid=changedScanid,
                                 changedType=changedType, changedWhere=changedWhere, changedDate=changedDate, changedOpened=changedOpened,
                                 changedClosed=changedClosed, changedNotes=changedNotes)
@@ -248,11 +282,13 @@ def addsite(request):
             s_notes = p['notes']
         site = Site(name=s_name, scanid=s_scanid, type=s_type, where=s_where, creator=get_display_name(eveigb, request), date=now, opened=s_opened, closed=s_closed, notes=s_notes)
         site.save()
+        # return the user to the appropriate page, depending on their user settings
         if getSettings(eveigb.charname).storeMultiple:
             return render(request, 'sitemngr/addsite.html', {'displayname': get_display_name(eveigb, request), 'isForm': True,
                  'message': 'Successfully stored the data into the database.', 'finish_msg': 'Store new site into the database:', 'timenow': now.strftime('%m/%d @ %H:%M')})
         else:
             return index(request)
+    # fill in passed information from the paste page
     elif request.method == 'GET':
         g = request.GET
         if g.has_key('scanid') and g['scanid']:
@@ -338,12 +374,16 @@ def editwormhole(request, wormholeid):
             if getBoolean(p['notes']) != wormhole.notes:
                 changedNotes = True
                 wormhole.notes = p['notes']
+        # ensure that at least one piece of data was changed
         if changedScanid or changedStart or changedDestination or changedTime or changedStatus or changedOpened or changedClosed or changedNotes:
             if appendNotes is not None:
                 wormhole.notes += appendNotes
+            # save the changes made to the wormhole object
             wormhole.save()
+            # construct a change for this edit
             change = WormholeChange(wormhole=wormhole, user=get_display_name(eveigb, request), date=now, changedScanid=changedScanid, changedType=False, changedStart=changedStart, changedDestination=changedDestination, changedTime=changedTime, changedStatus=changedStatus, changedOpened=changedOpened, changedClosed=changedClosed, changedNotes=changedNotes)
             change.save()
+            # make the new view of the index page update the graph
             set_dirty()
         return index(request)
     return render(request, 'sitemngr/editwormhole.html', {'displayname': get_display_name(eveigb, request), 'isForm': True,
@@ -387,12 +427,15 @@ def addwormhole(request):
         wormhole = Wormhole(creator=get_display_name(eveigb, request), date=now, scanid=s_scanid, type='null', start=s_start, destination=s_destination,
                             time=s_time, status=s_status, opened=s_opened, closed=s_closed, notes=s_notes)
         wormhole.save()
+        # make the new view of the index page update the graph
         set_dirty()
+        # return the user to the appropriate page, depending on their user settings
         if getSettings(eveigb.charname).storeMultiple:
             return render(request, 'sitemngr/addwormhole.html', {'request': request, 'displayname': get_display_name(eveigb, request),
                     'isForm': True, 'message': 'Successfully stored the data into the database.', 'finish_msg': 'Store new site into database:', 'timenow': now.strftime('%m/%d @ %H:%M')})
         else:
             return index(request)
+    # fill in passed information from the paste page
     elif request.method == 'GET':
         g = request.GET
         if g.has_key('scanid') and g['scanid']:
@@ -409,10 +452,12 @@ def addwormhole(request):
 # ==============================
 
 def p_get_all_data(line):
+    """ Parses all information from a line from the discovery scanner """
     siteTypes = ['Cosmic Signature', 'Data Site', 'Relic Site']
     anomTypes = ['Combat Site', 'Ore Site']  # 'Gas Site' ?
     wormholeTypes = ['Wormhole', 'Unstable Wormhole']
     data = {}
+    # defaults to ensure that we don't get a KeyError trying to access information not pulled from the line
     data['scanid'] = ''
     data['issite'] = False
     data['isanom'] = False
@@ -443,6 +488,7 @@ def p_get_all_data(line):
     return data
 
 class SpaceObject:
+    """ Represents an object in space """
     def __init__(self, i, what, name):
         self.id = i
         self.what = what
@@ -603,7 +649,6 @@ def paste(request):
 #     Systems
 # ==============================
 
-# TODO: Add killcount (via JS)
 def systemlanding(request):
     """ Return a list of a systems with active sites """
     eveigb = IGBHeaderParser(request)
@@ -640,17 +685,10 @@ def system(request, systemid):
     clazz = 0
     security = None
     is_kspace = None
+    # if the system is in wormhole space, it has a class
     if re.match(r'J\d{6}', systemid):
-        contents = urllib2.urlopen('http://www.ellatha.com/eve/WormholeSystemview.asp?key={0}'.format(systemid.replace('J', ''))).read().split('\n')
-        nextLine = False
-        for line in contents:
-            if 'Class:' in line:
-                nextLine = True
-                continue
-            if nextLine:
-                clazz = line.split('&')[0][-1]
-                is_kspace = False
-                break
+        get_wormhole_class(systemid)
+    # otherwise, it has a security level
     else:
         try:
             security = floor(MapSolarSystem.objects.get(name=systemid).security_level * 10) / 10
@@ -660,11 +698,14 @@ def system(request, systemid):
     is_in_chain = is_system_in_chain(systemid)
     closest_chain = None
     closest_jumps = 5000
+    # determine closest chain system to this
     if is_kspace:
         for chain in get_chain_systems():
             if not is_system_kspace(chain):
                 continue
             jumps = get_jumps_between(chain, systemid)
+            if jumps == -1:
+                continue
             if jumps < closest_jumps:
                 closest_jumps = jumps
                 closest_chain = chain
@@ -689,9 +730,13 @@ def is_system_kspace(system):
 def get_tradehub_jumps(request, system):
     """ Shows the number of jumps from each tradehub system """
     jumps = []
-    for hub in ['Jita', 'Rens', 'Dodixie', 'Amarr', 'Hek']:
+    for hub in get_tradehub_system_names:
         jumps.append([hub, get_jumps_between(system, hub)])
     return render(request, 'sitemngr/tradehubjumps.html', dict((x.lower(), y) for x, y in jumps))
+
+def get_tradehub_system_names():
+    """ Returns the names of all of the tradehub systems """
+    return ['Jita', 'Rens', 'Dodixie', 'Amarr', 'Hek']
 
 def get_jumps_between(start, finish):
     """ Polls Dotlan to calculate jumps between two systems """
@@ -836,17 +881,6 @@ def stats(request):
     con = sorted(con.items(), key=lambda kv: kv[1])
     for name, count in con:
         conList.append(Contributor(name, count))
-    avgTimePastes = 1
-    pasteTimeDiffs = []
-    # pastes = PasteUpdated.objects.all()
-    # totalPastes = len(pastes)
-    # if totalPastes <= 2:
-        # avgTimePastes = 'Not enough data'
-    # else:
-        # count = 0
-        # while count <= totalPastes:
-            # pasteTimeDiffs.append(pastes[count] - pastes[count + 1])
-            # count += 2
     return render(request, 'sitemngr/stats.html', {'displayname': get_display_name(eveigb, request), 'numSites': numSites,
                'numWormholes': numWormholes, 'numPastes': numPastes, 'numEdits': numEdits, 'numContributors': numContributors, 'allContributors': conList})
 
@@ -878,25 +912,33 @@ def viewhelp(request):
     eveigb = IGBHeaderParser(request)
     return render(request, 'sitemngr/help.html', {'displayname': get_display_name(eveigb, request), 'able': canView(eveigb, request)})
 
+# TODO: Comments
 def overlay(request):
+    """ Return a wealth of quickly-viewed information to be presented to on the idnex page """
     eveigb = IGBHeaderParser(request)
     if not canView(eveigb, request):
         return noaccess(request)
     data = ''
+    # if the c2 static is open
     c2_open = False
+    # list of highsec systems in the chain
     hs = []
+    # closest chain system to jita
     jita_closest = None
     least = 5000
+    # if the user is in-game, then get their current position
     current_system = eveigb.solarsystemname
     is_in_kspace = current_system and not re.match(r'^J\d{6}$', current_system)
     is_in_chain_system = False
     chain_systems = [w.destination for w in Wormhole.objects.filter(opened=True, closed=False)]
     chain_systems.extend(w.start for w in Wormhole.objects.filter(opened=True, closed=False))
+    # if the user is in-game, then determine if they are in a chain system
     if current_system:
         if current_system in chain_systems:
             is_in_chain_system = True
     closest_in = None
     closest_jumps = 5000
+    # if the user is in-game and not in a chain system, then determine the closest chain system
     if not is_in_chain_system:
         for system in chain_systems:
             if not re.match(r'^J\d{6}$', system):
@@ -904,21 +946,25 @@ def overlay(request):
                 if jumps < closest_jumps:
                     closest_in = system
                     closest_jumps = jumps
+    # look for an open c2 connection, and all highsec systems in the chain
     for wormhole in Wormhole.objects.filter(opened=True, closed=False):
         if not wormhole.destination.lower() in ['', ' ', 'closed', 'unopened', 'unknown']:
             if re.match(r'^J\d{6}$', wormhole.destination):
-                if wormhole.start == 'J132814':
+                if wormhole.start == appSettings.HOME_SYSTEM:
                     if not wormhole.destination.lower() in ['', ' ', 'closed', 'unopened', 'unknown']:
                         if re.match(r'^J\d{6}$', wormhole.destination):
                             if get_wormhole_class(wormhole.destination) == '2':
+                                # we know that we have a connection to a C2
                                 c2_open = True
                 continue
             if not is_system(wormhole.destination):
                 continue
+            # determine if this system is the closest to Jita
             jumps = get_jumps_between('Jita', wormhole.destination)
             if int(jumps) < least:
                 least = int(jumps)
                 jita_closest = wormhole.destination
+            # ensure that the system is actually in Eve, and not a user typo
             try:
                 obj = MapSolarSystem.objects.get(name=wormhole.destination)
                 status = obj.security_level
@@ -926,6 +972,7 @@ def overlay(request):
                     hs.append(wormhole.destination)
             except MapSolarSystem.DoesNotExist:
                 continue
+    # kills in the home system
     kills_npc = kills_ship = kills_pod = 0
     kills = evemap.kills_by_system()[0]
     for k in kills.iteritems():
@@ -946,6 +993,7 @@ def is_system(system):
         return False
 
 def get_wormhole_class(system):
+    """ Returns the class (1-6) of a wormhole by its system name """
     try:
         url = 'http://www.ellatha.com/eve/WormholeSystemview.asp?key={}'.format(system.replace('J', ''))
         contents = urllib2.urlopen(url).read().split('\n')
@@ -1040,6 +1088,56 @@ def settings(request):
     image = settings.userBackgroundImage
     return render(request, 'sitemngr/settings.html', {'displayname': get_display_name(eveigb, request), 'edit': edit, 'store': store, 'image': image, 'message': message})
 
+class Result:
+    """ Object for use by the get_search_results method """
+    def __init__(self, link, text):
+        self.link = 'http://tracker.talkinlocal.org/sitemngr/' + link
+        self.text = text
+    def __unicode__(self):
+        return unicode('<Result %s-%s>' % (self.link, self.text))
+
+def get_search_results(request, keyword):
+    """ Returns a list of links for use by the search feature on the index page """
+    ret = []
+    raw = []
+    # check system names in the chain
+    for system in get_chain_systems():
+        if system.startswith(keyword):
+            ret.append(Result('system/%s' % system, system))
+            raw.append(system)
+    # check tradehub system names
+    for system in get_tradehub_system_names():
+        if system.startswith(keyword) and not system in raw:
+            ret.append(Result('system/%s' % system, system))
+    # check site names and locations
+    for site in Site.objects.all():
+        if site.where.startswith(keyword) or site.name.startswith(keyword):
+            ret.append(Result('viewsite/%s' % site.id, 'Site %s' % site))
+            raw.append(site)
+    # check wormhole start and destination system names
+    for wormhole in Wormhole.objects.all():
+        if wormhole.start.startswith(keyword) or wormhole.destination.startswith(keyword):
+            ret.append(Result('viewwormhole/%s' % wormhole.id, 'Wormhole %s' % wormhole))
+            raw.append(wormhole)
+    # check for matching scanids if the keyword is two uppercase letters
+    if len(keyword) < 3 and keyword.isupper():
+        for site in Site.objects.all():
+            if site.scanid.startswith(keyword) and not site in raw:
+                ret.append(Result('viewsite/%s' % site.id, 'Site %s' % site))
+                raw.append(site)
+        for wormhole in Wormhole.objects.all():
+            if wormhole.scanid.startswith(keyword) and not wormhole in raw:
+                ret.append(Result('viewwormhole/%s' % wormhole.id, 'Wormhole %s' % wormhole))
+                raw.append(wormhole)
+    # if we've found nothing else, then check system names from all of the universe
+    if len(ret) == 0:
+        for system in MapSolarSystem.objects.all():
+            if system.name.startswith(keyword):
+                ret.append(Result('system/%s' % system.name, system.name))
+        if len(ret) == 0:
+            return HttpResponse('<p>No results.</p>')
+    return render(request, 'sitemngr/search_results.html', {'results': ret})
+
 # ==============================
 #     Util
 # ==============================
@@ -1059,6 +1157,7 @@ def getSystemID(systemname):
         return 'null'
 
 class Contributor:
+    """ Object for use by the stats page """
     def __init__(self, name, points):
         self.name = name
         self.points = points
@@ -1074,6 +1173,7 @@ def getBoolean(s):
     return s.lower() in ['true', 't', '1', 'yes', 'on']
 
 def get_display_name(eveigb, request):
+    """ Returns the correct name of a user from their browser """
     if request.user is not None:
         if request.user.is_active and request.user.is_authenticated:
             return request.user.username

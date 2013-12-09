@@ -12,15 +12,19 @@ Index
 	{
 		$('#graph').hide();
 		$('#overlay').hide();
+		$('#search').hide();
 		$('#overlay').load('http://tracker.talkinlocal.org/sitemngr/overlay/');
 	});
+	function get_tags() {
+		var t = $('#omnibox').val();
+		$('#search_results').load('http://localhost:8000/sitemngr/get_search_results/' + t);
+	}
 </script>
 {% endblock %}
 
 {% block content %}
 
 <center>
-
 
 {% if flag %}
     <div class="message">
@@ -40,7 +44,21 @@ Index
 <br>
 <button onclick="$('#graph').toggle(250);">Toggle graph</button>
 <button onclick="$('#overlay').toggle(250);">Show Overview</button>
+<button onclick="$('#search').toggle(250);">Search</button>
 
+<div id="search" style="border: 1px solid gray;">
+   <strong>Search box</strong><br>
+    <ul style="text-align: left;">
+       <li>Start typing what you are looking for. If you're looking for a system, type the first part of it's name. Systems directly in the 
+       chain are checked first, so you'll see them faster than some random system not in the chain. Same goes with tradehub systems.</li>
+       <li>Typing <b>wormhole</b> or <b>site</b> (broken into <b>signature</b> and <b>anomaly</b>) will list all objects in the database of that type.</li>
+       <li>If you're typing 1 or 2 letters in caps, the search will find all objects whose scan ids start with those letters.</li>
+       <li>Probably more to come.</li>
+   </ul>
+	<input type="text" id="omnibox" style="margin-top: 10px;" onkeyup="get_tags();">
+	<img src="http://i.imgur.com/WWZwIWk.png" width="30" height="30" onclick="$('#omnibox').val(''); $('#search_results').html('');"><br>
+	<div id="search_results" style="height: 200px; width: 50%; overflow: auto;"></div>
+</div>
 <div id="graph" style="border: 1px solid gray;">
 	<img src="{% static 'pictures/graph.png' %}" alt="Current graph not found"></img><br>
 	<p><strong>
