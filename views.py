@@ -41,7 +41,7 @@ dirty = True
 def set_dirty():
     global dirty
     dirty = True
-   
+
 def is_dirty():
     global dirty
     return dirty
@@ -1109,26 +1109,16 @@ def get_search_results(request, keyword):
     for system in get_tradehub_system_names():
         if system.startswith(keyword) and not system in raw:
             ret.append(Result('system/%s' % system, system))
-    # check site names and locations
+    # check site names and locations, and scanids
     for site in Site.objects.all():
-        if site.where.startswith(keyword) or site.name.startswith(keyword):
+        if site.where.startswith(keyword) or site.name.startswith(keyword) or site.scanid.startswith(keyword) or site.scanid == keyword:
             ret.append(Result('viewsite/%s' % site.id, 'Site %s' % site))
             raw.append(site)
-    # check wormhole start and destination system names
+    # check wormhole start and destination system names, and scanids
     for wormhole in Wormhole.objects.all():
-        if wormhole.start.startswith(keyword) or wormhole.destination.startswith(keyword):
+        if wormhole.start.startswith(keyword) or wormhole.destination.startswith(keyword) or wormhole.scanid.startswith(keyword) or wormhole.scanid == keyword:
             ret.append(Result('viewwormhole/%s' % wormhole.id, 'Wormhole %s' % wormhole))
             raw.append(wormhole)
-    # check for matching scanids if the keyword is two uppercase letters
-    if len(keyword) < 3 and keyword.isupper():
-        for site in Site.objects.all():
-            if site.scanid.startswith(keyword) and not site in raw:
-                ret.append(Result('viewsite/%s' % site.id, 'Site %s' % site))
-                raw.append(site)
-        for wormhole in Wormhole.objects.all():
-            if wormhole.scanid.startswith(keyword) and not wormhole in raw:
-                ret.append(Result('viewwormhole/%s' % wormhole.id, 'Wormhole %s' % wormhole))
-                raw.append(wormhole)
     # if we've found nothing else, then check system names from all of the universe
     if len(ret) == 0:
         for system in MapSolarSystem.objects.all():
