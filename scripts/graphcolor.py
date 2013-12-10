@@ -21,7 +21,8 @@ cmap['6'] = 'black'
 
 emap = {}
 emap['Fresh'] = 'bold'
-emap['< 50% mass'] = 'dashes'
+emap['< 50% mass'] = 'dashed'
+emap['< 50% mass'] = 'dashed'
 emap['< 50% time'] = 'dashes'
 emap['VoC'] = 'dotted'
 emap['EoL'] = 'dotted'
