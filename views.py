@@ -5,7 +5,6 @@ import urllib2
 from math import floor
 
 # Django
-from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -912,7 +911,6 @@ def viewhelp(request):
     eveigb = IGBHeaderParser(request)
     return render(request, 'sitemngr/help.html', {'displayname': get_display_name(eveigb, request), 'able': canView(eveigb, request)})
 
-# TODO: Comments
 def overlay(request):
     """ Return a wealth of quickly-viewed information to be presented to on the idnex page """
     eveigb = IGBHeaderParser(request)
@@ -1096,37 +1094,71 @@ class Result:
     def __unicode__(self):
         return unicode('<Result %s-%s>' % (self.link, self.text))
 
-def get_search_results(request, keyword):
+class Flag:
+    def __init__(self, flags):
+        self.open_only = 'o' in flags
+        self.closed_only = 'c' in flags
+        self.chain = 'f' in flags
+        self.systems = 'm' in flags
+        self.wormholes = 'w' in flags
+        self.sites = 's' in flags
+        self.universe = 'u' in flags
+        self.all = flags == '_'
+    def __unicode__(self):
+        return 'Flag: Open=%s Closed=%s Chain=%s Universe=%s Systems=%s Wormholes=%s Sites=%s' % (self.open_only, self.closed_only, self.chain, self.universe, self.systems, self.wormholes, self.sites)
+
+def get_search_results(request, keyword, flags):
     """ Returns a list of links for use by the search feature on the index page """
+    flags = Flag(flags)
     ret = []
     raw = []
-    # check system names in the chain
-    for system in get_chain_systems():
-        if system.startswith(keyword):
-            ret.append(Result('system/%s' % system, system))
-            raw.append(system)
-    # check tradehub system names
-    for system in get_tradehub_system_names():
-        if system.startswith(keyword) and not system in raw:
-            ret.append(Result('system/%s' % system, system))
+    wormholes = []
+    if flags.open_only and not flags.closed_only:
+        wormholes.extend([w for w in Wormhole.objects.filter(opened=True)])
+    elif not flags.open_only and flags.closed_only:
+        wormholes.extend([w for w in Wormhole.objects.filter(opened=False)])
+    else:
+        wormholes.extend([w for w in Wormhole.objects.all()])
+    if flags.sites or flags.systems:
+        wormholes = []
+    sites = []
+    if flags.open_only and not flags.closed_only:
+        sites.extend([s for s in Site.objects.filter(opened=True)])
+    elif not flags.open_only and flags.closed_only:
+        sites.extend([s for s in Site.objects.filter(opened=False)])
+    else:
+        sites.extend([s for s in Site.objects.all()])
+    if flags.wormholes or flags.systems:
+        sites = []
+    if not flags.wormholes and not flags.sites:
+        # check system names in the chain
+        for system in get_chain_systems():
+            if system.startswith(keyword) and not system in raw:
+                ret.append(Result('system/%s' % system, system))
+                raw.append(system)
+        # check tradehub system names
+        if flags.universe and not flags.chain:
+            for system in get_tradehub_system_names():
+                if system.startswith(keyword) and not system in raw:
+                    ret.append(Result('system/%s' % system, system))
     # check site names and locations, and scanids
-    for site in Site.objects.all():
+    for site in sites:
         if site.where.startswith(keyword) or site.name.startswith(keyword) or site.scanid.startswith(keyword) or site.scanid == keyword:
             ret.append(Result('viewsite/%s' % site.id, 'Site %s' % site))
             raw.append(site)
     # check wormhole start and destination system names, and scanids
-    for wormhole in Wormhole.objects.all():
+    for wormhole in wormholes:
         if wormhole.start.startswith(keyword) or wormhole.destination.startswith(keyword) or wormhole.scanid.startswith(keyword) or wormhole.scanid == keyword:
             ret.append(Result('viewwormhole/%s' % wormhole.id, 'Wormhole %s' % wormhole))
             raw.append(wormhole)
-    # if we've found nothing else, then check system names from all of the universe
-    if len(ret) == 0:
+    # if we've found nothing else, then check system names from all of the universe if we can include systems
+    if flags.universe or (len(ret) == 0 and not flags.wormholes and not flags.sites and not flags.chain):
         for system in MapSolarSystem.objects.all():
             if system.name.startswith(keyword):
                 ret.append(Result('system/%s' % system.name, system.name))
-        if len(ret) == 0:
-            return HttpResponse('<p>No results.</p>')
-    return render(request, 'sitemngr/search_results.html', {'results': ret})
+    if len(ret) == 0:
+        ret.append(Result('', 'No results'))
+    return render(request, 'sitemngr/search_results.html', {'results': ret, 'flags': flags})
 
 # ==============================
 #     Util
