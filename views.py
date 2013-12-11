@@ -394,7 +394,8 @@ def add_wormhole(request):
     if not can_view(eveigb, request):
         return no_access(request)
     g_scanid = ''
-    g_system = ''
+    g_start = ''
+    g_end = ''
     g_name = ''
     now = datetime.now()
     if request.method == 'POST':
@@ -439,12 +440,14 @@ def add_wormhole(request):
         g = request.GET
         if g.has_key('scanid') and g['scanid']:
             g_scanid = g['scanid']
-        if g.has_key('system') and g['system']:
-            g_system = g['system']
+        if g.has_key('start') and g['start']:
+            g_start = g['start']
+        if g.has_key('end') and g['end']:
+            g_end = g['end']
         if g.has_key('name') and g['name']:
             g_name = g['name']
     return render(request, 'sitemngr/addwormhole.html', {'request': request, 'displayname': get_display_name(eveigb, request),
-                 'isForm': True, 'finish_msg': 'Store new wormhole into the database:', 'g_scanid': g_scanid, 'g_system': g_system, 'g_name': g_name, 'timenow': now.strftime('%m/%d @ %H:%M')})
+                 'isForm': True, 'finish_msg': 'Store new wormhole into the database:', 'g_scanid': g_scanid, 'g_start': g_start, 'g_end': g_end, 'g_name': g_name, 'timenow': now.strftime('%m/%d @ %H:%M')})
 
 # ==============================
 #     Pastes

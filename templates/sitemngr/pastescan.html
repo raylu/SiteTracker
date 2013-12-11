@@ -111,7 +111,7 @@ Paste
                     </td>
                     <td>
                         {% if f.isWormhole %}
-                            <a href="/sitemngr/addwormhole/?scanid={{ f.scanid }}&timenow={{ timenow }}&system={{ f.system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
+                            <a href="/sitemngr/addwormhole/?scanid={{ f.scanid }}&timenow={{ timenow }}&start={{ f.system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
                         {% else %}
                             <a href="/sitemngr/addsite/?scanid={{ f.scanid }}&timenow={{ timenow }}&type={{ f.type }}&name={{ f.name }}&system={{ f.system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
                         {% endif %}
