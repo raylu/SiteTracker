@@ -62,7 +62,7 @@ def index(request, note=None):
         return no_access(request)
     sites = Site.objects.filter(closed=False)
     wormholes = Wormhole.objects.filter(closed=False)
-    notices = ['The downtime paste page has been completely redone.', 'Click the Show Overview button right below this.']
+    notices = ['All tables went on a diet.']
     # check if the wormhole objects and graph are out of sync
     if is_dirty():
         tidy()
