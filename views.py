@@ -698,13 +698,13 @@ def system(request, systemid):
     closest_chain = None
     closest_jumps = 5000
     # determine closest chain system to this
-    if is_kspace:
+    if is_kspace and is_system(systemid):
         for chain in get_chain_systems():
+            if not is_system(chain):
+                continue
             if not is_system_kspace(chain):
                 continue
             jumps = get_jumps_between(chain, systemid)
-            if jumps == -1:
-                continue
             if jumps < closest_jumps:
                 closest_jumps = jumps
                 closest_chain = chain
@@ -729,7 +729,7 @@ def is_system_kspace(system):
 def get_tradehub_jumps(request, system):
     """ Shows the number of jumps from each tradehub system """
     jumps = []
-    for hub in get_tradehub_system_names:
+    for hub in get_tradehub_system_names():
         jumps.append([hub, get_jumps_between(system, hub)])
     return render(request, 'sitemngr/tradehubjumps.html', dict((x.lower(), y) for x, y in jumps))
 
