@@ -58,8 +58,8 @@ def tidy():
 def index(request, note=None):
     """ Index page - lists all open sites """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
+    if not can_view(eveigb, request):
+        return no_access(request)
     sites = Site.objects.filter(closed=False)
     wormholes = Wormhole.objects.filter(closed=False)
     notices = ['The downtime paste page has been completely redone.', 'Click the Show Overview button right below this.']
@@ -75,7 +75,7 @@ def index(request, note=None):
     except TypeError:
         last_update_diff = '-never-'
     last_update_user = get_last_update_user()
-    return render(request, 'sitemngr/index.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage, 'flag': note, 'now': now, 'last_update_diff': last_update_diff, 'last_update_user': last_update_user})
+    return render(request, 'sitemngr/index.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': get_settings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': get_settings(get_display_name(eveigb, request)).userBackgroundImage, 'flag': note, 'now': now, 'last_update_diff': last_update_diff, 'last_update_user': last_update_user})
 
 def get_time_difference_formatted(old, recent):
     """ Formats the difference between two datetime objects """
@@ -140,11 +140,11 @@ def get_last_update():
                 except WormholeChange.DoesNotExist:
                     return PasteUpdated.objects.get(date=date)
 
-def viewall(request):
+def view_all(request):
     """ Index page, but with the closed objects instead of the open """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
+    if not can_view(eveigb, request):
+        return no_access(request)
     sites = Site.objects.filter(closed=True)
     wormholes = Wormhole.objects.filter(closed=True)
     return render(request, 'sitemngr/index.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'status': 'closed'})
@@ -155,8 +155,8 @@ def add(request):
             the user after using the paste page
     """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
+    if not can_view(eveigb, request):
+        return no_access(request)
     scanid = ''
     if request.method == 'GET':
         g = request.GET
@@ -168,20 +168,20 @@ def add(request):
 #     Site
 # ==============================
 
-def viewsite(request, siteid):
+def view_site(request, siteid):
     """ Views all the data on a particular site, including a list of changes """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
+    if not can_view(eveigb, request):
+        return no_access(request)
     site = get_object_or_404(Site, pk=siteid)
     changes = site.getChanges()
     return render(request, 'sitemngr/viewsite.html', {'displayname': get_display_name(eveigb, request), 'isForm': False, 'site': site, 'changes': changes})
 
-def editsite(request, siteid):
+def edit_site(request, siteid):
     """ Edit site page for changing data """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
+    if not can_view(eveigb, request):
+        return no_access(request)
     site = get_object_or_404(Site, pk=siteid)
     if request.method == 'POST':
         p = request.POST
@@ -246,11 +246,11 @@ def editsite(request, siteid):
         return index(request)
     return render(request, 'sitemngr/editsite.html', {'displayname': get_display_name(eveigb, request), 'isForm': True, 'site': site, 'finish_msg': 'Store changes back into the database:'})
 
-def addsite(request):
+def add_site(request):
     """ Add a site to the databse """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
+    if not can_view(eveigb, request):
+        return no_access(request)
     g_scanid = ''
     g_system = ''
     g_type = ''
@@ -282,7 +282,7 @@ def addsite(request):
         site = Site(name=s_name, scanid=s_scanid, type=s_type, where=s_where, creator=get_display_name(eveigb, request), date=now, opened=s_opened, closed=s_closed, notes=s_notes)
         site.save()
         # return the user to the appropriate page, depending on their user settings
-        if getSettings(eveigb.charname).storeMultiple:
+        if get_settings(eveigb.charname).storeMultiple:
             return render(request, 'sitemngr/addsite.html', {'displayname': get_display_name(eveigb, request), 'isForm': True,
                  'message': 'Successfully stored the data into the database.', 'finish_msg': 'Store new site into the database:', 'timenow': now.strftime('%m/%d @ %H:%M')})
         else:
@@ -305,20 +305,20 @@ def addsite(request):
 #     Wormhole
 # ==============================
 
-def viewwormhole(request, wormholeid):
+def view_wormhole(request, wormholeid):
     """ Views all the data on a particular wormhole, including a list of changes """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
+    if not can_view(eveigb, request):
+        return no_access(request)
     wormhole = get_object_or_404(Wormhole, pk=wormholeid)
     changes = wormhole.getChanges()
     return render(request, 'sitemngr/viewwormhole.html', {'displayname': get_display_name(eveigb, request), 'isForm': False, 'wormhole': wormhole, 'changes': changes})
 
-def editwormhole(request, wormholeid):
+def edit_wormhole(request, wormholeid):
     """ Edit wormhole page for changing data """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
+    if not can_view(eveigb, request):
+        return no_access(request)
     wormhole = get_object_or_404(Wormhole, pk=wormholeid)
     if request.method == 'POST':
         p = request.POST
@@ -388,11 +388,11 @@ def editwormhole(request, wormholeid):
     return render(request, 'sitemngr/editwormhole.html', {'displayname': get_display_name(eveigb, request), 'isForm': True,
           'wormhole': wormhole, 'finish_msg': 'Store changes back into the database'})
 
-def addwormhole(request):
+def add_wormhole(request):
     """ Add a wormhole to the databse """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
+    if not can_view(eveigb, request):
+        return no_access(request)
     g_scanid = ''
     g_system = ''
     g_name = ''
@@ -429,7 +429,7 @@ def addwormhole(request):
         # make the new view of the index page update the graph
         set_dirty()
         # return the user to the appropriate page, depending on their user settings
-        if getSettings(eveigb.charname).storeMultiple:
+        if get_settings(eveigb.charname).storeMultiple:
             return render(request, 'sitemngr/addwormhole.html', {'request': request, 'displayname': get_display_name(eveigb, request),
                     'isForm': True, 'message': 'Successfully stored the data into the database.', 'finish_msg': 'Store new site into database:', 'timenow': now.strftime('%m/%d @ %H:%M')})
         else:
@@ -501,8 +501,8 @@ def paste(request):
         textarea and submit for automatic review.
     """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
+    if not can_view(eveigb, request):
+        return no_access(request)
     now = datetime.now()
     if request.method == 'POST':
         post = request.POST
@@ -551,7 +551,7 @@ def paste(request):
             for w in new_wormholes:
                 newids.append(SpaceObject(w, 'Wormhole', ''))
             return render(request, 'sitemngr/pastescandowntime.html', {'system': system, 'pastedata': paste_data, 'sites': sites, 'wormholes': wormholes, 'newids': newids,
-                           'displayname': get_display_name(eveigb, request), 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage})
+                           'displayname': get_display_name(eveigb, request), 'newTab': get_settings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': get_settings(get_display_name(eveigb, request)).userBackgroundImage})
         elif post.has_key('afterdowntime') and post['afterdowntime']:
             # After downtime paste page after submitting database changes
             PasteUpdated(user=get_display_name(eveigb, request), date=datetime.now()).save()
@@ -564,8 +564,8 @@ def paste(request):
                     continue
                 if v == '-IGNORE-':
                     continue
-                if isSite(k):
-                    site = getSite(k)
+                if is_site(k):
+                    site = get_site(k)
                     if v == '-CLOSE-':
                         site.closed = True
                         site.save()
@@ -582,7 +582,7 @@ def paste(request):
                                     changedClosed=False, changedNotes=False)
                         change.save()
                 else:
-                    wormhole = getWormhole(k)
+                    wormhole = get_wormhole(k)
                     if v == '-CLOSE-':
                         wormhole.closed = True
                         wormhole.save()
@@ -620,16 +620,16 @@ def paste(request):
                     newP.scanid = data['scanid']
                     newP.type = data['type']
                     newP.name = data['name']
-                    if isSite(newP.scanid):
-                        site = getSite(newP.scanid)
+                    if is_site(newP.scanid):
+                        site = get_site(newP.scanid)
                         if site.where == system:
                             # Should not have to call this
                             if site in notfound:
                                 notfound.remove(site)
                             found = True
                             present.append(site)
-                    elif isWormhole(newP.scanid):
-                        wormhole = getWormhole(newP.scanid)
+                    elif is_wormhole(newP.scanid):
+                        wormhole = get_wormhole(newP.scanid)
                         if wormhole.start == system:
                             # Should not have to call this
                             if wormhole in notfound:
@@ -639,20 +639,20 @@ def paste(request):
                     if not found:
                         findnew.append(newP)
                 return render(request, 'sitemngr/pastescan.html', {'displayname': get_display_name(eveigb, request), 'raw': post['pastedata'],
-                               'present': present, 'notfound': notfound, 'findnew': findnew, 'timenow': now, 'system': system, 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage})
+                               'present': present, 'notfound': notfound, 'findnew': findnew, 'timenow': now, 'system': system, 'newTab': get_settings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': get_settings(get_display_name(eveigb, request)).userBackgroundImage})
     # Base request - show the base pastescan page
-    return render(request, 'sitemngr/pastescan.html', {'displayname': get_display_name(eveigb, request), 'timenow': now, 'newTab': getSettings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': getSettings(get_display_name(eveigb, request)).userBackgroundImage})
+    return render(request, 'sitemngr/pastescan.html', {'displayname': get_display_name(eveigb, request), 'timenow': now, 'newTab': get_settings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': get_settings(get_display_name(eveigb, request)).userBackgroundImage})
 
 
 # ==============================
 #     Systems
 # ==============================
 
-def systemlanding(request):
+def system_landing(request):
     """ Return a list of a systems with active sites """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
+    if not can_view(eveigb, request):
+        return no_access(request)
     now = datetime.now()
     systems = []
     for site in Site.objects.filter(closed=False):
@@ -671,8 +671,8 @@ def system(request, systemid):
         Also show all closed wormholes in this system in the last 10 (configurable) days.
     """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
+    if not can_view(eveigb, request):
+        return no_access(request)
     opensites = Site.objects.filter(where=systemid, closed=False, opened=True)
     unopenedsites = Site.objects.filter(where=systemid, closed=False, opened=False)
     openwormholes = []
@@ -754,8 +754,8 @@ def get_jumps_between(start, finish):
 def lookup(request, scanid):
     """ Lookup page for finding sites and wormholes by their scanid """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
+    if not can_view(eveigb, request):
+        return no_access(request)
     system = None
     if request.method == 'GET':
         g = request.GET
@@ -765,23 +765,23 @@ def lookup(request, scanid):
         if site.scanid == scanid:
             if system is not None:
                 if site.where == system:
-                    return viewsite(request, site.id)
+                    return view_site(request, site.id)
             else:
-                return viewsite(request, site.id)
+                return view_site(request, site.id)
     for wormhole in Wormhole.objects.all():
         if wormhole.scanid == scanid:
             if system is not None:
                 if wormhole.start == system:
-                    return viewwormhole(request, wormhole.id)
+                    return view_wormhole(request, wormhole.id)
             else:
-                return viewwormhole(request, wormhole.id)
+                return view_wormhole(request, wormhole.id)
     return render(request, 'sitemngr/lookup.html')
 
 def mastertable(request):
     """ Master spreadsheet-link page for browsing """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
+    if not can_view(eveigb, request):
+        return no_access(request)
     sites = Site.objects.all()
     wormholes = Wormhole.objects.all()
     return render(request, 'sitemngr/mastertable.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes})
@@ -796,16 +796,16 @@ def changelog(request):
     eveigb = IGBHeaderParser(request)
     return render(request, 'sitemngr/changelog.html', {'displayname': get_display_name(eveigb, request)})
 
-def igbtest(request):
+def igb_test(request):
     """ Show all data that the in-game browser can send to a Trusted Site """
     eveigb = IGBHeaderParser(request)
     return render(request, 'sitemngr/igbtest.html', {'displayname': get_display_name(eveigb, request)})
 
-def recentscanedits(request):
+def recent_scan_edits(request):
     """ Returns a readout of all recent scanid changes """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
+    if not can_view(eveigb, request):
+        return no_access(request)
     sites = []
     wormholes = []
     count = 0
@@ -829,8 +829,8 @@ def recentscanedits(request):
 def output(request):
     """ Output current data for the channel MotD """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
+    if not can_view(eveigb, request):
+        return no_access(request)
     wormholes = Wormhole.objects.filter(closed=False, start=appSettings.HOME_SYSTEM)
     motd = str(appSettings.HOME_SYSTEM) + ' Intel Channel\n\nWormholes:\n'
     for w in wormholes:
@@ -843,8 +843,8 @@ def output(request):
 def stats(request):
     """ Returns usage statistics """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
+    if not can_view(eveigb, request):
+        return no_access(request)
     numSites = len(Site.objects.all())
     numWormholes = len(Wormhole.objects.all())
     numEdits = len(SiteChange.objects.all()) + len(WormholeChange.objects.all())
@@ -883,11 +883,11 @@ def stats(request):
     return render(request, 'sitemngr/stats.html', {'displayname': get_display_name(eveigb, request), 'numSites': numSites,
                'numWormholes': numWormholes, 'numPastes': numPastes, 'numEdits': numEdits, 'numContributors': numContributors, 'allContributors': conList})
 
-def checkkills(request):
+def check_kills(request):
     """ Returns a readout of all ship and pod kills in and system with open objects """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
+    if not can_view(eveigb, request):
+        return no_access(request)
     reports = []
     systems = []
     for wormhole in Wormhole.objects.filter(closed=False):
@@ -898,24 +898,24 @@ def checkkills(request):
     if len(systems) > 0:
         retSys = []
         for system in systems:
-            retSys.append(getSystemID(system))
+            retSys.append(get_system_ID(system))
         kills = evemap.kills_by_system()[0]
         for k in kills.iteritems():
             if k[0] in retSys:
-                r = KillReport(system=getSystemName(k[0]), systemid=k[0], npc=k[1]['faction'], ship=k[1]['ship'], pod=k[1]['pod'])
+                r = KillReport(system=get_system_name(k[0]), systemid=k[0], npc=k[1]['faction'], ship=k[1]['ship'], pod=k[1]['pod'])
                 reports.append(r)
     return render(request, 'sitemngr/checkkills.html', {'displayname': get_display_name(eveigb, request), 'systems': systems, 'reports': reports})
 
-def viewhelp(request):
+def view_help(request):
     """ Help/instructions page """
     eveigb = IGBHeaderParser(request)
-    return render(request, 'sitemngr/help.html', {'displayname': get_display_name(eveigb, request), 'able': canView(eveigb, request)})
+    return render(request, 'sitemngr/help.html', {'displayname': get_display_name(eveigb, request), 'able': can_view(eveigb, request)})
 
 def overlay(request):
     """ Return a wealth of quickly-viewed information to be presented to on the idnex page """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
+    if not can_view(eveigb, request):
+        return no_access(request)
     data = ''
     # if the c2 static is open
     c2_open = False
@@ -1039,8 +1039,8 @@ def create_account(request):
     """
     if request.method == 'POST':
         eveigb = IGBHeaderParser(request)
-        if not canView(eveigb):
-            return noaccess(request)
+        if not can_view(eveigb):
+            return no_access(request)
         try:
             if User.objects.get(username__exact=eveigb.charname):
                 return index(request, 'You already have an account on this server.')
@@ -1057,8 +1057,8 @@ def create_account(request):
 def settings(request):
     """ Settings page for viewing and changing user settings """
     eveigb = IGBHeaderParser(request)
-    if not canView(eveigb, request):
-        return noaccess(request)
+    if not can_view(eveigb, request):
+        return no_access(request)
     message = None
     try:
         settings = Settings.objects.get(user=eveigb.charname)
@@ -1164,14 +1164,14 @@ def get_search_results(request, keyword, flags):
 #     Util
 # ==============================
 
-def getSystemName(systemid):
+def get_system_name(systemid):
     """ Returns the common name for the system from the Eve API's systemid representation """
     try:
         return MapSolarSystem.objects.get(id=systemid).name
     except MapSolarSystem.DoesNotExist:
         return 'null'
 
-def getSystemID(systemname):
+def get_system_ID(systemname):
     """ Returns the systemid for use in the Eve API corresponding to the systemname """
     try:
         return MapSolarSystem.objects.get(name=systemname).id
@@ -1184,10 +1184,10 @@ class Contributor:
         self.name = name
         self.points = points
 
-def noaccess(request):
+def no_access(request):
     """ Shown when the viewer is restricted from viewing the page """
     eveigb = IGBHeaderParser(request)
-    wrongAlliance = canViewWrongAlliance(eveigb)
+    wrongAlliance = can_view_wrong_alliance(eveigb)
     return render(request, 'sitemngr/noaccess.html', {'displayname': get_display_name(eveigb, request), 'wrongAlliance': wrongAlliance})
 
 def getBoolean(s):
@@ -1203,47 +1203,49 @@ def get_display_name(eveigb, request):
         return eveigb.charname
     return 'someone'
 
-def canView(igb, request=None):
+def can_view(igb, request=None):
     """
         Returns True if the user can view that page by testing
             if they are using the EVE IGB (Trusted mode) and in the appropriate alliance
     """
+    if get_display_name(igb, request) in appSettings.BLOCKED_USERS:
+        return False
     if request is not None:
         if request.user is not None:
             if request.user.is_active:
                 return True
     return igb is not None and igb.is_igb and igb.trusted and igb.alliancename == appSettings.ALLIANCE_NAME
 
-def canViewWrongAlliance(igb):
+def can_view_wrong_alliance(igb):
     """
         Returns True if the user can view that page by testing
             if they are using the EVE IGB (Trusted mode), but does not check alliance
     """
     return igb is not None and igb.is_igb and igb.trusted and igb.alliancename != appSettings.ALLIANCE_NAME
 
-def isSite(scanid):
+def is_site(scanid):
     """ Returns True if the scanid represents a site object """
-    return getSite(scanid) is not None
+    return get_site(scanid) is not None
 
-def getSite(scanid):
+def get_site(scanid):
     """ Returns site with scan id (or None) """
     for site in Site.objects.all():
         if site.scanid.lower() == scanid.lower():
             return site
     return None
 
-def isWormhole(scanid):
+def is_wormhole(scanid):
     """ Returns True if the scanid represents a wormhole object """
-    return getWormhole(scanid) is not None
+    return get_wormhole(scanid) is not None
 
-def getWormhole(scanid):
+def get_wormhole(scanid):
     """ Returns wormhole with scanid (or None) """
     for wormhole in Wormhole.objects.all():
         if wormhole.scanid.lower() == scanid.lower():
             return wormhole
     return None
 
-def getSettings(username):
+def get_settings(username):
     """ Returns the settings for a user """
     try:
         settings = Settings.objects.get(user=username)
