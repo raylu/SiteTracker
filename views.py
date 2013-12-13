@@ -66,7 +66,10 @@ def index(request, note=None):
     # check if the wormhole objects and graph are out of sync
     if is_dirty():
         tidy()
-        notices.append('Graph updated!')
+        if useGraphing:
+            notices.append('Graph updated!')
+        else:
+            notices.append('Graph would be updated, but it\'s not being used.')
     now = datetime.utcnow()
     # get the last updated time and player
     last_update_diff = None
