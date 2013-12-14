@@ -1,0 +1,71 @@
+{% extends 'sitemngr/base.html' %}
+
+{% block subtitle %}
+Mass Close
+{% endblock %}
+
+{% block content %}
+
+<center>
+
+{{ data }}
+
+<form method="POST" action="">
+{% csrf_token %}
+    <table>
+        <tr>
+            <th>
+                Scan id
+            </th>
+            <th>
+                Date
+            </th>
+            <th>
+                Start
+            </th>
+            <th>
+               Destination 
+            </th>
+            <th>
+                Status
+            </th>
+            <th>
+                Opened
+            </th>
+            <th>
+                <b>Close wormhole</b>
+            </th>
+        </tr>
+        {% for w in wormholes %}
+        <tr>
+            <td>
+                <a href="/sitemngr/viewwormhole/{{ w.pk }}">{{ w.scanid }}</a>
+            </td>
+            <td>
+                {{ w.date|date:'H:i, M d, y' }}
+            </td>
+            <td>
+                <a href="/sitemngr/system/{{ w.start }}">{{ w.start }}</a>
+            </td>
+            <td>
+                <a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>
+            </td>
+            <td>
+                {{ w.status }}
+            </td>
+            <td>
+                {% if w.opened %}<span style="color: green;">True</span>{% else %}<span style="color: red;">False</span>{% endif %}
+            </td>
+            <td>
+                <input type="checkbox" name="{{ w.id }}">
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <input type="submit" value="Commit edits">
+</form>
+
+</center>
+
+{% endblock %}

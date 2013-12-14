@@ -29,5 +29,6 @@ urlpatterns = patterns('',
    url(r'^overlay/', 'sitemngr.views.overlay'),
    url(r'^get_tradehub_jumps/([-a-zA-Z0-9 ]+)', 'sitemngr.views.get_tradehub_jumps'),
    url(r'^get_search_results/([-a-zA-Z0-9 ]+)/([-a-zA-Z0-9_]+)', 'sitemngr.views.get_search_results'),
-   url(r'^refreshgraph/', 'sitemngr.views.refresh_graph')
+   url(r'^refreshgraph/', 'sitemngr.views.refresh_graph'),
+   url(r'^massclose/', 'sitemngr.views.mass_close')
 )

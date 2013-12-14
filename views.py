@@ -1172,6 +1172,24 @@ def refresh_graph(request):
     set_dirty()
     return index(request)
 
+def mass_close(request):
+    """ Close multiple wormholes at once, to be used for deleting entire chains after their connection is set to closed """
+    eveigb = IGBHeaderParser(request)
+    if not can_view(eveigb, request):
+        return no_access(request)
+    data = ''
+    if request.method == 'POST':
+        p = request.POST
+        for k in p.iterkeys():
+            if k == 'csrfmiddlewaretoken':
+                continue
+            wormhole = Wormhole.objects.get(id=k)
+            wormhole.closed = True
+            wormhole.save()
+            WormholeChange(wormhole=wormhole, user=get_display_name(eveigb, request), date=datetime.now(), changedScanid=False, changedType=False, changedStart=False, changedDestination=False, changedTime=False, changedStatus=False, changedOpened=False, changedClosed=True, changedNotes=False).save()
+    wormholes = Wormhole.objects.filter(closed=False)
+    return render(request, 'sitemngr/massclose.html', {'displayname': get_display_name(eveigb, request), 'wormholes': wormholes, 'data': data})
+
 # ==============================
 #     Util
 # ==============================
