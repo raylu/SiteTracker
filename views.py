@@ -929,6 +929,7 @@ def overlay(request):
     hs = []
     # closest chain system to jita
     jita_closest = None
+    jita_jumps = 5000
     least = 5000
     # if the user is in-game, then get their current position
     home_system = appSettings.HOME_SYSTEM
@@ -969,6 +970,7 @@ def overlay(request):
             if int(jumps) < least:
                 least = int(jumps)
                 jita_closest = wormhole.destination
+                jita_jumps = jumps
             # ensure that the system is actually in Eve, and not a user typo
             try:
                 obj = MapSolarSystem.objects.get(name=wormhole.destination)
@@ -986,7 +988,7 @@ def overlay(request):
             kills_ship = k[1]['ship']
             kills_pod = k[1]['pod']
     return render(request, 'sitemngr/overlay.html', {'displayname': get_display_name(eveigb, request), 'home_system': home_system, 'current_system': current_system, 'is_in_kspace': is_in_kspace, 'is_in_chain_system': is_in_chain_system,
-                     'c2_open': c2_open, 'hs': hs, 'jita_closest': jita_closest, 'closest_in': closest_in, 'closest_jumps': closest_jumps,
+                     'c2_open': c2_open, 'hs': hs, 'jita_closest': jita_closest, 'jita_jumps': jita_jumps, 'closest_in': closest_in, 'closest_jumps': closest_jumps,
                      'kills_npc': kills_npc, 'kills_ship': kills_ship, 'kills_pod': kills_pod, 'data': data})
 
 def is_system(system):
@@ -1187,6 +1189,7 @@ def mass_close(request):
             wormhole.closed = True
             wormhole.save()
             WormholeChange(wormhole=wormhole, user=get_display_name(eveigb, request), date=datetime.now(), changedScanid=False, changedType=False, changedStart=False, changedDestination=False, changedTime=False, changedStatus=False, changedOpened=False, changedClosed=True, changedNotes=False).save()
+        set_dirty()
     wormholes = Wormhole.objects.filter(closed=False)
     return render(request, 'sitemngr/massclose.html', {'displayname': get_display_name(eveigb, request), 'wormholes': wormholes, 'data': data})
 
