@@ -87,6 +87,7 @@ def graph():
             continue
         g.add_edge(w.start, w.destination, style=get_edge_type(w.start, w.destination))
     g.layout()
+    os.remove('/var/www/mysite/sitemngr/static/pictures/graph.png')
     g.draw('/var/www/mysite/sitemngr/static/pictures/graph.png')
     print 'Graphed', datetime.now().strftime('%m/%d/%Y %H:%M:%S')
 

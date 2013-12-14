@@ -1166,6 +1166,11 @@ def get_search_results(request, keyword, flags):
         ret.append(Result('', 'No results'))
     return render(request, 'sitemngr/search_results.html', {'results': ret, 'flags': flags})
 
+def refresh_graph(request):
+    """ A simple redirect used for manually refreshing the wormhole chain graph """
+    set_dirty()
+    return index(request)
+
 # ==============================
 #     Util
 # ==============================
