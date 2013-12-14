@@ -1,7 +1,7 @@
 <p>
-    Recent NPC kills in Nexus: {% if kills_npc %}<b>Yes: {{ kills_npc }}</b>{% else %}No{% endif %}<br>
-    Recent Ships kills in Nexus: {% if kills_ship %}<b>Yes: {{ kills_ship }}</b>{% else %}No{% endif %}<br>
-    Recent Pods kills in Nexus: {% if kills_pod %}<b>Yes: {{ kills_pod }}</b>{% else %}No{% endif %}<br>
+    Recent NPC kills in {{ home_system }}: {% if kills_npc %}<b>Yes: {{ kills_npc }}</b>{% else %}No{% endif %}<br>
+    Recent Ships kills in {{ home_system }}: {% if kills_ship %}<b>Yes: {{ kills_ship }}</b>{% else %}No{% endif %}<br>
+    Recent Pods kills in {{ home_system }}: {% if kills_pod %}<b>Yes: {{ kills_pod }}</b>{% else %}No{% endif %}<br>
     Is the C2 open: {% if c2_open %}<b>Yes</b>{% else %}False{% endif %}<br>
     High Sec systems in the database: {% if hs %}<b>{% for h in hs %}{{h}}, {% endfor %}</b>{% else %}None{% endif %}<br>
     Closest chain system to Jita: {% if jita_closest %}<b>{{ jita_closest }}</b>{% else %}Null{% endif %}<br>

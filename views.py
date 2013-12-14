@@ -931,6 +931,7 @@ def overlay(request):
     jita_closest = None
     least = 5000
     # if the user is in-game, then get their current position
+    home_system = appSettings.HOME_SYSTEM
     current_system = eveigb.solarsystemname
     is_in_kspace = current_system and not re.match(r'^J\d{6}$', current_system)
     is_in_chain_system = False
@@ -954,7 +955,7 @@ def overlay(request):
     for wormhole in Wormhole.objects.filter(opened=True, closed=False):
         if not wormhole.destination.lower() in ['', ' ', 'closed', 'unopened', 'unknown']:
             if re.match(r'^J\d{6}$', wormhole.destination):
-                if wormhole.start == appSettings.HOME_SYSTEM:
+                if wormhole.start == home_system:
                     if not wormhole.destination.lower() in ['', ' ', 'closed', 'unopened', 'unknown']:
                         if re.match(r'^J\d{6}$', wormhole.destination):
                             if get_wormhole_class(wormhole.destination) == '2':
@@ -984,7 +985,7 @@ def overlay(request):
             kills_npc = k[1]['faction']
             kills_ship = k[1]['ship']
             kills_pod = k[1]['pod']
-    return render(request, 'sitemngr/overlay.html', {'displayname': get_display_name(eveigb, request), 'current_system': current_system, 'is_in_kspace': is_in_kspace, 'is_in_chain_system': is_in_chain_system,
+    return render(request, 'sitemngr/overlay.html', {'displayname': get_display_name(eveigb, request), 'home_system': home_system, 'current_system': current_system, 'is_in_kspace': is_in_kspace, 'is_in_chain_system': is_in_chain_system,
                      'c2_open': c2_open, 'hs': hs, 'jita_closest': jita_closest, 'closest_in': closest_in, 'closest_jumps': closest_jumps,
                      'kills_npc': kills_npc, 'kills_ship': kills_ship, 'kills_pod': kills_pod, 'data': data})
 
