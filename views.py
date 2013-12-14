@@ -1067,7 +1067,7 @@ def settings(request):
         return no_access(request)
     message = None
     try:
-        settings = Settings.objects.get(user=eveigb.charname)
+        settings = Settings.objects.get(user=get_display_name(eveigb, request))
     except Settings.DoesNotExist:
         settings = Settings(user=eveigb.charname, editsInNewTabs=True, storeMultiple=True)
         settings.save()
