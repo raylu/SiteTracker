@@ -285,7 +285,7 @@ def add_site(request):
         site = Site(name=s_name, scanid=s_scanid, type=s_type, where=s_where, creator=get_display_name(eveigb, request), date=now, opened=s_opened, closed=s_closed, notes=s_notes)
         site.save()
         # return the user to the appropriate page, depending on their user settings
-        if get_settings(eveigb.charname).storeMultiple:
+        if get_settings(get_display_name(eveigb, request)).storeMultiple:
             return render(request, 'sitemngr/addsite.html', {'displayname': get_display_name(eveigb, request), 'isForm': True,
                  'message': 'Successfully stored the data into the database.', 'finish_msg': 'Store new site into the database:', 'timenow': now.strftime('%m/%d @ %H:%M')})
         else:
@@ -433,7 +433,7 @@ def add_wormhole(request):
         # make the new view of the index page update the graph
         set_dirty()
         # return the user to the appropriate page, depending on their user settings
-        if get_settings(eveigb.charname).storeMultiple:
+        if get_settings(get_display_name(eveigb, request)).storeMultiple:
             return render(request, 'sitemngr/addwormhole.html', {'request': request, 'displayname': get_display_name(eveigb, request),
                     'isForm': True, 'message': 'Successfully stored the data into the database.', 'finish_msg': 'Store new site into database:', 'timenow': now.strftime('%m/%d @ %H:%M')})
         else:
@@ -575,7 +575,7 @@ def paste(request):
                     if v == '-CLOSE-':
                         site.closed = True
                         site.save()
-                        change = SiteChange(site=site, date=now, user=eveigb.charname, changedName=False, changedScanid=False,
+                        change = SiteChange(site=site, date=now, user=get_display_name(eveigb, request), changedName=False, changedScanid=False,
                                     changedType=False, changedWhere=False, changedDate=False, changedOpened=False,
                                     changedClosed=True, changedNotes=False)
                         change.save()
@@ -583,7 +583,7 @@ def paste(request):
                         site.notes += ' Scanid: {0} >> {1}'.format(site.scanid, v)
                         site.scanid = v
                         site.save()
-                        change = SiteChange(site=site, date=now, user=eveigb.charname, changedName=False, changedScanid=True,
+                        change = SiteChange(site=site, date=now, user=get_display_name(eveigb, request), changedName=False, changedScanid=True,
                                     changedType=False, changedWhere=False, changedDate=False, changedOpened=False,
                                     changedClosed=False, changedNotes=False)
                         change.save()
@@ -592,7 +592,7 @@ def paste(request):
                     if v == '-CLOSE-':
                         wormhole.closed = True
                         wormhole.save()
-                        change = WormholeChange(wormhole=wormhole, user=eveigb.charname, date=now, changedScanid=False, changedType=False,
+                        change = WormholeChange(wormhole=wormhole, user=get_display_name(eveigb, request), date=now, changedScanid=False, changedType=False,
                                      changedStart=False, changedDestination=False, changedTime=False, changedStatus=False,
                                      changedOpened=False, changedClosed=True, changedNotes=False)
                         change.save()
@@ -600,7 +600,7 @@ def paste(request):
                         wormhole.notes += 'Scanid: {0} >> {1}'.format(wormhole.scanid, v)
                         wormhole.scanid = v
                         wormhole.save()
-                        change = WormholeChange(wormhole=wormhole, user=eveigb.charname, date=now, changedScanid=True, changedType=False,
+                        change = WormholeChange(wormhole=wormhole, user=get_display_name(eveigb, request), date=now, changedScanid=True, changedType=False,
                                      changedStart=False, changedDestination=False, changedTime=False, changedStatus=False,
                                      changedOpened=False, changedClosed=False, changedNotes=False)
                         change.save()
@@ -1069,7 +1069,7 @@ def settings(request):
     try:
         settings = Settings.objects.get(user=get_display_name(eveigb, request))
     except Settings.DoesNotExist:
-        settings = Settings(user=eveigb.charname, editsInNewTabs=True, storeMultiple=True)
+        settings = Settings(user=get_display_name(eveigb, request), editsInNewTabs=True, storeMultiple=True)
         settings.save()
     if request.method == 'POST':
         p = request.POST
