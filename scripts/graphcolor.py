@@ -29,13 +29,19 @@ emap['VoC'] = 'dotted'
 emap['EoL'] = 'dotted'
 emap['Unknown'] = 'solid'
 
+def is_k_space(system_name):
+    return not is_w_space(system_name)
+
+def is_w_space(system_name):
+    return re.match(r'^J\d{6}$', system_name)
+
 def get_edge_type(start, destination):
     wormhole = Wormhole.objects.get(start=start, destination=destination)
     return emap[wormhole.status]
 
 def get_color(system_name):
     system = None
-    if re.match(r'J\d{6}', system_name):
+    if is_w_space(system_name):
         return get_color_wh(system_name)
     try:
         system = MapSolarSystem.objects.get(name=system_name)
@@ -65,6 +71,11 @@ def get_color_wh(system_name):
         pass
     return 'black'
 
+def get_shape(system_name):
+    if is_k_space(system_name):
+        return 'ellipse'
+    return 'diamond'
+
 def graph():
     g = AGraph(label='Overview', landscape='false', directed=False, ranksep='0.2')
     g.edge_attr.update(len='1.5', color='black')
@@ -81,16 +92,16 @@ def graph():
             nodes.append(w.destination)
     for n in nodes:
         if n == 'J132814':
-            g.add_node(n, color='red', fontcolor='red')
+            g.add_node(n, color='red', fontcolor='red', shape='box')
             continue
-        g.add_node(n, color=get_color(n))
+        g.add_node(n, color=get_color(n), shape=get_shape(n))
     for w in wormholes:
         if w.destination.lower() in ['', ' ', 'unopened', 'closed'] or w.start.lower() in ['', ' ', 'unopened', 'closed']:
             continue
         if w.status in ['Fresh', 'Unknown'] and (now.replace(tzinfo=pytz.utc) - w.date.replace(tzinfo=pytz.utc)).seconds / 60 / 60 > 12:
-            g.add_edge(w.start, w.destination, style='dotted', color='red')
+            g.add_edge(w.start, w.destination, style='dotted', color='red', label=w.scanid)
             continue
-        g.add_edge(w.start, w.destination, style=get_edge_type(w.start, w.destination), color='black')
+        g.add_edge(w.start, w.destination, style=get_edge_type(w.start, w.destination), color='black', label=w.scanid)
     g.layout()
     os.remove('/var/www/mysite/sitemngr/static/pictures/graph.png')
     g.draw('/var/www/mysite/sitemngr/static/pictures/graph.png')
