@@ -72,9 +72,10 @@ def get_color_wh(system_name):
     return 'black'
 
 def get_shape(system_name):
-    if is_k_space(system_name):
-        return 'ellipse'
-    return 'diamond'
+    # if is_k_space(system_name):
+        # return 'ellipse'
+    # return 'diamond'
+    return 'ellipse'
 
 def graph():
     g = AGraph(label='Overview', landscape='false', directed=False, ranksep='0.2')
