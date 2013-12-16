@@ -5,6 +5,7 @@ from pygraphviz import *
 import urllib2
 from time import sleep
 from datetime import datetime
+import pytz
 import os
 
 cmap = {}
@@ -68,6 +69,7 @@ def graph():
     g = AGraph(label='Overview', landscape='false', directed=False, ranksep='0.2')
     g.edge_attr.update(len='1.5', color='black')
     wormholes = Wormhole.objects.filter(opened=True, closed=False)
+    now = datetime.now(pytz.utc)
     nodes = []
     nodes.append('J132814')
     for w in wormholes:
@@ -85,7 +87,10 @@ def graph():
     for w in wormholes:
         if w.destination.lower() in ['', ' ', 'unopened', 'closed'] or w.start.lower() in ['', ' ', 'unopened', 'closed']:
             continue
-        g.add_edge(w.start, w.destination, style=get_edge_type(w.start, w.destination))
+        if w.status in ['Fresh', 'Unknown'] and (now.replace(tzinfo=pytz.utc) - w.date.replace(tzinfo=pytz.utc)).seconds / 60 / 60 > 12:
+            g.add_edge(w.start, w.destination, style='dotted', color='red')
+            continue
+        g.add_edge(w.start, w.destination, style=get_edge_type(w.start, w.destination), color='black')
     g.layout()
     os.remove('/var/www/mysite/sitemngr/static/pictures/graph.png')
     g.draw('/var/www/mysite/sitemngr/static/pictures/graph.png')
