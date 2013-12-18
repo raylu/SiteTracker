@@ -745,13 +745,16 @@ def get_tradehub_system_names():
 
 def get_jumps_between(start, finish):
     """ Polls Dotlan to calculate jumps between two systems """
-    url = 'http://evemaps.dotlan.net/route/%s:%s' % (start, finish)
-    count = 0
-    contents = urllib2.urlopen(url).read()
-    for line in contents.split('\n'):
-        if '<td align="right">' in line:
-            count += 1
-    return (count - 1) / 2
+    try:
+        url = 'http://evemaps.dotlan.net/route/%s:%s' % (start, finish)
+        count = 0
+        contents = urllib2.urlopen(url).read()
+        for line in contents.split('\n'):
+            if '<td align="right">' in line:
+                count += 1
+        return (count - 1) / 2
+    except:
+        return -1
 
 # ==============================
 #     Reference lookup
