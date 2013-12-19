@@ -23,7 +23,7 @@ Index
 		$('#search_results').load('http://tracker.talkinlocal.org/sitemngr/get_search_results/' + keyword + '/' + flags);
 	}
 	function toggleSection(which) {
-	   $("#" + which).toggle(100);
+	   $("#" + which).toggle(200);
 	}
 </script>
 {% endblock %}
@@ -108,7 +108,7 @@ Index
                 </td>
             </tr>
         </table><br>
-        <input type="submit" value="Parse"> 
+        <input type="submit" value="Parse" class="btn btn-primary"> 
     </form>
 </div>
 <div id="graph" style="border: 1px solid gray; display: none;">
