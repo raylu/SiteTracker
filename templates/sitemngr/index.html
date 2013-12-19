@@ -10,9 +10,6 @@ Index
 <script type="text/javascript">
 	$(document).ready(function()
 	{
-		$('#graph').hide();
-		$('#overlay').hide();
-		$('#search').hide();
 		$('#omnibox_instructions').hide();
 		$('#search_results').hide();
 		$('#overlay').load('http://tracker.talkinlocal.org/sitemngr/overlay/');
@@ -24,6 +21,9 @@ Index
 		  flags = '_'
 		$('#search_results').show();
 		$('#search_results').load('http://tracker.talkinlocal.org/sitemngr/get_search_results/' + keyword + '/' + flags);
+	}
+	function toggleSection(which) {
+	   $("#" + which).toggle(100);
 	}
 </script>
 {% endblock %}
@@ -48,11 +48,12 @@ Index
 {% endif %}
 
 <br>
-<button onclick="$('#graph').toggle(250);">Toggle graph</button>
-<button onclick="$('#overlay').toggle(250);">Show Overview</button>
-<button onclick="$('#search').toggle(250);">Search</button>
+<button onclick="toggleSection('graph');">Toggle graph</button>
+<button onclick="toggleSection('overlay');">Show Overview</button>
+<button onclick="toggleSection('search');">Search</button>
+<button onclick="toggleSection('index_paste');">Paste</button>
 
-<div id="search" style="border: 1px solid gray;">
+<div id="search" style="border: 1px solid gray; display: none;">
     <strong>Search box</strong><br>
     <a onclick="$('#omnibox_instructions').toggle(100);">Show instructions</a><br>
     <div id="omnibox_instructions" style="text-align: left; padding-left: 5px;">
@@ -80,7 +81,35 @@ Index
 	<img src="http://i.imgur.com/WWZwIWk.png" width="30" height="30" onclick="$('#omnibox').val(''); $('#omni_flags').val(''); $('#search_results').hide(); $('#search_results').html('');"><br>
 	<div id="search_results" style="height: 200px; width: 50%; overflow: auto;"></div>
 </div>
-<div id="graph" style="border: 1px solid gray;">
+<div id="index_paste" style="border: 1px solid gray; display: none;">
+    <h4>This is the same thing as the paste page, without having to load that separate page before pasting.</h4>
+    <form action="/sitemngr/paste/" method="POST">
+    {% csrf_token %}
+        <table style="border: none;">
+            <tr style="border: none;">
+                <td>
+                    <label><b>System</b>:</label>
+                </td>
+                <td>
+                    <input type="text" name="system" value="{% if system %}{{ system }}{% elif eveigb.is_igb %}{{ eveigb.solarsystemname }}{% else %}J132814{% endif %}">
+                </td>
+            </tr>
+        </table><br>
+        <textarea name="pastedata" rows="20" id="ta_pastedata">{% if raw %}{{ raw }}{% endif %}</textarea><br>
+        <table style="border: none;">
+            <tr style="border: none;">
+                <td>
+                    <label><b>After downtime?</b></label>
+                </td>
+                <td>
+                    <input type="checkbox" name="downtime">
+                </td>
+            </tr>
+        </table><br>
+        <input type="submit" value="Parse"> 
+    </form>
+</div>
+<div id="graph" style="border: 1px solid gray; display: none;">
 	<img src="{% static 'pictures/graph.png' %}" alt="Current graph not found"></img><br>
 	<p><strong>
     	System outline colors: HS = gold, LS = purple, NS = brown, C1 = blue, C2 = green, C3 = yellow, C4 = orange, C5 = red, C6 = black, not found = black<br>
@@ -88,7 +117,7 @@ Index
 		<i>Note</i>: Dotted red lines mean that the wormhole has been "Fresh" or "Unknown" for more than 12 hours
 	</strong></p>
 </div>
-<div style="width: 100%; border: 1px solid black; margin-bottom: 20px;" id="overlay">
+<div id="overlay" style="width: 100%; border: 1px solid black; margin-bottom: 20px; display: none;">
     <span style="color: gray; text-align: left;">Loading ...</span>
 </div>
 

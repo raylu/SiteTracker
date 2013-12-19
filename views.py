@@ -78,7 +78,7 @@ def index(request, note=None):
     except TypeError:
         last_update_diff = '-never-'
     last_update_user = get_last_update_user()
-    return render(request, 'sitemngr/index.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': get_settings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': get_settings(get_display_name(eveigb, request)).userBackgroundImage, 'flag': note, 'now': now, 'last_update_diff': last_update_diff, 'last_update_user': last_update_user})
+    return render(request, 'sitemngr/index.html', {'displayname': get_display_name(eveigb, request), 'homepage': True, 'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': get_settings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': get_settings(get_display_name(eveigb, request)).userBackgroundImage, 'flag': note, 'now': now, 'last_update_diff': last_update_diff, 'last_update_user': last_update_user})
 
 def get_time_difference_formatted(old, recent):
     """ Formats the difference between two datetime objects """
