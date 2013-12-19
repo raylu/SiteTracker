@@ -62,7 +62,7 @@ def index(request, note=None):
         return no_access(request)
     sites = Site.objects.filter(closed=False)
     wormholes = Wormhole.objects.filter(closed=False)
-    notices = ['All tables went on a diet.']
+    notices = ['All tables went on a diet.', 'You can click these message boxes to make them disappear.']
     # check if the wormhole objects and graph are out of sync
     if is_dirty():
         tidy()

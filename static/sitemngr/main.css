@@ -17,24 +17,19 @@ body {
 }
 
 table {
-    padding: 5px;
     border-collapse: collapse;
-    border: 2px solid black;
 }
 
 tr {
     padding: 5px 0 5px 0;
     text-align: center;
-    border: 1px solid black;
-}
-
-th,td {
-    padding: 2px;
+    border-top: 1px solid silver;
+    border-bottom: 1px solid silver;
 }
 
 th {
     font-size: 120%;
-    border: 1px solid black;
+    border: 1px solid gray;
 }
 
 .addsite {

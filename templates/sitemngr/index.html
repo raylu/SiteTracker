@@ -11,8 +11,11 @@ Index
 	$(document).ready(function()
 	{
 		$('#omnibox_instructions').hide();
-		$('#search_results').hide();
+		$('#search_results').hide(250);
 		$('#overlay').load('http://tracker.talkinlocal.org/sitemngr/overlay/');
+		$('.message').bind('click', function() {
+           $(this).hide();
+        });
 	});
 	function get_tags() {
 		var keyword = $('#omnibox').val();
@@ -32,18 +35,19 @@ Index
 
 <center>
 
-{% if flag %}
+{% if notices or flag %}
     <div class="message">
-		{{ flag }}<br>
-    </div>
-    <hr>
-{% endif %}
-
-{% if notices %}
-    <div class="message">
-        {% for n in notices %}
-            {{ n }}<br>
-        {% endfor %}
+        {% if notices %}
+            {% for n in notices %}
+                {{ n }}<br>
+            {% endfor %}
+        {% endif %}
+        {% if flag %}
+            {% if notices %}
+                <hr style="color: white;">
+            {% endif %}
+            {{ flag }}<br>
+        {% endif %}
     </div>
 {% endif %}
 
@@ -131,111 +135,119 @@ Index
     <div class="span6">
         <h1>Index of {% if status and status == 'open' %}{% else %}closed {% endif %}sites</h1>
         <table>
-            <tr>
-                <th>
-                    Site Name
-                </th>
-                <th>
-                    Scan id
-                </th>
-                <th>
-                    Site Type
-                </th>
-                <th>
-                    Location
-                </th>
-                <th>
-                    Opened?
-                </th>
-                <th>
-                    Date Entered
-                </th>
-                <th>
-                    Edit
-                </th>
-            </tr>
-            {% for s in sites %}
-				{% if s.isAnom %}
-				<tr class="anom">
-				{% elif s.opened %}
-				<tr class="open">
-				{% else %}
-				<tr class="closed">
-				{% endif %}
-					<td>
-						<a href="/sitemngr/viewsite/{{ s.id }}">{{ s.name }}</a>
-					</td>
-					<td>
-						{{ s.scanid }}
-					</td>
-					<td>
-						{{ s.type }}
-					</td>
-					<td>
-						<a href="/sitemngr/system/{{ s.where }}">{{ s.where }}</a>
-					</td>
-					<td>
-						{% if s.opened %}<span class="g">{{ s.opened }}</span>{% else %}<span class="r">{{ s.opened }}</span>{% endif %}
-					</td>
-					<td>
-						{{ s.date|date:'m/d @ H:i' }}
-					</td>
-					<td>
-						<a href="/sitemngr/editsite/{{ s.id }}" {% if newTab %}target="_blank"{% endif %}>EDIT</a>
-					</td>
-				</tr>
-            {% endfor %}
+            <thead>
+                <tr>
+                    <th>
+                        Site Name
+                    </th>
+                    <th>
+                        Scan id
+                    </th>
+                    <th>
+                        Site Type
+                    </th>
+                    <th>
+                        Location
+                    </th>
+                    <th>
+                        Opened?
+                    </th>
+                    <th>
+                        Date Entered
+                    </th>
+                    <th>
+                        Edit
+                    </th>
+                </tr>
+            </thread>
+            <tbody>
+                {% for s in sites %}
+    				{% if s.isAnom %}
+    				<tr class="anom">
+    				{% elif s.opened %}
+    				<tr class="open">
+    				{% else %}
+    				<tr class="closed">
+    				{% endif %}
+    					<td>
+    						<a href="/sitemngr/viewsite/{{ s.id }}">{{ s.name }}</a>
+    					</td>
+    					<td>
+    						{{ s.scanid }}
+    					</td>
+    					<td>
+    						{{ s.type }}
+    					</td>
+    					<td>
+    						<a href="/sitemngr/system/{{ s.where }}">{{ s.where }}</a>
+    					</td>
+    					<td>
+    						{% if s.opened %}<span class="g">{{ s.opened }}</span>{% else %}<span class="r">{{ s.opened }}</span>{% endif %}
+    					</td>
+    					<td>
+    						{{ s.date|date:'m/d @ H:i' }}
+    					</td>
+    					<td>
+    						<a href="/sitemngr/editsite/{{ s.id }}" {% if newTab %}target="_blank"{% endif %}>EDIT</a>
+    					</td>
+    				</tr>
+                {% endfor %}
+            </tbody>
         </table>
     </div>
     <div class="span6">
         <h1>Index of {% if status and status == 'open' %}{% else %}closed {% endif %}wormholes</h1>
         <table>
-            <tr>
-                <th>
-                    Scan ID
-                </th>
-                <th>
-                    Opened in
-                </th>
-                <th>
-                    Leads to
-                </th>
-                <th>
-                    Time
-                </th>
-                <th>
-                    Status
-                </th>
-                <th>
-                    Edit
-                </th>
-            </tr>
-            {% for w in wormholes %}
-				{% if w.opened %}
-				<tr class="open">
-				{% else %}
-				<tr class="closed">
-				{% endif %}
-					<td>
-						<a href="/sitemngr/viewwormhole/{{ w.id }}">{{ w.scanid }}</a>
-					</td>
-					<td>
-						<a href="/sitemngr/system/{{ w.start }}">{{ w.start }}</a>
-					</td>
-					<td>
-						{% if w.destination == 'Unknown' or w.destination == '' or w.destination == 'Unopened' or w.destination == 'Closed' %}{{ w.destination }}{% else %}<a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>{% endif %}
-					</td>
-					<td>
-						{{ w.time }}
-					</td>
-					<td>
-						{{ w.status }}
-					</td>
-					<td>
-						<a href="/sitemngr/editwormhole/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>EDIT</a>
-					</td>
-				</tr>
-            {% endfor %}
+            <thead>
+                <tr>
+                    <th>
+                        Scan ID
+                    </th>
+                    <th>
+                        Opened in
+                    </th>
+                    <th>
+                        Leads to
+                    </th>
+                    <th>
+                        Time
+                    </th>
+                    <th>
+                        Status
+                    </th>
+                    <th>
+                        Edit
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for w in wormholes %}
+    				{% if w.opened %}
+    				<tr class="open">
+    				{% else %}
+    				<tr class="closed">
+    				{% endif %}
+    					<td>
+    						<a href="/sitemngr/viewwormhole/{{ w.id }}">{{ w.scanid }}</a>
+    					</td>
+    					<td>
+    						<a href="/sitemngr/system/{{ w.start }}">{{ w.start }}</a>
+    					</td>
+    					<td>
+    						{% if w.destination == 'Unknown' or w.destination == '' or w.destination == 'Unopened' or w.destination == 'Closed' %}{{ w.destination }}{% else %}<a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>{% endif %}
+    					</td>
+    					<td>
+    						{{ w.time }}
+    					</td>
+    					<td>
+    						{{ w.status }}
+    					</td>
+    					<td>
+    						<a href="/sitemngr/editwormhole/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>EDIT</a>
+    					</td>
+    				</tr>
+                {% endfor %}
+            </tbody>
         </table>
     </div>
 </div>
