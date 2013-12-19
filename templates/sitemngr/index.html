@@ -48,11 +48,13 @@ Index
 {% endif %}
 
 <br>
-<button onclick="toggleSection('graph');">Toggle graph</button>
-<button onclick="toggleSection('overlay');">Show Overview</button>
-<button onclick="toggleSection('search');">Search</button>
-<button onclick="toggleSection('index_paste');">Paste</button>
-
+<div class="btn-group">
+	<button class="btn" onclick="toggleSection('graph');">Toggle graph</button>
+	<button class="btn" onclick="toggleSection('overlay');">Show Overview</button>
+	<button class="btn" onclick="toggleSection('search');">Search</button>
+	<button class="btn" onclick="toggleSection('index_paste');">Paste</button>
+</div>
+<br><br>
 <div id="search" style="border: 1px solid gray; display: none;">
     <strong>Search box</strong><br>
     <a onclick="$('#omnibox_instructions').toggle(100);">Show instructions</a><br>
