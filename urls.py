@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.conf.urls import patterns, url
+from django.conf.urls.static import static
 
 urlpatterns = patterns('',
    url(r'^$', 'sitemngr.views.index'),
@@ -31,4 +33,4 @@ urlpatterns = patterns('',
    url(r'^get_search_results/([-a-zA-Z0-9 ]+)/([-a-zA-Z0-9_]+)', 'sitemngr.views.get_search_results'),
    url(r'^refreshgraph/', 'sitemngr.views.refresh_graph'),
    url(r'^massclose/', 'sitemngr.views.mass_close')
-)
+) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

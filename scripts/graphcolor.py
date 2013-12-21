@@ -22,6 +22,7 @@ cmap['6'] = 'black'
 
 emap = {}
 emap['Fresh'] = 'bold'
+emap['Undecayed'] = 'bold'
 emap['< 50% mass'] = 'dashed'
 emap['< 50% mass'] = 'dashed'
 emap['< 50% time'] = 'dashes'
@@ -99,12 +100,15 @@ def graph():
     for w in wormholes:
         if w.destination.lower() in ['', ' ', 'unopened', 'closed'] or w.start.lower() in ['', ' ', 'unopened', 'closed']:
             continue
-        if w.status in ['Fresh', 'Unknown'] and (now.replace(tzinfo=pytz.utc) - w.date.replace(tzinfo=pytz.utc)).seconds / 60 / 60 > 12:
+        if w.status in ['Fresh', 'Unknown'] and (now.replace(tzinfo=pytz.utc) - w.date.replace(tzinfo=pytz.utc)).seconds / 60 / 60 > 20:
             g.add_edge(w.start, w.destination, style='dotted', color='red', label=w.scanid)
-            continue
-        g.add_edge(w.start, w.destination, style=get_edge_type(w.start, w.destination), color='black', label=w.scanid)
+        else:
+            g.add_edge(w.start, w.destination, style=get_edge_type(w.start, w.destination), color='black', label=w.scanid)
     g.layout()
-    os.remove('/var/www/mysite/sitemngr/static/pictures/graph.png')
+    try:
+        os.remove('/var/www/mysite/sitemngr/static/pictures/graph.png')
+    except OSError:
+        pass
     g.draw('/var/www/mysite/sitemngr/static/pictures/graph.png')
     print 'Graphed', datetime.now().strftime('%m/%d/%Y %H:%M:%S')
 

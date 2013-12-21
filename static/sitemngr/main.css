@@ -32,6 +32,10 @@ th {
     border: 1px solid gray;
 }
 
+.hovertable tr:hover td {
+    background-color: #F5F5F5;
+}
+
 .addsite {
     font-size: 150%;
     background-color: #EDEDED;
@@ -41,6 +45,11 @@ th {
 
 input {
     text-align: center;
+}
+
+input[type="checkbox"] {
+    text-align: left;
+    vertical-align: center;
 }
 
 input[type="text"] {

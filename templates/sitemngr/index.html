@@ -11,10 +11,10 @@ Index
 	$(document).ready(function()
 	{
 		$('#omnibox_instructions').hide();
-		$('#search_results').hide(250);
+		$('#search_results').hide();
 		$('#overlay').load('http://tracker.talkinlocal.org/sitemngr/overlay/');
 		$('.message').bind('click', function() {
-           $(this).hide();
+           $(this).hide(250);
         });
 	});
 	function get_tags() {
@@ -35,19 +35,18 @@ Index
 
 <center>
 
-{% if notices or flag %}
-    <div class="message">
-        {% if notices %}
-            {% for n in notices %}
-                {{ n }}<br>
-            {% endfor %}
-        {% endif %}
-        {% if flag %}
-            {% if notices %}
-                <hr style="color: white;">
-            {% endif %}
-            {{ flag }}<br>
-        {% endif %}
+{% if notices %}
+    <div class="alert" id="alert_notices">
+        <button type="button" class="close" onclick="$('#alert_notices').fadeOut(250);">&times;</button>
+        {% for n in notices %}
+            {{ n }}<br>
+        {% endfor %}
+    </div>
+{% endif %}
+{% if flag %}
+    <div class="alert" id="alert_flag">
+        <button type="button" class="close" onclick="$('#alert_flag').fadeOut(250);">&times;</button>
+        {{ flag }}<br>
     </div>
 {% endif %}
 
@@ -58,7 +57,9 @@ Index
 	<button class="btn" onclick="toggleSection('search');">Search</button>
 	<button class="btn" onclick="toggleSection('index_paste');">Paste</button>
 </div>
+
 <br><br>
+
 <div id="search" style="border: 1px solid gray; display: none;">
     <strong>Search box</strong><br>
     <a onclick="$('#omnibox_instructions').toggle(100);">Show instructions</a><br>
@@ -108,11 +109,11 @@ Index
                     <label><b>After downtime?</b></label>
                 </td>
                 <td>
-                    <input type="checkbox" name="downtime">
+                    <input type="checkbox" name="downtime" id="c_paste_downtime">
                 </td>
             </tr>
         </table><br>
-        <input type="submit" value="Parse" class="btn btn-primary"> 
+        <input type="submit" value="Parse" class="btn btn-primary" data-loading-text="Parsing..." onclick="$(this).button('loading');"> 
     </form>
 </div>
 <div id="graph" style="border: 1px solid gray; display: none;">
@@ -134,7 +135,7 @@ Index
 <div class="row">
     <div class="span6">
         <h1>Index of {% if status and status == 'open' %}{% else %}closed {% endif %}sites</h1>
-        <table>
+        <table class="hovertable">
             <thead>
                 <tr>
                     <th>
@@ -163,11 +164,11 @@ Index
             <tbody>
                 {% for s in sites %}
     				{% if s.isAnom %}
-    				<tr class="anom">
+    				    <tr class="anom">
     				{% elif s.opened %}
-    				<tr class="open">
+    				    <tr class="open">
     				{% else %}
-    				<tr class="closed">
+    				    <tr class="closed">
     				{% endif %}
     					<td>
     						<a href="/sitemngr/viewsite/{{ s.id }}">{{ s.name }}</a>
@@ -197,7 +198,7 @@ Index
     </div>
     <div class="span6">
         <h1>Index of {% if status and status == 'open' %}{% else %}closed {% endif %}wormholes</h1>
-        <table>
+        <table class="hovertable">
             <thead>
                 <tr>
                     <th>

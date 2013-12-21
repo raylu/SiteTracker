@@ -60,11 +60,13 @@
 						<option>{{ wormhole.status }}</option>
 					{% endif %}
                     <option>Fresh</option>
+                    <option>Undecayed</option>
                     <option>< 50% mass</option>
                     <option>< 50% time</option>
                     <option>VoC</option>
                     <option>EoL</option>
                     <option>Unknown</option>
+                    <option>Closed</option>
                 </select>
             {% else %}
                 <input type="text" value="{{ wormhole.status }}" readonly>
@@ -101,7 +103,7 @@
             <label>{% if finish_msg %}{{ finish_msg }}{% endif %}</label>
         </td>
         <td>
-            <input type="submit" value="Store" class="btn btn-primary">
+            <input type="submit" value="Store" class="btn btn-primary" data-loading-text="Storing..." onclick="$(this).button('loading');">
         </td>
     </tr>
     {% endif %}

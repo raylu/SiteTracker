@@ -62,7 +62,7 @@ def index(request, note=None):
         return no_access(request)
     sites = Site.objects.filter(closed=False)
     wormholes = Wormhole.objects.filter(closed=False)
-    notices = ['All tables went on a diet.', 'You can click these message boxes to make them disappear.']
+    notices = ['All tables went on a diet.']
     # check if the wormhole objects and graph are out of sync
     if is_dirty():
         tidy()
@@ -550,10 +550,10 @@ def paste(request):
             for wormhole in allWormholes:
                 wormholes.append(wormhole)
                 paste_data.append(PasteMatch(scanid=wormhole.scanid, name='%s > %s' % (wormhole.start, wormhole.destination), p_type='wormhole', allowed=new_wormholes))
-            for s in new_sites:
-                newids.append(SpaceObject(s, 'Signature', names[s]))
             for a in new_anoms:
                 newids.append(SpaceObject(a, 'Anomaly', names[s]))
+            for s in new_sites:
+                newids.append(SpaceObject(s, 'Signature', names[s]))
             for w in new_wormholes:
                 newids.append(SpaceObject(w, 'Wormhole', ''))
             return render(request, 'sitemngr/pastescandowntime.html', {'system': system, 'pastedata': paste_data, 'sites': sites, 'wormholes': wormholes, 'newids': newids,
