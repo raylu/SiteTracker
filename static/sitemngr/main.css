@@ -30,6 +30,8 @@ tr {
 th {
     font-size: 120%;
     border: 1px solid gray;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 
 .hovertable tr:hover td {

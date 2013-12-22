@@ -79,7 +79,7 @@
             <label>{% if finish_msg %}{{ finish_msg }}{% endif %}</label>
         </td>
         <td>
-            <input type="submit" value="Store" class="btn btn-primary" data-loading-text="Storing..." onclick="$(this).button('loading');">
+            <input type="submit" id="submit_button" value="Store" class="btn btn-primary" data-loading-text="Storing..." onclick="$(this).button('loading');">
         </td>
     </tr>
     {% endif %}
