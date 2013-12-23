@@ -9,12 +9,15 @@ Index
 {% block javascript %}
 <script type="text/javascript">
 	$(document).ready(function() {
-		$('#omnibox_instructions').hide();
-		$('#search_results').hide();
 		$('#overlay').load('http://tracker.talkinlocal.org/sitemngr/overlay/');
 		$('.message').bind('click', function() {
            $(this).hide(250);
         });
+		$('#tt1').tooltip();
+		$('#tt2').tooltip();
+		$('#tt3').tooltip();
+		$('#tt4').tooltip();
+		$('#tt5').tooltip();
 	});
 	function get_tags() {
 		var keyword = $('#omnibox').val();
@@ -61,7 +64,7 @@ Index
 <div id="search" style="border: 1px solid gray; display: none;">
     <strong>Search box</strong><br>
     <a onclick="$('#omnibox_instructions').toggle(100);">Show instructions</a><br>
-    <div id="omnibox_instructions" style="text-align: left; padding-left: 5px;">
+    <div id="omnibox_instructions" style="text-align: left; padding-left: 5px; display: none;">
         <strong>Search box</strong>
         <ul>
             <li>Start typing what you are looking for. If you're looking for a system, type the first part of it's name. Systems directly in the 
@@ -84,7 +87,18 @@ Index
 	<input type="text" id="omnibox" style="margin-top: 10px;" onkeyup="get_tags();" placeholder="Search...">
 	<input type="text" id="omni_flags" style="margin-top: 10px; width: 10%;" onkeyup="get_tags();" placeholder="Flags">
 	<img src="http://i.imgur.com/WWZwIWk.png" width="30" height="30" onclick="$('#omnibox').val(''); $('#omni_flags').val(''); $('#search_results').hide(); $('#search_results').html('');"><br>
-	<div id="search_results" style="height: 200px; width: 50%; overflow: auto;"></div>
+	<div id="search_results" style="height: 200px; width: 50%; overflow: auto; display: none;"></div>
+</div>
+<div id="overlay" style="width: 100%; border: 1px solid black; display: none;">
+    <span style="color: gray; text-align: left;">Loading ...</span>
+</div>
+<div id="graph" style="border: 1px solid gray; display: none;">
+	<img src="{% static 'pictures/graph.png' %}" alt="Current graph not found"></img><br>
+	<p><strong>
+    	System outline colors: HS = gold, LS = purple, NS = brown, C1 = blue, C2 = green, C3 = yellow, C4 = orange, C5 = red, C6 = black, not found = black<br>
+		Line styles: Fresh = bold, < 50% mass & < 50% time = dashed, EoL & VoC = dotted, Unknown = standard<br>
+		<i>Note</i>: Dotted red lines mean that the wormhole has been "Fresh" or "Unknown" for more than 12 hours
+	</strong></p>
 </div>
 <div id="index_paste" style="border: 1px solid gray; display: none;">
     <h4>This is the same thing as the paste page, without having to load that separate page before pasting.</h4>
@@ -107,43 +121,34 @@ Index
                     <label><b>After downtime?</b></label>
                 </td>
                 <td>
-                    <input type="checkbox" name="downtime" id="c_paste_downtime">
+					<label class="checkbox">
+						<input type="checkbox" name="downtime" id="c_paste_downtime">
+					</label>
                 </td>
             </tr>
         </table><br>
         <input type="submit" value="Parse" class="btn btn-primary" data-loading-text="Parsing..." onclick="$(this).button('loading');"> 
     </form>
 </div>
-<div id="graph" style="border: 1px solid gray; display: none;">
-	<img src="{% static 'pictures/graph.png' %}" alt="Current graph not found"></img><br>
-	<p><strong>
-    	System outline colors: HS = gold, LS = purple, NS = brown, C1 = blue, C2 = green, C3 = yellow, C4 = orange, C5 = red, C6 = black, not found = black<br>
-		Line styles: Fresh = bold, < 50% mass & < 50% time = dashed, EoL & VoC = dotted, Unknown = standard<br>
-		<i>Note</i>: Dotted red lines mean that the wormhole has been "Fresh" or "Unknown" for more than 12 hours
-	</strong></p>
-</div>
-<div id="overlay" style="width: 100%; border: 1px solid black; margin-bottom: 20px; display: none;">
-    <span style="color: gray; text-align: left;">Loading ...</span>
-</div>
 
-<h5><a href="/sitemngr/system/J132814">Home System Page</a></h5>
+<h5><a href="/sitemngr/system/{{ homesystem }}" id="tt1" data-toggle="tooltip" title="Direct link to the system overview page for the homesystem in settings, {{ homesystem }}">Home System Page</a></h5>
 
 <h5>It is currently Eve time {{ now|date:'H:i:s, N j' }}. Last update: {{ last_update_diff }} ago, by {{ last_update_user }}</h5>
 
 <div class="row">
     <div class="span6">
-        <h1>Index of {% if status and status == 'open' %}{% else %}closed {% endif %}sites</h1>
+        <h1 id="tt4" data-toggle="tooltip" title="A 'site' is a Cosmic Anomaly or a Cosmic Signature. Both are grouped under this name.">Index of {% if status and status == 'open' %}{% else %}closed {% endif %}sites</h1>
         <table class="hovertable">
             <thead>
                 <tr>
                     <th>
-                        Site Name
+                        ID
                     </th>
                     <th>
-                        Scan id
+                        Name
                     </th>
                     <th>
-                        Site Type
+                        Type
                     </th>
                     <th>
                         Location
@@ -152,7 +157,7 @@ Index
                         Opened?
                     </th>
                     <th>
-                        Date Entered
+                        Entered
                     </th>
                     <th>
                         Edit
@@ -169,10 +174,10 @@ Index
     				    <tr class="closed">
     				{% endif %}
     					<td>
-    						<a href="/sitemngr/viewsite/{{ s.id }}">{{ s.name }}</a>
+							<a href="/sitemngr/viewsite/{{ s.id }}">{{ s.scanid }}</a>
     					</td>
     					<td>
-    						{{ s.scanid }}
+    						{{ s.name }}
     					</td>
     					<td>
     						{{ s.type }}
@@ -187,7 +192,7 @@ Index
     						{{ s.date|date:'m/d @ H:i' }}
     					</td>
     					<td>
-    						<a href="/sitemngr/editsite/{{ s.id }}" {% if newTab %}target="_blank"{% endif %}>EDIT</a>
+							<a class="label label-info" href="/sitemngr/editsite/{{ s.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a>
     					</td>
     				</tr>
                 {% endfor %}
@@ -195,12 +200,12 @@ Index
         </table>
     </div>
     <div class="span6">
-        <h1>Index of {% if status and status == 'open' %}{% else %}closed {% endif %}wormholes</h1>
+        <h1 id="tt5" data-toggle="tooltip" title="Wormholes start in one system and lead to another - the main method of transportantion for those living in wormhole-space.">Index of {% if status and status == 'open' %}{% else %}closed {% endif %}wormholes</h1>
         <table class="hovertable">
             <thead>
                 <tr>
                     <th>
-                        Scan ID
+                        ID
                     </th>
                     <th>
                         Opened in
@@ -209,7 +214,7 @@ Index
                         Leads to
                     </th>
                     <th>
-                        Time
+                        Entered
                     </th>
                     <th>
                         Status
@@ -236,13 +241,13 @@ Index
     						{% if w.destination == 'Unknown' or w.destination == '' or w.destination == 'Unopened' or w.destination == 'Closed' %}{{ w.destination }}{% else %}<a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>{% endif %}
     					</td>
     					<td>
-    						{{ w.time }}
+    						{{ w.date|date:'m/d @ H:i' }}
     					</td>
     					<td>
     						{{ w.status }}
     					</td>
     					<td>
-    						<a href="/sitemngr/editwormhole/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>EDIT</a>
+    						<a class="label label-info" href="/sitemngr/editwormhole/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a>
     					</td>
     				</tr>
                 {% endfor %}
@@ -253,13 +258,13 @@ Index
 <br><br><br>
 <p style="font-size: 200%;">
     {% if status and status == 'open' %}
-        <a href="/sitemngr/viewall/">View closed</a>
+        <a href="/sitemngr/viewall/" id="tt2" data-toggle="tooltip" title="View this index page in the same format, but only show closed sites and wormholes intead of the open entries">View closed</a>
     {% else %}
         <a href="/sitemngr/">Back</a>
     {% endif %}
     <br>
 </p>
-<a href="/sitemngr/refreshgraph/">Manually refresh graph</a>
+<a href="/sitemngr/refreshgraph/" id="tt3" data-toggle="tooltip" title="Use this to force the wormhole chain graph to update. This shouldn't ever be needed, but just in case someone makes edits directly on the database, use this page.">Manually refresh graph</a>
 
 </center>
 

@@ -7,11 +7,14 @@ Add Site
 {% block javascript %}
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#submit_button').attr('disabled', 'disabled');
-        $('#l_scanid').css('color', 'red');
+		var sid = $('#t_scanid').val();
+		if (sid.length != 3) {
+			$('#submit_button').attr('disabled', 'disabled');
+			$('#l_scanid').css('color', 'red');
+		}
         $('#t_scanid').keyup(function() {
-            var t = $('#t_scanid').val();
-            if (t.length == 3)
+            var sid = $('#t_scanid').val();
+            if (sid.length == 3)
             {
                 $('#submit_button').removeAttr("disabled");
                 $('#l_scanid').css('color', 'black');
@@ -50,11 +53,13 @@ Add Site
 
 <form action="" method="POST">
 {% csrf_token %}
-    {% include 'sitemngr/siteform.html' %}
+	{% include 'sitemngr/siteform.html' %}
 </form>
+<div class="alert alert-error" id="validation" style="display: none;"></div>
+
 
 <button class="btn" onclick="$('#directions').toggle(250);">Toggle Directions</button>
-<div id="directions" style="width: 50%; margin-left: auto; margin-right: auto; background-color: white; border: 1px solid silver;" padding-right: 5px;" hidden>
+<div id="directions" class="directions">
     <ul style="text-align: left;">
         <li>The <b>Creator</b> field is auto-filled with the user's name.</li>
         <li>The <b>Scan ID</b> field is the 3-digit id from your Discovery Scanner.</li>

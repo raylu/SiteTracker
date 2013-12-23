@@ -10,7 +10,7 @@
     {% if site %}
     <tr>
         <td>
-            <label>Date:</label>
+            <label>Date</label>
         </td>
         <td>
             <input type="text" name="date" value="{% if site %}{{ site.date|date:'H:i, M d, y' }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
@@ -19,39 +19,39 @@
     {% endif %}
     <tr>
         <td>
-            <label id="l_scanid">Scan ID:</label>
+            <label id="l_scanid">Scan ID</label>
         </td>
         <td>
-            <input type="text" id="t_scanid" name="scanid" value="{% if site %}{{ site.scanid }}{% elif g_scanid %}{{ g_scanid }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <label>Name of site:</label>
-        </td>
-        <td>
-            <input type="text" name="name" value="{% if site %}{{ site.name }}{% elif g_name %}{{ g_name }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+            <input type="text" id="t_scanid" name="scanid" placeholder="AAA, BBB, LOL ..." value="{% if site %}{{ site.scanid }}{% elif g_scanid %}{{ g_scanid }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
         </td>
     </tr>
     <tr>
         <td>
-            <label>Type of site:</label>
+            <label>Name of site</label>
         </td>
         <td>
-            <input type="text" name="type" value="{% if site %}{{ site.type }}{% elif g_type %}{{ g_type }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <label>Location of site:</label>
-        </td>
-        <td>
-            <input type="text" name="where" value="{% if site %}{{ site.where }}{% elif g_system %}{{ g_system }}{% else %}{{ eveigb.solarsystemname }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+            <input type="text" name="name" placeholder="Core Stronghold, Quarantine Area ..." value="{% if site %}{{ site.name }}{% elif g_name %}{{ g_name }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
         </td>
     </tr>
     <tr>
         <td>
-            <label>Has the site been opened:</label>
+            <label>Type of site</label>
+        </td>
+        <td>
+            <input type="text" name="type" placeholder="Combat, gas, data ..." value="{% if site %}{{ site.type }}{% elif g_type %}{{ g_type }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>Location of site</label>
+        </td>
+        <td>
+            <input type="text" name="where" placeholder="Jita, J123456 ..." value="{% if site %}{{ site.where }}{% elif g_system %}{{ g_system }}{% else %}{{ eveigb.solarsystemname }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>Has the site been opened</label>
         </td>
         <td>
             <input type="checkbox" name="opened" {% if site and site.opened %}checked="checked"{% endif %} {% if not isForm %}disabled="disabled"{% endif %}>
@@ -59,7 +59,7 @@
     </tr>
     <tr>
         <td>
-            <label>Has the site despawned:</label>
+            <label>Has the site despawned</label>
         </td>
         <td>
             <input type="checkbox" name="closed" {% if site and site.closed %}checked="checked"{% endif %} {% if not isForm %}disabled="disabled"{% endif %}>
@@ -67,7 +67,7 @@
     </tr>
     <tr>
         <td>
-            <label>Notes:</label>
+            <label>Notes</label>
         </td>
         <td>
             <textarea name="notes"{% if isForm %}{% else %} readonly{% endif %}>{% if site %}{{ site.notes }}{% endif %}</textarea>

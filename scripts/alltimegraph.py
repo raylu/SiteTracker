@@ -39,7 +39,7 @@ for start in files:
     f.close()
 
 chart = pygal.Bar()
-chart.title = 'All time edits over 30'
+chart.title = 'Number of edits per user'
 
 for a, b in edits.iteritems():
     if b > 30:

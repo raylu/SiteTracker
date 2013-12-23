@@ -101,6 +101,13 @@ class Wormhole(models.Model):
         return back
     def printOutT2MM(self):
         return '{0} {1} > {2}'.format(self.scanid, self.start, self.destination)
+    def get_status_colored(self):
+        if self.status in ['Fresh', 'Undecayed']:
+            return "<span color='green'>%s</span>" % self.status
+        elif self.status in ['< 50% mass', '< 50% time', 'Unknown']:
+            return "<span color='orange'>%s</span>" % self.status
+        else:
+            return "<span color='red'>%s</span>" % self.status
 
 class WormholeChange(models.Model):
     """ WormholeChange object for keeping track of changes to wormholes """

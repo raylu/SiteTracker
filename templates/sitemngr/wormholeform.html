@@ -1,7 +1,7 @@
 <table>
     <tr>
         <td>
-            <label>Creator:</label>
+            <label>Creator</label>
         </td>
         <td>
             <input type="text" name="creator" value="{% if wormhole %}{{ wormhole.creator }}{% elif isForm %}{{ displayname }}{% endif %}" readonly>
@@ -10,7 +10,7 @@
     {% if wormhole %}
     <tr>
         <td>
-            <label>Date:</label>
+            <label>Date</label>
         </td>
         <td>
             <input type="text" name="date" value="{% if wormhole %}{{ wormhole.date|date:'H:i, M d, y' }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
@@ -19,41 +19,31 @@
     {% endif %}
     <tr>
         <td>
-            <label id="l_scanid">Scan ID:</label>
+            <label id="l_scanid">Scan ID</label>
         </td>
         <td>
-            <input type="text" id="t_scanid" name="scanid" value="{% if wormhole %}{{ wormhole.scanid }}{% elif g_scanid %}{{ g_scanid }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <label>Started in:</label>
-        </td>
-        <td>
-            <input type="text" name="start" value="{% if wormhole %}{{ wormhole.start }}{% elif g_start %}{{ g_start }}{% else %}{{ eveigb.solarsystemname }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+            <input type="text" id="t_scanid" name="scanid" placeholder="AAA, BBB, LOL ..." value="{% if wormhole %}{{ wormhole.scanid }}{% elif g_scanid %}{{ g_scanid }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
         </td>
     </tr>
     <tr>
         <td>
-            <label>Leads to:</label>
+            <label>Started in</label>
         </td>
         <td>
-            <input type="text" name="destination" value="{% if wormhole %}{{ wormhole.destination }}{% elif g_end %}{{ g_end }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
-        </td>
-    </tr>
-    <!--
-    <tr>
-        <td>
-            <label>Last updated:</label>
-        </td>
-        <td>
-            <input type="text" name="time" value="{% if wormhole %}{{ wormhole.time }}{% elif timenow %}{{ timenow }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+            <input type="text" name="start" placeholder="Jita, J123456 ..." value="{% if wormhole %}{{ wormhole.start }}{% elif g_start %}{{ g_start }}{% else %}{{ eveigb.solarsystemname }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
         </td>
     </tr>
-    -->
     <tr>
         <td>
-            <label>Status at time above:</label>
+            <label>Leads to</label>
+        </td>
+        <td>
+            <input type="text" name="destination" placeholder="Jita, J123456 ..." value="{% if wormhole %}{{ wormhole.destination }}{% elif g_end %}{{ g_end }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>Status at time above</label>
         </td>
         <td>
             {% if isForm %}
@@ -77,7 +67,7 @@
     </tr>
     <tr>
         <td>
-            <label>Has the wormhole been opened:</label>
+            <label>Has the wormhole been opened</label>
         </td>
         <td>
             <input type="checkbox" name="opened" {% if wormhole and wormhole.opened %}checked="checked"{% endif %}{% if isForm and not wormhole %}checked="checked"{% endif %}{% if not isForm %} disabled="disabled"{% endif %}{% if not isForm %}{% endif %}>
@@ -85,7 +75,7 @@
     </tr>
     <tr>
         <td>
-            <label>Has the wormhole closed:</label>
+            <label>Has the wormhole closed</label>
         </td>
         <td>
             <input type="checkbox" name="closed" {% if wormhole and wormhole.closed %}checked="checked"{% endif %} {% if not isForm %}disabled="disabled"{% endif %}>
@@ -93,7 +83,7 @@
     </tr>
     <tr>
         <td>
-            <label>Notes:</label>
+            <label>Notes</label>
         </td>
         <td>
             <textarea name="notes"{% if isForm %}{% else %} readonly{% endif %}>{% if wormhole %}{{ wormhole.notes }}{% endif %}</textarea>
