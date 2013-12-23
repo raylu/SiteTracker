@@ -67,7 +67,7 @@ def index(request, note=None):
     if is_dirty():
         tidy()
         if useGraphing:
-            notices.append('Graph updated!')
+            notices.append('Graph updated')
         else:
             notices.append('Graph would be updated, but it\'s not being used.')
     now = datetime.utcnow()
@@ -1035,8 +1035,6 @@ def login_page(request, note=None):
                 return render(request, 'sitemngr/login.html', {'note': 'An error occurred when logging in - check your username and password'})
         else:
             return index(request, 'You must enter both a username and a password.')
-    else:
-        note = 'Nope'
     return render(request, 'sitemngr/login.html', {'note': note, 'displayname': get_display_name(None, request)})
 
 def logout_page(request):

@@ -9,10 +9,10 @@ Login
 <center>
 
 {% if note %}
-    <div class="message">
-        {{ note }}<br>
+	 <div class="alert" id="alert_notices">
+        <button type="button" class="close" onclick="$('#alert_notices').fadeOut(250);">&times;</button>
+		{{ note }}
     </div>
-    <hr>
 {% endif %}
 
 <div class="row">
@@ -22,7 +22,7 @@ Login
         {% csrf_token %}
             <label>Username: </label><input type="text" name="username"><br>
             <label>Password: </label><input type="password" name="password"><br>
-            <input type="submit" value="Login">
+            <input type="submit" value="Login" class="btn btn-primary" data-loading-text="Checking..." onclick="$(this).button('loading');">
         </form>
     </div>
     <div class="span6">
@@ -31,7 +31,7 @@ Login
         {% csrf_token %}
             <label>Username: </label><input type="text" name="username" value="{{ eveigb.charname }}" readonly><br>
             <label>Password: </label><input type="password" name="password"><br>
-            <input type="submit" value="Create account">
+            <input type="submit" value="Create account" class="btn btn-primary" data-loading-text="Creating..." onclick="$(this).button('loading');">
         </form>
     </div>
 </div>

@@ -19,7 +19,7 @@
     {% endif %}
     <tr>
         <td>
-            <label>Scan ID:</label>
+            <label id="l_scanid">Scan ID:</label>
         </td>
         <td>
             <input type="text" id="t_scanid" name="scanid" value="{% if wormhole %}{{ wormhole.scanid }}{% elif g_scanid %}{{ g_scanid }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
@@ -41,6 +41,7 @@
             <input type="text" name="destination" value="{% if wormhole %}{{ wormhole.destination }}{% elif g_end %}{{ g_end }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
         </td>
     </tr>
+    <!--
     <tr>
         <td>
             <label>Last updated:</label>
@@ -49,6 +50,7 @@
             <input type="text" name="time" value="{% if wormhole %}{{ wormhole.time }}{% elif timenow %}{{ timenow }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
         </td>
     </tr>
+    -->
     <tr>
         <td>
             <label>Status at time above:</label>
@@ -103,7 +105,7 @@
             <label>{% if finish_msg %}{{ finish_msg }}{% endif %}</label>
         </td>
         <td>
-            <input type="submit" value="Store" class="btn btn-primary" data-loading-text="Storing..." onclick="$(this).button('loading');">
+            <input type="submit" id="submit_button" value="Store" class="btn btn-primary" data-loading-text="Storing..." onclick="$(this).button('loading');">
         </td>
     </tr>
     {% endif %}

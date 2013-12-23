@@ -19,7 +19,7 @@
     {% endif %}
     <tr>
         <td>
-            <label>Scan ID:</label>
+            <label id="l_scanid">Scan ID:</label>
         </td>
         <td>
             <input type="text" id="t_scanid" name="scanid" value="{% if site %}{{ site.scanid }}{% elif g_scanid %}{{ g_scanid }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
