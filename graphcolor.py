@@ -49,7 +49,7 @@ def get_color(system_name):
     except MapSolarSystem.DoesNotExist:
         return 'black'
     status = system.security_level
-    if status > 0.5:
+    if status > 0.45:
         return cmap['HS']
     elif status > 0.1:
         return cmap['LS']

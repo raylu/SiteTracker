@@ -696,7 +696,7 @@ def system(request, systemid):
     # otherwise, it has a security level
     else:
         try:
-            security = floor(MapSolarSystem.objects.get(name=systemid).security_level * 10) / 10
+            security = round(MapSolarSystem.objects.get(name=systemid).security_level, 1)
             is_kspace = True
         except MapSolarSystem.DoesNotExist:
                 pass
@@ -978,7 +978,7 @@ def overlay(request):
             try:
                 obj = MapSolarSystem.objects.get(name=wormhole.destination)
                 status = obj.security_level
-                if status > 0.5:
+                if status > 0.45:
                     hs.append(wormhole.destination)
             except MapSolarSystem.DoesNotExist:
                 continue
