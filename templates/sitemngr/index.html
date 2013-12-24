@@ -94,11 +94,11 @@ Index
 </div>
 <div id="graph" style="border: 1px solid gray; display: none;">
 	<img src="{% static 'pictures/graph.png' %}" alt="Current graph not found"></img><br>
-	<p><strong>
-    	System outline colors: HS = gold, LS = purple, NS = brown, C1 = blue, C2 = green, C3 = yellow, C4 = orange, C5 = red, C6 = black, not found = black<br>
-		Line styles: Fresh = bold, < 50% mass & < 50% time = dashed, EoL & VoC = dotted, Unknown = standard<br>
-		<i>Note</i>: Dotted red lines mean that the wormhole has been "Fresh" or "Unknown" for more than 12 hours
-	</strong></p>
+	<p>
+    	<b>System outline colors</b>: HS = gold, LS = purple, NS = brown, C1 = blue, C2 = green, C3 = yellow, C4 = orange, C5 = red, C6 = black, not found = black<br>
+		<b>Line styles</b>: Fresh = bold, < 50% mass & < 50% time = dashed, EoL & VoC = dotted, Unknown = standard<br>
+		<i>Note</i>: Dotted red lines mean that the wormhole has been "Fresh" or "Unknown" for more than 16 hours
+	</p>
 </div>
 <div id="index_paste" style="border: 1px solid gray; display: none;">
     <h4>This is the same thing as the paste page, without having to load that separate page before pasting.</h4>
@@ -133,7 +133,7 @@ Index
 
 <h5><a href="/sitemngr/system/{{ homesystem }}" id="tt1" data-toggle="tooltip" title="Direct link to the system overview page for the homesystem in settings, {{ homesystem }}">Home System Page</a></h5>
 
-<h5>It is currently Eve time {{ now|date:'H:i:s, N j' }}. Last update: {{ last_update_diff }} ago, by {{ last_update_user }}</h5>
+<h5>It is currently Eve time {% now 'H:i:s, N j' %}. Last update: {{ last_update_diff }} ago, by {{ last_update_user }}</h5>
 
 <div class="row">
     <div class="span6">
@@ -154,7 +154,7 @@ Index
                         Location
                     </th>
                     <th>
-                        Opened?
+                        Opened
                     </th>
                     <th>
                         Entered

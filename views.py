@@ -62,7 +62,7 @@ def index(request, note=None):
         return no_access(request)
     sites = Site.objects.filter(closed=False)
     wormholes = Wormhole.objects.filter(closed=False)
-    notices = ['All tables went on a diet.']
+    notices = []
     # check if the wormhole objects and graph are out of sync
     if is_dirty():
         tidy()
@@ -78,7 +78,7 @@ def index(request, note=None):
     except TypeError:
         last_update_diff = '-never-'
     last_update_user = get_last_update_user()
-    return render(request, 'sitemngr/index.html', {'displayname': get_display_name(eveigb, request), 'homepage': True, 'homesystem': appSettings.HOME_SYSTEM, 'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': get_settings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': get_settings(get_display_name(eveigb, request)).userBackgroundImage, 'flag': note, 'now': now, 'last_update_diff': last_update_diff, 'last_update_user': last_update_user})
+    return render(request, 'sitemngr/index.html', {'displayname': get_display_name(eveigb, request), 'homepage': True, 'homesystem': appSettings.HOME_SYSTEM, 'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': get_settings(get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': get_settings(get_display_name(eveigb, request)).userBackgroundImage, 'flag': note, 'last_update_diff': last_update_diff, 'last_update_user': last_update_user})
 
 def get_time_difference_formatted(old, recent):
     """ Formats the difference between two datetime objects """
@@ -551,7 +551,7 @@ def paste(request):
                 wormholes.append(wormhole)
                 paste_data.append(PasteMatch(scanid=wormhole.scanid, name='%s > %s' % (wormhole.start, wormhole.destination), p_type='wormhole', allowed=new_wormholes))
             for a in new_anoms:
-                newids.append(SpaceObject(a, 'Anomaly', names[s]))
+                newids.append(SpaceObject(a, 'Anomaly', names[a]))
             for s in new_sites:
                 newids.append(SpaceObject(s, 'Signature', names[s]))
             for w in new_wormholes:
