@@ -100,7 +100,11 @@ def graph():
     for w in wormholes:
         if w.destination.lower() in ['', ' ', 'unopened', 'closed'] or w.start.lower() in ['', ' ', 'unopened', 'closed']:
             continue
-        if w.status in ['Fresh', 'Unknown'] and (now.replace(tzinfo=pytz.utc) - w.date.replace(tzinfo=pytz.utc)).seconds / 60 / 60 > 20:
+        if w.status in ['Fresh', 'Undecayed'] and (now.replace(tzinfo=pytz.utc) - w.date.replace(tzinfo=pytz.utc)).seconds / 60 / 60 > 20:
+            w.status = 'Unknown'
+            w.save()
+            g.add_edge(w.start, w.destination, style='dotted', color='red', label=w.scanid)
+        elif w.status == 'Unknown' and (now.replace(tzinfo=pytz.utc) - w.date.replace(tzinfo=pytz.utc)).seconds / 60 / 60 > 20:
             g.add_edge(w.start, w.destination, style='dotted', color='red', label=w.scanid)
         else:
             g.add_edge(w.start, w.destination, style=get_edge_type(w.start, w.destination), color='black', label=w.scanid)
