@@ -35,18 +35,32 @@
     </tr>
     <tr>
         <td>
-            <label>Type of site</label>
-        </td>
-        <td>
-            <input type="text" name="type" placeholder="Combat, gas, data ..." value="{% if site %}{{ site.type }}{% elif g_type %}{{ g_type }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
-        </td>
-    </tr>
-    <tr>
-        <td>
             <label>Location of site</label>
         </td>
         <td>
             <input type="text" name="where" placeholder="Jita, J123456 ..." value="{% if site %}{{ site.where }}{% elif g_system %}{{ g_system }}{% else %}{{ eveigb.solarsystemname }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>Type of site</label>
+        </td>
+        <td>
+			{% if isForm %}
+				<select name="">
+					{% if site %}
+						<option>{{ site.type }}</option>
+					{% endif %}
+					<option>Combat</option>
+					<option>Relic</option>
+					<option>Gas</option>
+					<option>Data</option>
+					<option>Ore</option>
+				</select>
+			{% else %}
+				<input type="text" value="{{ site.type }}" readonly>
+			{% endif %}
+            <!-- <input type="text" name="type" placeholder="Combat, gas, data ..." value="{% if site %}{{ site.type }}{% elif g_type %}{{ g_type }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}> -->
         </td>
     </tr>
     <tr>
