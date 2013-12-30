@@ -13,18 +13,18 @@ class Site(models.Model):
     # When the site was added
     date = models.DateTimeField()
     # Name of the site
-    name = models.CharField(max_length=150)
+    name = models.CharField(max_length=150, blank=False)
     # Scan id
-    scanid = models.CharField(max_length=10)
+    scanid = models.CharField(max_length=10, blank=False)
     # Type of site
-    type = models.CharField(max_length=100)
+    type = models.CharField(max_length=100, blank=False)
     # Where the site is located
-    where = models.CharField(max_length=50)
+    where = models.CharField(max_length=50, blank=False)
     # True if the site has been opened
-    opened = models.BooleanField(default=False)
+    opened = models.BooleanField(default=False, blank=False)
     # True if the site is closed (done)
-    closed = models.BooleanField(default=False)
-    notes = models.TextField()
+    closed = models.BooleanField(default=False, blank=False)
+    notes = models.TextField(blank=True)
     def __repr__(self):
         return ''
     def __unicode__(self):
@@ -49,16 +49,16 @@ class SiteChange(models.Model):
     # Site in question
     site = models.ForeignKey(Site)
     # Date of the change
-    date = models.DateTimeField()
-    user = models.CharField(max_length=100)
-    changedName = models.BooleanField()
-    changedScanid = models.BooleanField()
-    changedType = models.BooleanField()
-    changedWhere = models.BooleanField()
-    changedDate = models.BooleanField()
-    changedOpened = models.BooleanField()
-    changedClosed = models.BooleanField()
-    changedNotes = models.BooleanField()
+    date = models.DateTimeField(blank=False, default=False)
+    user = models.CharField(max_length=100, blank=False, default=False)
+    changedName = models.BooleanField(blank=False, default=False)
+    changedScanid = models.BooleanField(blank=False, default=False)
+    changedType = models.BooleanField(blank=False, default=False)
+    changedWhere = models.BooleanField(blank=False, default=False)
+    changedDate = models.BooleanField(blank=False, default=False)
+    changedOpened = models.BooleanField(blank=False, default=False)
+    changedClosed = models.BooleanField(blank=False, default=False)
+    changedNotes = models.BooleanField(blank=False, default=False)
     def __unicode__(self):
         return self.pk
 
@@ -123,8 +123,8 @@ class WormholeChange(models.Model):
     changedTime = models.BooleanField()
     changedStatus = models.BooleanField()
     changedOpened = models.BooleanField()
-    changedClosed = models.BooleanField()
-    changedNotes = models.BooleanField()
+    changedClosed = models.BooleanField(blank=False, default=False)
+    changedNotes = models.BooleanField(blank=False, default=False)
     def __unicode__(self):
         return self.pk
 
@@ -135,24 +135,6 @@ class Settings(models.Model):
     userBackgroundImage = models.BooleanField(default=True)
     def __unicode__(self):
         return unicode('Settings for %s' % self.user)
-
-class Chain(models.Model):
-    """
-        Chains of wormholes and k-space jumps
-        'jumpCodes' are -1 for k-space jumpgates and the id of
-            the wormhole
-    """
-    name = models.CharField(max_length=300)
-    start = models.CharField(max_length=50)
-    end = models.CharField(max_length=50)
-    jumps = models.TextField()
-    def addJump(self, jumpCode, nextSystem):
-        if self.jumps == '':
-            self.jumps = '{0}>{1}'.format(jumpCode, nextSystem)
-        else:
-            self.jumps += ',{0}>{1}'.format(jumpCode, nextSystem)
-    def __unicode__(self):
-        return unicode('{0}-{1}-{2}'.format(self.name, self.start, self.end))
 
 class PasteUpdated(models.Model):
     """ Recording when someone uses the paste feature """
