@@ -55,6 +55,11 @@ def cleanup(offset_days=14):
             con[w.user] += 1
         else:
             con[w.user] = 1
+    for p in PasteUpdated.objects.all():
+        if p.user in con:
+            con[p.user] += 1
+        else:
+            con[p.user] = 1
     con = sorted(con.items(), key=lambda kv: kv[1])
     f = open('stats_' + now.strftime('%m.%d.%Y-%H.%M.%S'), 'w')
     for a,b in con:
@@ -62,7 +67,8 @@ def cleanup(offset_days=14):
     f.write('\nSites: %s\n' % len(Site.objects.all()))
     f.write('SiteChanges: %s\n' % len(SiteChange.objects.all()))
     f.write('Wormholes: %s\n' % len(Wormhole.objects.all()))
-    f.write('WormholeChanges: %s\n\n' % len(WormholeChange.objects.all()))
+    f.write('WormholeChanges: %s\n' % len(WormholeChange.objects.all()))
+    f.write('Pastes: %s\n\n' % len(PasteUpdated.objects.all()))
 
     print 'Deleting old site changes'
     c = deletelist(sitechanges)

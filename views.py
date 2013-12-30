@@ -434,7 +434,7 @@ def add_wormhole(request):
         if p.has_key('notes') and p['notes']:
             s_notes = p['notes']
         try:
-            Wormhole.objects.get(scanid=s_scanid, start=s_start, destination=s_destination)
+            Wormhole.objects.get(start=s_start, destination=s_destination, opened=True, closed=False)
             messages.add_message(request, messages.INFO, 'That exact wormhole already exists in the database! You can use the masterlist page to find it.')
             return redirect('/sitemngr/')
         except Wormhole.DoesNotExist:
@@ -807,6 +807,21 @@ def mastertable(request):
     wormholes = Wormhole.objects.all()
     return render(request, 'sitemngr/mastertable.html', {'displayname': get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes})
 
+def delete_wormhole(request, wormholeid):
+    """ Deletes the wormhole and all it's change objects from the database, permanently """
+    if not request or not request.user or not request.user.is_staff:
+        messages.add_message(request, messages.INFO, 'You do not have access to that page')
+        return redirect('/sitemngr/')
+    try:
+        wormhole = Wormhole.objects.get(id=wormholeid)
+        for c in WormholeChange.objects.filter(wormhole=wormhole):
+            c.delete()
+        wormhole.delete()
+        messages.add_message(request, messages.INFO, 'Wormhole and its changes permanently deleted from the database')
+        return redirect('/sitemngr/')
+    except Wormhole.DoesNotExist:
+        messages.add_message(request, messages.INFO, 'Invalid wormhole id number')
+        return redirect('/sitemngr/')
 
 # ==============================
 #     Data

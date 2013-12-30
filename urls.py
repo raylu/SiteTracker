@@ -32,5 +32,6 @@ urlpatterns = patterns('',
    url(r'^get_tradehub_jumps/([-a-zA-Z0-9 ]+)', 'sitemngr.views.get_tradehub_jumps'),
    url(r'^get_search_results/([-a-zA-Z0-9 ]+)/([-a-zA-Z0-9_]+)', 'sitemngr.views.get_search_results'),
    url(r'^refreshgraph/', 'sitemngr.views.refresh_graph'),
-   url(r'^massclose/', 'sitemngr.views.mass_close')
+   url(r'^massclose/', 'sitemngr.views.mass_close'),
+   url(r'^deletewormhole/(\d+)', 'sitemngr.views.delete_wormhole')
 ) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
