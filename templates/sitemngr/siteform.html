@@ -27,14 +27,6 @@
     </tr>
     <tr>
         <td>
-            <label>Name of site</label>
-        </td>
-        <td>
-            <input type="text" name="name" placeholder="Core Stronghold, Quarantine Area ..." value="{% if site %}{{ site.name }}{% elif g_name %}{{ g_name }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
-        </td>
-    </tr>
-    <tr>
-        <td>
             <label>Location of site</label>
         </td>
         <td>
@@ -43,11 +35,19 @@
     </tr>
     <tr>
         <td>
+            <label>Name of site</label>
+        </td>
+        <td>
+            <input type="text" name="name" placeholder="Core Stronghold, Quarantine Area ..." value="{% if site %}{{ site.name }}{% elif g_name %}{{ g_name }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <label>Type of site</label>
         </td>
         <td>
 			{% if isForm %}
-				<select name="">
+				<select name="type">
 					{% if site %}
 						<option>{{ site.type }}</option>
 					{% endif %}

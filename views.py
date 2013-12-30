@@ -2,10 +2,10 @@
 from datetime import datetime
 import re
 import urllib2
-from math import floor
 
 # Django
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 
@@ -246,7 +246,7 @@ def edit_site(request, siteid):
                                 changedType=changedType, changedWhere=changedWhere, changedDate=changedDate, changedOpened=changedOpened,
                                 changedClosed=changedClosed, changedNotes=changedNotes)
             change.save()
-        return index(request)
+        return redirect('/sitemngr/')
     return render(request, 'sitemngr/editsite.html', {'displayname': get_display_name(eveigb, request), 'isForm': True, 'site': site, 'finish_msg': 'Store changes back into the database:'})
 
 def add_site(request):
@@ -282,6 +282,12 @@ def add_site(request):
             s_closed = getBoolean(p['closed'])
         if p.has_key('notes') and p['notes']:
             s_notes = p['notes']
+        try:
+            Site.objects.get(scanid=s_scanid, where=s_where, type=s_type, name=s_name)
+            messages.add_message(request, messages.INFO, 'That exact site already exists in the database! You can use the masterlist page to find it.')
+            return redirect('/sitemngr/')
+        except Site.DoesNotExist:
+            pass
         site = Site(name=s_name, scanid=s_scanid, type=s_type, where=s_where, creator=get_display_name(eveigb, request), date=now, opened=s_opened, closed=s_closed, notes=s_notes)
         site.save()
         # return the user to the appropriate page, depending on their user settings
@@ -289,7 +295,7 @@ def add_site(request):
             return render(request, 'sitemngr/addsite.html', {'displayname': get_display_name(eveigb, request), 'isForm': True,
                  'message': 'Successfully stored the data into the database.', 'finish_msg': 'Store new site into the database:', 'timenow': now.strftime('%m/%d @ %H:%M')})
         else:
-            return index(request)
+            return redirect('/sitemngr/')
     # fill in passed information from the paste page
     elif request.method == 'GET':
         g = request.GET
@@ -387,7 +393,7 @@ def edit_wormhole(request, wormholeid):
             change.save()
             # make the new view of the index page update the graph
             set_dirty()
-        return index(request)
+        return redirect('/sitemngr/')
     return render(request, 'sitemngr/editwormhole.html', {'displayname': get_display_name(eveigb, request), 'isForm': True,
           'wormhole': wormhole, 'finish_msg': 'Store changes back into the database'})
 
@@ -427,6 +433,12 @@ def add_wormhole(request):
             s_closed = getBoolean(p['closed'])
         if p.has_key('notes') and p['notes']:
             s_notes = p['notes']
+        try:
+            Wormhole.objects.get(scanid=s_scanid, start=s_start, destination=s_destination)
+            messages.add_message(request, messages.INFO, 'That exact wormhole already exists in the database! You can use the masterlist page to find it.')
+            return redirect('/sitemngr/')
+        except Wormhole.DoesNotExist:
+            pass
         wormhole = Wormhole(creator=get_display_name(eveigb, request), date=now, scanid=s_scanid, type='null', start=s_start, destination=s_destination,
                             time=s_time, status=s_status, opened=s_opened, closed=s_closed, notes=s_notes)
         wormhole.save()
@@ -437,7 +449,7 @@ def add_wormhole(request):
             return render(request, 'sitemngr/addwormhole.html', {'request': request, 'displayname': get_display_name(eveigb, request),
                     'isForm': True, 'message': 'Successfully stored the data into the database.', 'finish_msg': 'Store new site into database:', 'timenow': now.strftime('%m/%d @ %H:%M')})
         else:
-            return index(request)
+            return redirect('/sitemngr/')
     # fill in passed information from the paste page
     elif request.method == 'GET':
         g = request.GET
@@ -605,7 +617,7 @@ def paste(request):
                                      changedOpened=False, changedClosed=False, changedNotes=False)
                         change.save()
             set_dirty()
-            return index(request)
+            return redirect('/sitemngr/')
         else:
             # Parse data to return to normal paste page
             PasteUpdated(user=get_display_name(eveigb, request), date=datetime.now()).save()
@@ -1028,19 +1040,22 @@ def login_page(request, note=None):
             if user is not None:
                 if user.is_active:
                     login(request, user)
-                    return index(request, 'Successfully logged in')
+                    return redirect('/sitemngr/')
                 else:
-                    return render(request, 'sitemngr/login.html', {'note': 'This account is disabled'})
+                    messages.add_message(request, messages.INFO, 'That account is disabled')
+                    return redirect('/sitemngr/')
             else:
-                return render(request, 'sitemngr/login.html', {'note': 'An error occurred when logging in - check your username and password'})
+                messages.add_message(request, messages.INFO, 'An error occurred when logging in - check your username and password')
+                return redirect('/sitemngr/')
         else:
-            return index(request, 'You must enter both a username and a password.')
+            messages.add_message(request, messages.INFO, 'You must enter both a username and a password')
+            return redirect('/sitemngr/')
     return render(request, 'sitemngr/login.html', {'note': note, 'displayname': get_display_name(None, request)})
 
 def logout_page(request):
     """ If the user is logged into an account, they are logged off """
     logout(request)
-    return index(request, 'You have been logged out.')
+    return redirect('/sitemngr/')
 
 def create_account(request):
     """
@@ -1053,16 +1068,18 @@ def create_account(request):
             return no_access(request)
         try:
             if User.objects.get(username__exact=eveigb.charname):
-                return index(request, 'You already have an account on this server.')
+                messages.add_message(request, messages.INFO, 'You already have an account on this server')
+                return redirect('/sitemngr/')
         except User.DoesNotExist:
             pass
         p = request.POST
         if p['password']:
             user = User.objects.create_user(username=eveigb.charname, password=p['password'])
             user.save()
-            return index(request, 'Successfully created account on the server.')
+            messages.add_message(request, messages.INFO, 'Successfully created account on the server')
+            return redirect('/sitemngr/')
         return login_page(request, 'You must enter a password.')
-    return index(request)
+    return redirect('/sitemngr/')
 
 def settings(request):
     """ Settings page for viewing and changing user settings """
@@ -1173,7 +1190,7 @@ def get_search_results(request, keyword, flags):
 def refresh_graph(request):
     """ A simple redirect used for manually refreshing the wormhole chain graph """
     set_dirty()
-    return index(request)
+    return redirect('/sitemngr/')
 
 def mass_close(request):
     """ Close multiple wormholes at once, to be used for deleting entire chains after their connection is set to closed """

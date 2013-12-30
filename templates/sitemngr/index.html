@@ -45,6 +45,14 @@ Index
         {% endfor %}
     </div>
 {% endif %}
+{% if messages %}
+    <div class="alert alert-error" id="alert_notices">
+        <button type="button" class="close" onclick="$('#alert_notices').fadeOut(250);">&times;</button>
+        {% for m in messages %}
+            {{ m }}<br>
+        {% endfor %}
+    </div>
+{% endif %}
 {% if flag %}
     <div class="alert" id="alert_flag">
         <button type="button" class="close" onclick="$('#alert_flag').fadeOut(250);">&times;</button>
