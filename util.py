@@ -75,10 +75,9 @@ def get_last_update():
                     return PasteUpdated.objects.get(date=date)
 
 def p_get_all_data(line):
-    # TODO: See TODO.txt
     """ Parses all information from a line from the discovery scanner """
-    siteTypes = ['Cosmic Signature', 'Data Site', 'Relic Site']
-    anomTypes = ['Combat Site', 'Ore Site']  # 'Gas Site' ?
+    siteTypes = ['Cosmic Signature', 'Data', 'Relic', 'Gas']
+    anomTypes = ['Cosmic Anomaly', 'Combat Site', 'Ore Site']  # 'Gas Site' ?
     wormholeTypes = ['Wormhole', 'Unstable Wormhole']
     data = {}
     # defaults to ensure that we don't get a KeyError trying to access information not pulled from the line
@@ -93,28 +92,23 @@ def p_get_all_data(line):
             continue
         if re.match(r'^[a-zA-Z]{3}-\d{3}$', section):
             data['scanid'] = section[:3].upper().replace('\r', '').replace('\n', '')
-            print 'Line\'s scanid is', data['scanid']
             continue
-        if section in siteTypes:
+        if section in siteTypes and not data['iswormhole']:
             data['issite'] = True
             data['type'] = section.replace('\r', '').replace('\n', '')
-            print data['scanid'], 'is site'
             continue
         if section in anomTypes:
             data['isanom'] = True
             data['type'] = section.replace('\r', '').replace('\n', '')
-            print data['scanid'], 'is anom'
             continue
         if section in wormholeTypes:
             data['iswormhole'] = True
+            data['issite'] = False
             data['type'] = section.replace('\r', '').replace('\n', '')
-            print data['scanid'], 'is wormhole'
             continue
         if '%' in section or 'AU' in section:
-            print section, '- skipping'
             continue
         data['name'] = section.replace('\r', '').replace('\n', '')
-        print data['scanid'], 'name is', data['name']
     return data
 
 class SpaceObject:
