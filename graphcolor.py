@@ -7,6 +7,7 @@ from time import sleep
 from datetime import datetime
 import pytz
 import os
+from . import util
 
 cmap = {}
 cmap['HS'] = 'gold'
@@ -30,19 +31,13 @@ emap['VoC'] = 'dotted'
 emap['EoL'] = 'dotted'
 emap['Unknown'] = 'solid'
 
-def is_k_space(system_name):
-    return not is_w_space(system_name)
-
-def is_w_space(system_name):
-    return re.match(r'^J\d{6}$', system_name)
-
 def get_edge_type(start, destination):
     wormhole = Wormhole.objects.get(start=start, destination=destination)
     return emap[wormhole.status]
 
 def get_color(system_name):
     system = None
-    if is_w_space(system_name):
+    if util.is_system_wspace(system_name):
         return get_color_wh(system_name)
     try:
         system = MapSolarSystem.objects.get(name=system_name)
@@ -55,7 +50,7 @@ def get_color(system_name):
         return cmap['LS']
     else:
         return cmap['NS']
-    
+
 def get_color_wh(system_name):
     level = 1
     try:
@@ -71,12 +66,6 @@ def get_color_wh(system_name):
     except:
         pass
     return 'black'
-
-def get_shape(system_name):
-    # if is_k_space(system_name):
-        # return 'ellipse'
-    # return 'diamond'
-    return 'ellipse'
 
 def graph():
     g = AGraph(label='Overview', landscape='false', directed=False, ranksep='0.2')
@@ -96,7 +85,7 @@ def graph():
         if n == 'J132814':
             g.add_node(n, color='red', fontcolor='red', shape='box')
             continue
-        g.add_node(n, color=get_color(n), shape=get_shape(n))
+        g.add_node(n, color=get_color(n), shape='ellipse')
     for w in wormholes:
         if w.destination.lower() in ['', ' ', 'unopened', 'closed'] or w.start.lower() in ['', ' ', 'unopened', 'closed']:
             continue
@@ -116,18 +105,13 @@ def graph():
     g.draw('/var/www/mysite/sitemngr/static/pictures/graph.png')
     print 'Graphed', datetime.now().strftime('%m/%d/%Y %H:%M:%S')
 
-def should_update():
-    return True
-
 def repeat():
     while 1:
-        if should_update():
-            graph()
-            sleep(60 * 2)
+        graph()
+        sleep(60 * 2)
 
 def run():
     graph()
-    # repeat()
 
 def run_once():
     graph()
