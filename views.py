@@ -620,6 +620,12 @@ def system(request, systemid):
             if jumps < closest_jumps:
                 closest_jumps = jumps
                 closest_chain = chain
+    else:
+        # wormhole class
+        try:
+            clazz = util.get_wormhole_class(systemid)
+        except:
+            pass
     return render(request, 'sitemngr/system.html', {'displayname': util.get_display_name(eveigb, request), 'system': systemid, 'openwormholes': openwormholes, 'closedwormholes': closedwormholes,
                             'class': clazz, 'security': security, 'kspace': is_kspace, 'opensites': opensites, 'unopenedsites': unopenedsites,
                             'is_in_chain': is_in_chain, 'closest_chain': closest_chain, 'closest_jumps': closest_jumps})

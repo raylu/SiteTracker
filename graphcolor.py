@@ -54,14 +54,7 @@ def get_color(system_name):
 def get_color_wh(system_name):
     level = 1
     try:
-        url = 'http://www.ellatha.com/eve/WormholeSystemview.asp?key={}'.format(system_name.replace('J', ''))
-        contents = urllib2.urlopen(url).read().split('\n')
-        level = 0
-        for line in contents:
-            if line.startswith('<td bgcolor="#F5F5F5">'):
-                if re.match(r'^\d$', line.split('>')[1][0]):
-                    level = line.split('>')[1][0]
-                    break
+        level = util.get_wormhole_class(system_name)
         return cmap[level]
     except:
         pass

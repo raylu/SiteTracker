@@ -1,10 +1,15 @@
+# Python
+import re
+import urllib2
+
+# sitemngr
 from models import (Site, SiteChange,
                              Wormhole, WormholeChange,
                              PasteUpdated, Settings)
 from . import settings as appSettings
+
+# eve_db
 from eve_db.models import MapSolarSystem
-import re
-import urllib2
 
 def get_time_difference_formatted(old, recent):
     """ Formats the difference between two datetime objects """
@@ -88,22 +93,28 @@ def p_get_all_data(line):
             continue
         if re.match(r'^[a-zA-Z]{3}-\d{3}$', section):
             data['scanid'] = section[:3].upper().replace('\r', '').replace('\n', '')
+            print 'Line\'s scanid is', data['scanid']
             continue
         if section in siteTypes:
             data['issite'] = True
             data['type'] = section.replace('\r', '').replace('\n', '')
+            print data['scanid'], 'is site'
             continue
         if section in anomTypes:
             data['isanom'] = True
             data['type'] = section.replace('\r', '').replace('\n', '')
+            print data['scanid'], 'is anom'
             continue
         if section in wormholeTypes:
             data['iswormhole'] = True
             data['type'] = section.replace('\r', '').replace('\n', '')
+            print data['scanid'], 'is wormhole'
             continue
         if '%' in section or 'AU' in section:
+            print section, '- skipping'
             continue
         data['name'] = section.replace('\r', '').replace('\n', '')
+        print data['scanid'], 'name is', data['name']
     return data
 
 class SpaceObject:
@@ -160,15 +171,12 @@ def is_system(system):
 
 def get_wormhole_class(system):
     """ Returns the class (1-6) of a wormhole by its system name """
-    try:
-        url = 'http://www.ellatha.com/eve/WormholeSystemview.asp?key={}'.format(system.replace('J', ''))
-        contents = urllib2.urlopen(url).read().split('\n')
-        for line in contents:
-            if line.startswith('<td bgcolor="#F5F5F5">'):
-                if re.match(r'^\d$', line.split('>')[1][0]):
-                    return line.split('>')[1][0]
-    except:
-        pass
+    url = 'http://www.ellatha.com/eve/WormholeSystemview.asp?key={}'.format(system.replace('J', ''))
+    contents = urllib2.urlopen(url).read().split('\n')
+    for line in contents:
+        if line.startswith('<td bgcolor="#F5F5F5">'):
+            if re.match(r'^\d$', line.split('>')[1][0]):
+                return line.split('>')[1][0]
     return 0
 
 class Result:
