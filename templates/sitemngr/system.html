@@ -8,7 +8,6 @@ System Info
 <script type="text/javascript">
     $(document).ready(function()
     {
-        $('#db_control').hide();
         {% if kspace %}
             $('#jumps').load('http://tracker.talkinlocal.org/sitemngr/get_tradehub_jumps/{{ system }}/');
         {% endif %}
@@ -35,7 +34,7 @@ System Info
 <h5><a href="http://wormhol.es/{{ system }}">Wormhol.es page</a></h5>
 
 <h5><a onclick="$('#db_control').toggle(250);">Database access</a></h5>
-<div id="db_control">
+<div id="db_control" hidden>
     <a href="/sitemngr/addsite/?system={{ system }}">Create new site in this system</a><br>
     <a href="/sitemngr/addwormhole/?start={{ system }}">Start new wormhole in this system</a><br>
     <a href="/sitemngr/addwormhole/?end={{ system }}">End new wormhole in this system</a><br>
