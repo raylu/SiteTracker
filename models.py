@@ -35,14 +35,9 @@ class Site(models.Model):
         return SiteChange.objects.filter(site=self.id)
     # Printout for output into MotD or T2MM
     def printOut(self):
-        back = '{0} {1} {2}'.format(self.scanid, self.type, self.name)
-        if self.opened:
-            back += ' (Open, last updated: {0})'.format(self.date.strftime('%H:%M %m/%d'))
-        else:
-            back += ' (Closed, last updated: {0})'.format(self.date.strftime('%H:%M %m/%d'))
-        return back
+        return '{0} [{1}] {2} - {3}'.format(self.scanid, self.type[0], self.name, 'Open' if self.opened else 'Closed')
     def isAnom(self):
-        return self.name in ['Exceptional Core Deposit', 'Unexceptional Frontier Reservoir', 'Ordinary Permiter Deposit', 'Core Garrison', 'Core Stronghold', 'Oruze Osobnyk', 'Quarantine Area', 'Ordinary Perimeter Deposit', 'Rarified Core Deposit', 'Unexceptional Frontier Deposit']
+        return self.name in ['Average Frontier Deposit', 'Exceptional Core Deposit', 'Unexceptional Frontier Reservoir', 'Ordinary Permiter Deposit', 'Core Garrison', 'Core Stronghold', 'Oruze Osobnyk', 'Quarantine Area', 'Ordinary Perimeter Deposit', 'Rarified Core Deposit', 'Unexceptional Frontier Deposit']
 
 class SiteChange(models.Model):
     """ SiteChange object for keeping track of changes to sites """
@@ -93,12 +88,7 @@ class Wormhole(models.Model):
         return WormholeChange.objects.filter(wormhole=self.pk)
     # Printout for output into MotD or T2MM
     def printOut(self):
-        back = '{0} {1} > {2}'.format(self.scanid, self.start, self.destination)
-        if self.opened:
-            back += ' (Open, last updated: {0}, status: {1})'.format(self.time, self.status)
-        else:
-            back += ' (Closed)'
-        return back
+        return '{0} {1} > {2} ({3})'.format(self.scanid, self.start, self.destination, self.status)
     def printOutT2MM(self):
         return '{0} {1} > {2}'.format(self.scanid, self.start, self.destination)
     def get_status_colored(self):

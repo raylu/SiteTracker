@@ -43,7 +43,7 @@ Paste
     <div class="span4">
         <h5>The following already exist in the database:</h5>
         {% if present %}
-            <table>
+            <table class="table-striped">
                 <tr>
                     <th>
                         Scan ID
@@ -70,7 +70,7 @@ Paste
     <div class="span4">
         <h5>The following are not in your paste, but<br>are in the database for this system. Please review:</h5>
         {% if notfound %}
-            <table>
+            <table class="table-striped">
                 <tr>
                     <th>
                         Scan ID
@@ -97,7 +97,7 @@ Paste
     <div class="span4">
         <h5>The following are in your paste, but<br>are not in the database. Please add:</h5>
         {% if findnew %}
-            <table>
+            <table class="table-striped">
                 <tr>
                     <th>
                         Scan ID

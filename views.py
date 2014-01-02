@@ -742,10 +742,10 @@ def output(request):
     if not util.can_view(eveigb, request):
         return no_access(request)
     wormholes = Wormhole.objects.filter(closed=False, start=appSettings.HOME_SYSTEM)
-    motd = str(appSettings.HOME_SYSTEM) + ' Intel Channel\n\nWormholes:\n'
+    motd = str(appSettings.HOME_SYSTEM) + ' Intel Channel\nWormholes:\n'
     for w in wormholes:
         motd += w.printOut() + '\n'
-    motd += '\nSignatures:\n'
+    motd += 'Signatures:\n'
     for site in Site.objects.filter(closed=False, where=str(appSettings.HOME_SYSTEM)):
         motd += site.printOut() + '\n'
     return render(request, 'sitemngr/output.html', {'displayname': util.get_display_name(eveigb, request), 'motd': motd})

@@ -1,13 +1,24 @@
 {% extends 'sitemngr/base.html' %}
+{% load staticfiles %}
 
 {% block subtitle %}
 Help
+{% endblock %}
+
+{% block extraHead %}
+<style>
+h3 {
+    background-color: lightblue;
+    width: 65%;
+}
+</style>
 {% endblock %}
 
 {% block content %}
 
 <center>
 
+<!-- Old instructions
 <h1>Instructions</h1><br>
 
 <h3>How to acess this site</h3>
@@ -80,13 +91,65 @@ not found = black<br><br>
 It is important, then, to really be sure that you're typing system names as they are in-game.
 
 <hr><h3>Submiting bugs and feature requests</h3>
-Visit the <a href="http://tracker.talkinlocal.org/knowledge/">support center</a>. This app is in Beta, so everything <i>should</i> work, but in case it doesn't, don't primary me.
+Visit the <a href="http://tracker.talkinlocal.org/knowledge/">support center</a>. Everything <i>should</i> work, but in case it doesn't, don't primary me.
 
 <hr><h2 style="color: red;">TL;DR</h2>
 Use the <a href="/sitemngr/paste">paste page</a> to have the site tell you what needs to be done. Do those things.
+-->
 
-<hr>
-<h2>Thanks</h2>
+<h2>How to Use This Site</h2>
+
+<h3 id="gainingaccess"><a href="#gainingaccess">Gaining Access</a></h3>
+<p style="text-align: left; font-size: 125%;">
+    <img src="{% static 'pictures/tutorial/1.png' %}"><br><br>
+    When you first visit the site, it will be disabled. You must add it to the Eve browser's trusted list. To do so quickly, click 
+    the link in the top left corner.
+    <br><br><img src="{% static 'pictures/tutorial/2.png' %}"><br><br>
+</p>
+
+<h3 id="navigating"><a href="#navigating">Navigating</a></h3>
+<p style="text-align: left; font-size: 125%;">
+    Navigation can be done with using URLs (bookmarks are supported), but the top nav bar is easiest to move 
+    around the site.
+</p>
+<div class="row">
+    <div class="span6">
+        <img src="{% static 'pictures/tutorial/4.png' %}">
+    </div>
+    <div class="span6">
+        <img src="{% static 'pictures/tutorial/5.png' %}"><br><br>
+        <p style="text-align: left; font-size: 125%;">
+            The pages you will most commonly be using are<br>
+            1. the index page,<br>
+            2. add site/womrmhole pages,<br>
+            3. edit pages, and<br>
+            4. paste scan data.<br><br>
+            In addition, any text that looks like a link, probably is.
+        </p>
+    </div>
+</div>
+
+<h3 id="indexpage"><a href="#indexpage">The Index Page</a></h3>
+<p style="text-align: left; font-size: 125%;">
+    <img src="{% static 'pictures/tutorial/3.png' %}"><br><br>
+    It looks busy, but everything is broken down and separated into its own section of the page.<br><br>
+    The additional information buttons need more explanation, so:
+    <br><br><img src="{% static 'pictures/tutorial/6.png' %}">
+</p>
+
+<h3 id="addingediting"><a href="#addingediting">Adding Editing Sites and Wormholes</a></h3>
+<p style="text-align: left; font-size: 125%;">
+    <img src="{% static 'pictures/tutorial/7.png' %}">
+</p>
+
+<h3 id="pastepage"><a href="#pastepage">The Paste Page</a></h3>
+<p style="text-align: left; font-size: 125%;">
+    <img src="{% static 'pictures/tutorial/8.png' %}"><br><br>
+    After clicking Parse, you will see something like this:
+    <br><br><img src="{% static 'pictures/tutorial/9.png' %}">
+</p>
+
+<h2 id="thanks"><a href="#thanks">Thanks</a></h2>
 <p>
 	I wish to extend gratitude to everyone who uses this site, but to a few people in particular:<br>
 	- Elroy and Tsal, for accepting and promoting this app, and for offering many excellent suggestions about how it should work,<br>
