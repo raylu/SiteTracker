@@ -1058,6 +1058,14 @@ def mass_close(request):
     wormholes = Wormhole.objects.filter(closed=False)
     return render(request, 'sitemngr/massclose.html', {'displayname': util.get_display_name(eveigb, request), 'wormholes': wormholes, 'data': data})
 
+# TODO: Write
+def inline_edit_site(request):
+    pass
+
+# TODO: Write
+def inline_edit_wormhole(request):
+    pass
+
 def no_access(request):
     """ Shown when the viewer is restricted from viewing the page """
     eveigb = IGBHeaderParser(request)

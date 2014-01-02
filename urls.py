@@ -33,5 +33,7 @@ urlpatterns = patterns('',
    url(r'^get_search_results/([-a-zA-Z0-9 ]+)/([-a-zA-Z0-9_]+)', 'sitemngr.views.get_search_results'),
    url(r'^refreshgraph/', 'sitemngr.views.refresh_graph'),
    url(r'^massclose/', 'sitemngr.views.mass_close'),
-   url(r'^deletewormhole/(\d+)', 'sitemngr.views.delete_wormhole')
+   url(r'^deletewormhole/(\d+)', 'sitemngr.views.delete_wormhole'),
+   url(r'^inlineeditsite/(\d+)', 'sitemngr.views.inline_edit_site'),
+   url(r'^inlineeditwormhole/(\d+)', 'sitemngr.views.inline_edit_wormhole'),
 ) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
