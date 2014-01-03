@@ -8,7 +8,6 @@ Index
 {% block javascript %}
 <script type="text/javascript">
 	$(document).ready(function() {
-		// console.log('Document ready');
 		$('#overlay').load('http://tracker.talkinlocal.org/sitemngr/overlay/');
 		$('.message').bind('click', function() {
            $(this).hide(250);
@@ -34,79 +33,79 @@ Index
 	function toggleSection(which) {
 	   $("#" + which).toggle(200);
 	}
-	function edit(n) {
-		// console.log('Edit ' + n);
-        var id = n;
-		var scanid = $('#id' + n).text();
-		var start = $('#start' + n).text();
-		var end = $('#end' + n).text();
-		var status = $('#status' + n).text();
-		// console.log(id + ', ' + start + ', ' + end + ', ' + status);
-		$('#id' + n).html('<input type="text" id="id' + n + '_edit" value="' + scanid + '">');
-		$('#start' + n).html('<input type="text" id="start' + n + '_edit" value="' + start + '">');
-		$('#end' + n).html('<input type="text" id="end' + n + '_edit" value="' + end + '">');
-		$('#status' + n).html('<input type="text" id="status' + n + '_edit" value="' + status + '">');
-		$('#link' + n).html('<a class="label label-important" onclick="cancel(' + n + ')">Cancel</a> <td><a class="label label-success" onclick="save(' + n + ')">Save</a></td>');
-		// $('#tr' + n).append('<td><a onclick="save(' + n + ')">Save</a></td>');
+	function edit(type, n) {
+        if (type === 'wormhole') {
+            var scanid = $('#id' + n).text();
+            var start = $('#start' + n).text();
+            var end = $('#end' + n).text();
+            var status = $('#status' + n).text();
+            $('#id' + n).html('<input type="text" id="id' + n + '_edit" value="' + scanid + '">');
+            $('#start' + n).html('<input type="text" id="start' + n + '_edit" value="' + start + '">');
+            $('#end' + n).html('<input type="text" id="end' + n + '_edit" value="' + end + '">');
+            $('#status' + n).html('<input type="text" id="status' + n + '_edit" value="' + status + '">');
+            $('#link' + n).html('<a class="label label-important" onclick="cancel(\'wormhole\', ' + n + ')">Cancel</a> <td><a class="label label-success" onclick="save(\'wormhole\', ' + n + ')">Save</a></td>');
+        }
+        else if (type === 'site') {
+            // TODO
+        }
 	}
-	function cancel(n) {
-		// console.log('Cancel  ' + n);
-        var id = n;
-		var scanid = $('#id' + n).html().split('"')[5];
-		var start = $('#start' + n).html().split('"')[5];
-		var end = $('#end' + n).html().split('"')[5];
-		var status = $('#status' + n).html().split('"')[5];
-		// console.log(id + ', ' + start + ', ' + end + ', ' + status);
-		$('#link' + n).html('<a class="label label-info" href="/sitemngr/editwormhole/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(' + n + ')">In line</a>');
-		$('#id' + n).html('<a href="/sitemngr/viewwormhole/' + n + '">' + scanid + '</a>');
-		$('#start' + n).html('<a href="/sitemngr/system/' + start +'">' + start + '</a>');
-		$('#end' + n).html('<a href="/sitemngr/system/' + end +'">' + end + '</a>');
-		$('#status' + n).html(status);
-		// $('#tr' + n + ' td:last-child').remove();
+	function cancel(type, n) {
+        if (type === 'wormhole') {
+            var scanid = $('#id' + n).html().split('"')[5];
+            var start = $('#start' + n).html().split('"')[5];
+            var end = $('#end' + n).html().split('"')[5];
+            var status = $('#status' + n).html().split('"')[5];
+            $('#link' + n).html('<a class="label label-info" href="/sitemngr/editwormhole/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'wormhole\', ' + n + ')">In line</a>');
+            $('#id' + n).html('<a href="/sitemngr/viewwormhole/' + n + '">' + scanid + '</a>');
+            $('#start' + n).html('<a href="/sitemngr/system/' + start +'">' + start + '</a>');
+            $('#end' + n).html('<a href="/sitemngr/system/' + end +'">' + end + '</a>');
+            $('#status' + n).html(status);
+        }
+        else if (type === 'site') {
+            // TODO
+        }
 	}
-	function save(n) {
-		// console.log('Save ' + n);
+	function save(type, n) {
 		$('#js_alerts_out').text('Saving...');
 		$('#js_alerts').fadeIn(250);
-        var id = n;
-		var scanid = $('#id' + n + '_edit').val();
-		var start = $('#start' + n + '_edit').val();
-		var end = $('#end' + n + '_edit').val();
-		var status = $('#status' + n + '_edit').val();
-		// console.log(id + ', ' + start + ', ' + end + ', ' + status);
-        // var csrftoken = $.cookie('csrftoken');
-        // // console.log(csrftoken);
-		$.ajax({
-		  type: "POST",
-		  url: String("inlineeditwormhole/" + n),
-		  data: {
-              id: id,
-		      scanid: scanid,
-		      start: start,
-		      end: end,
-		      status: status
-		  },
-		  success: function(data) {
-            alert('Success: ' + data);
-		  },
-          fail: function(data) {
-              alert('Fail: ' + data);
-              cancel(n);
-              return;
-          },
-          error: function(data) {
-              alert('Error: ' + data);
-              cancel(n);
-              return;
-          }
-        });
-		$('#link' + n).html('<a class="label label-info" href="/sitemngr/editwormhole/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(' + n + ')">In line</a>');
-		$('#id' + n).html('<a href="/sitemngr/viewwormhole/' + n + '">' + scanid + '</a>');
-		$('#start' + n).html('<a href="/sitemngr/system/' + start +'">' + start + '</a>');
-		$('#end' + n).html('<a href="/sitemngr/system/' + end +'">' + end + '</a>');
-		$('#status' + n).html(status);
-		$('#js_alerts_out').text('Saved');
-		$('#js_alerts').fadeOut(3000);
+        if (type === 'wormhole') {
+            var id = n;
+            var scanid = $('#id' + n + '_edit').val();
+            var start = $('#start' + n + '_edit').val();
+            var end = $('#end' + n + '_edit').val();
+            var status = $('#status' + n + '_edit').val();
+            $.ajax({
+              type: "POST",
+              url: String("inlineeditwormhole/" + n),
+              data: {
+                  id: id,
+                  scanid: scanid,
+                  start: start,
+                  end: end,
+                  status: status
+              },
+              fail: function(data) {
+                  alert('Fail: ' + data);
+                  cancel("wormhole", n);
+                  return;
+              },
+              error: function(data) {
+                  alert('Error: ' + data);
+                  cancel("wormhole", n);
+                  return;
+              }
+            });
+            $('#link' + n).html('<a class="label label-info" href="/sitemngr/editwormhole/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'wormhole\'' + n + ')">In line</a>');
+            $('#id' + n).html('<a href="/sitemngr/viewwormhole/' + n + '">' + scanid + '</a>');
+            $('#start' + n).html('<a href="/sitemngr/system/' + start +'">' + start + '</a>');
+            $('#end' + n).html('<a href="/sitemngr/system/' + end +'">' + end + '</a>');
+            $('#status' + n).html(status);
+            $('#js_alerts_out').text('Saved');
+            $('#js_alerts').fadeOut(3000);
+        }
+        else if (type === 'site') {
+            // TODO
+        }
 	}
 </script>
 {% endblock %}
@@ -234,75 +233,68 @@ Index
 
 <h5>It is currently Eve time {% now 'H:i:s, N j' %}. Last update: {{ last_update_diff }} ago, by {{ last_update_user }}</h5>
 
-<div class="row">
-    <div class="span6">
-        <h1 id="tt4" data-toggle="tooltip" title="A 'site' is a Cosmic Anomaly or a Cosmic Signature. Both are grouped under this name.">Index of {% if status and status == 'open' %}{% else %}closed {% endif %}sites</h1>
-        <table class="hovertable">
-            <thead>
-                <tr>
-                    <th> ID</th>
-                    <th>Name
-                    <th>Type</th>
-                    <th>Location</th>
-                    <th>Opened</th>
-					<th>Entered</th>
-					<th>Edit</th>
-                </tr>
-            </thread>
-            <tbody>
-                {% for s in sites %}
-    				{% if s.isAnom %}
-    				    <tr class="anom">
-    				{% elif s.opened %}
-    				    <tr class="open">
-    				{% else %}
-    				    <tr class="closed">
-    				{% endif %}
-    					<td><a href="/sitemngr/viewsite/{{ s.id }}">{{ s.scanid }}</a></td>
-    					<td>{{ s.name }}</td>
-    					<td>{{ s.type }}</td>
-    					<td><a href="/sitemngr/system/{{ s.where }}">{{ s.where }}</a></td>
-    					<td>{% if s.opened %}<span class="g">{{ s.opened }}</span>{% else %}<span class="r">{{ s.opened }}</span>{% endif %}</td>
-    					<td>{{ s.date|date:'m/d @ H:i' }}</td>
-    					<td><a class="label label-info" href="/sitemngr/editsite/{{ s.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a></td>
-    				</tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="span6">
-        <h1 id="tt5" data-toggle="tooltip" title="Wormholes start in one system and lead to another - the method of transportantion for those living in wormhole-space.">Index of {% if status and status == 'open' %}{% else %}closed {% endif %}wormholes</h1>
-        <table class="hovertable">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Opened in</th>
-                    <th>Leads to</th>
-                    <th>Entered</th>
-                    <th>Status</th>
-                    <th>Edit</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for w in wormholes %}
-    				{% if w.opened %}
-    				<tr class="open">
-    				{% else %}
-    				<tr class="closed">
-    				{% endif %}
-    					<td id="id{{ w.id }}"><a href="/sitemngr/viewwormhole/{{ w.id }}">{{ w.scanid }}</a></td>
-    					<td id="start{{ w.id }}"><a href="/sitemngr/system/{{ w.start }}">{{ w.start }}</a></td>
-    					<td id="end{{ w.id }}">{% if w.destination == 'Unknown' or w.destination == '' or w.destination == 'Unopened' or w.destination == 'Closed' %}{{ w.destination }}{% else %}<a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>{% endif %}</td>
-    					<td>{{ w.date|date:'m/d @ H:i' }}</td>
-    					<td id="status{{ w.id }}">{{ w.status }}</td>
-    					<!-- <td id="link{{ w.id }}"><a class="label label-info" href="/sitemngr/editwormhole/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a></td> -->
-    					<td id="link{{ w.id }}"><a class="label label-info" href="/sitemngr/editwormhole/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit({{ w.id }});">In line</a></td>
-    				</tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
+<h1 id="tt5" data-toggle="tooltip" title="Wormholes start in one system and lead to another - the method of transportantion for those living in wormhole-space.">Index of {% if status and status == 'open' %}{% else %}closed {% endif %}wormholes</h1>
+<table class="hovertable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Opened in</th>
+            <th>Leads to</th>
+            <th>Entered</th>
+            <th>Status</th>
+            <th>Edit</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for w in wormholes %}
+			{% if w.opened %}
+			<tr class="open">
+			{% else %}
+			<tr class="closed">
+			{% endif %}
+				<td id="id{{ w.id }}"><a href="/sitemngr/viewwormhole/{{ w.id }}">{{ w.scanid }}</a></td>
+				<td id="start{{ w.id }}"><a href="/sitemngr/system/{{ w.start }}">{{ w.start }}</a></td>
+				<td id="end{{ w.id }}">{% if w.destination == 'Unknown' or w.destination == '' or w.destination == 'Unopened' or w.destination == 'Closed' %}{{ w.destination }}{% else %}<a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>{% endif %}</td>
+				<td>{{ w.date|date:'m/d @ H:i' }}</td>
+				<td id="status{{ w.id }}">{{ w.status }}</td>
+				<td id="link{{ w.id }}"><a class="label label-info" href="/sitemngr/editwormhole/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('wormhole', {{ w.id }});">In line</a></td>
+			</tr>
+        {% endfor %}
+    </tbody>
+</table>
+<h1 id="tt4" data-toggle="tooltip" title="A 'site' is a Cosmic Anomaly or a Cosmic Signature. Both are grouped under this name.">Index of {% if status and status == 'open' %}{% else %}closed {% endif %}sites</h1>
+<table class="hovertable">
+    <thead>
+        <tr>
+            <th> ID</th>
+            <th>Name
+            <th>Type</th>
+            <th>Location</th>
+            <th>Opened</th>
+            <th>Entered</th>
+            <th>Edit</th>
+        </tr>
+    </thread>
+    <tbody>
+        {% for s in sites %}
+            {% if s.isAnom %}
+                <tr class="anom">
+            {% elif s.opened %}
+                <tr class="open">
+            {% else %}
+                <tr class="closed">
+            {% endif %}
+                <td><a href="/sitemngr/viewsite/{{ s.id }}">{{ s.scanid }}</a></td>
+                <td>{{ s.name }}</td>
+                <td>{{ s.type }}</td>
+                <td><a href="/sitemngr/system/{{ s.where }}">{{ s.where }}</a></td>
+                <td>{% if s.opened %}<span class="g">{{ s.opened }}</span>{% else %}<span class="r">{{ s.opened }}</span>{% endif %}</td>
+                <td>{{ s.date|date:'m/d @ H:i' }}</td>
+                <td id="link{{ s.id }}"><a class="label label-info" href="/sitemngr/editsite/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('site', {{ s.id }});">In line</a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
 <br><br><br>
 <p style="font-size: 200%;">
     {% if status and status == 'open' %}
