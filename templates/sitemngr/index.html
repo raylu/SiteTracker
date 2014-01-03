@@ -35,34 +35,50 @@ Index
 	}
 	function edit(type, n) {
         if (type === 'wormhole') {
-            var scanid = $('#id' + n).text();
-            var start = $('#start' + n).text();
-            var end = $('#end' + n).text();
-            var status = $('#status' + n).text();
-            $('#id' + n).html('<input type="text" id="id' + n + '_edit" value="' + scanid + '">');
-            $('#start' + n).html('<input type="text" id="start' + n + '_edit" value="' + start + '">');
-            $('#end' + n).html('<input type="text" id="end' + n + '_edit" value="' + end + '">');
-            $('#status' + n).html('<input type="text" id="status' + n + '_edit" value="' + status + '">');
-            $('#link' + n).html('<a class="label label-important" onclick="cancel(\'wormhole\', ' + n + ')">Cancel</a> <td><a class="label label-success" onclick="save(\'wormhole\', ' + n + ')">Save</a></td>');
+            var scanid = $('#wid' + n).text();
+            var start = $('#wstart' + n).text();
+            var end = $('#wend' + n).text();
+            var status = $('#wstatus' + n).text();
+            $('#wid' + n).html('<input type="text" id="wid' + n + '_edit" value="' + scanid + '">');
+            $('#wstart' + n).html('<input type="text" id="wstart' + n + '_edit" value="' + start + '">');
+            $('#wend' + n).html('<input type="text" id="wend' + n + '_edit" value="' + end + '">');
+            $('#wstatus' + n).html('<input type="text" id="wstatus' + n + '_edit" value="' + status + '">');
+            $('#wlink' + n).html('<a class="label label-important" onclick="cancel(\'wormhole\', ' + n + ')">Cancel</a> <td><a class="label label-success" onclick="save(\'wormhole\', ' + n + ')">Save</a></td>');
         }
         else if (type === 'site') {
-            // TODO
+            var scanid = $('#sid' + n).text();
+            var name = $('#sname' + n).text();
+            var type = $('#stype' + n).text();
+            var where = $('#swhere' + n).text();
+            $('#sid' + n).html('<input type="text" id="sid' + n + '_edit" value="' + scanid + '">');
+            $('#sname' + n).html('<input type="text" id="sname' + n + '_edit" value="' + name + '">');
+            $('#stype' + n).html('<input type="text" id="stype' + n + '_edit" value="' + type + '">');
+            $('#swhere' + n).html('<input type="text" id="swhere' + n + '_edit" value="' + where + '">');
+            $('#slink' + n).html('<a class="label label-important" onclick="cancel(\'site\', ' + n + ')">Cancel</a> <td><a class="label label-success" onclick="save(\'site\', ' + n + ')">Save</a></td>');
         }
 	}
 	function cancel(type, n) {
         if (type === 'wormhole') {
-            var scanid = $('#id' + n).html().split('"')[5];
-            var start = $('#start' + n).html().split('"')[5];
-            var end = $('#end' + n).html().split('"')[5];
-            var status = $('#status' + n).html().split('"')[5];
-            $('#link' + n).html('<a class="label label-info" href="/sitemngr/editwormhole/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'wormhole\', ' + n + ')">In line</a>');
-            $('#id' + n).html('<a href="/sitemngr/viewwormhole/' + n + '">' + scanid + '</a>');
-            $('#start' + n).html('<a href="/sitemngr/system/' + start +'">' + start + '</a>');
-            $('#end' + n).html('<a href="/sitemngr/system/' + end +'">' + end + '</a>');
-            $('#status' + n).html(status);
+            var scanid = $('#wid' + n).html().split('"')[5];
+            var start = $('#wstart' + n).html().split('"')[5];
+            var end = $('#wend' + n).html().split('"')[5];
+            var status = $('#wstatus' + n).html().split('"')[5];
+            $('#wlink' + n).html('<a class="label label-info" href="/sitemngr/editwormhole/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'wormhole\', ' + n + ')">In line</a>');
+            $('#wid' + n).html('<a href="/sitemngr/viewwormhole/' + n + '">' + scanid + '</a>');
+            $('#wstart' + n).html('<a href="/sitemngr/system/' + start +'">' + start + '</a>');
+            $('#wend' + n).html('<a href="/sitemngr/system/' + end +'">' + end + '</a>');
+            $('#wstatus' + n).html(status);
         }
         else if (type === 'site') {
-            // TODO
+            var scanid = $('#sid' + n).html().split('"')[5];
+            var name = $('#sname' + n).html().split('"')[5];
+            var type = $('#stype' + n).html().split('"')[5];
+            var where = $('#swhere' + n).html().split('"')[5];
+            $('#slink' + n).html('<a class="label label-info" href="/sitemngr/editsite/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'site\', ' + n + ')">In line</a>');
+            $('#sid' + n).html('<a href="/sitemngr/viewsite/' + n + '">' + scanid + '</a>');
+            $('#sname' + n).html(name);
+            $('#stype' + n).html(type);
+            $('#swhere' + n).html('<a href="/sitemngr/system/' + where + '">' + where + '</a>');
         }
 	}
 	function save(type, n) {
@@ -70,10 +86,10 @@ Index
 		$('#js_alerts').fadeIn(250);
         if (type === 'wormhole') {
             var id = n;
-            var scanid = $('#id' + n + '_edit').val();
-            var start = $('#start' + n + '_edit').val();
-            var end = $('#end' + n + '_edit').val();
-            var status = $('#status' + n + '_edit').val();
+            var scanid = $('#wid' + n + '_edit').val();
+            var start = $('#wstart' + n + '_edit').val();
+            var end = $('#wend' + n + '_edit').val();
+            var status = $('#wstatus' + n + '_edit').val();
             $.ajax({
               type: "POST",
               url: String("inlineeditwormhole/" + n),
@@ -95,16 +111,48 @@ Index
                   return;
               }
             });
-            $('#link' + n).html('<a class="label label-info" href="/sitemngr/editwormhole/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'wormhole\'' + n + ')">In line</a>');
-            $('#id' + n).html('<a href="/sitemngr/viewwormhole/' + n + '">' + scanid + '</a>');
-            $('#start' + n).html('<a href="/sitemngr/system/' + start +'">' + start + '</a>');
-            $('#end' + n).html('<a href="/sitemngr/system/' + end +'">' + end + '</a>');
-            $('#status' + n).html(status);
+            $('#wlink' + n).html('<a class="label label-info" href="/sitemngr/editwormhole/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'wormhole\',' + n + ')">In line</a>');
+            $('#wid' + n).html('<a href="/sitemngr/viewwormhole/' + n + '">' + scanid + '</a>');
+            $('#wstart' + n).html('<a href="/sitemngr/system/' + start +'">' + start + '</a>');
+            $('#wend' + n).html('<a href="/sitemngr/system/' + end +'">' + end + '</a>');
+            $('#wstatus' + n).html(status);
             $('#js_alerts_out').text('Saved');
             $('#js_alerts').fadeOut(3000);
         }
         else if (type === 'site') {
-            // TODO
+            var id = n;
+            var scanid = $('#sid' + n + '_edit').val();
+            var name = $('#sname' + n + '_edit').val();
+            var type = $('#stype' + n + '_edit').val();
+            var where = $('#swhere' + n + '_edit').val();
+            $.ajax({
+                type: "POST",
+                url: String("inlineeditsite/" + n),
+                data: {
+                    id: id,
+                    scanid: scanid,
+                    name: name,
+                    type: type,
+                    where: where
+                },
+                fail: function(data) {
+                    alert('Fail: ' + data);
+                    cancel("site", n);
+                    return;
+                },
+                error: function(data) {
+                    alert('Error: ' + data);
+                    cancel("site", n);
+                    return;
+                }
+            });
+            $('#slink' + n).html('<a class="label label-info" href="/sitemngr/editsite/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'site\',' + n + ')">In line</a>');
+            $('#sid' + n).html('<a href="/sitemngr/viewsite/' + n + '">' + scanid + '</a>');
+            $('#sname' + n).html(name);
+            $('#stype' + n).html(type);
+            $('#swhere' + n).html('<a href="/sitemngr/system/' + where + '">' + where + '</a>');
+            $('#js_alerts_out').text('Saved');
+            $('#js_alerts').fadeOut(3000);
         }
 	}
 </script>
@@ -252,12 +300,12 @@ Index
 			{% else %}
 			<tr class="closed">
 			{% endif %}
-				<td id="id{{ w.id }}"><a href="/sitemngr/viewwormhole/{{ w.id }}">{{ w.scanid }}</a></td>
-				<td id="start{{ w.id }}"><a href="/sitemngr/system/{{ w.start }}">{{ w.start }}</a></td>
-				<td id="end{{ w.id }}">{% if w.destination == 'Unknown' or w.destination == '' or w.destination == 'Unopened' or w.destination == 'Closed' %}{{ w.destination }}{% else %}<a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>{% endif %}</td>
+				<td id="wid{{ w.id }}"><a href="/sitemngr/viewwormhole/{{ w.id }}">{{ w.scanid }}</a></td>
+				<td id="wstart{{ w.id }}"><a href="/sitemngr/system/{{ w.start }}">{{ w.start }}</a></td>
+				<td id="wend{{ w.id }}">{% if w.destination == 'Unknown' or w.destination == '' or w.destination == 'Unopened' or w.destination == 'Closed' %}{{ w.destination }}{% else %}<a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>{% endif %}</td>
 				<td>{{ w.date|date:'m/d @ H:i' }}</td>
-				<td id="status{{ w.id }}">{{ w.status }}</td>
-				<td id="link{{ w.id }}"><a class="label label-info" href="/sitemngr/editwormhole/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('wormhole', {{ w.id }});">In line</a></td>
+				<td id="wstatus{{ w.id }}">{{ w.status }}</td>
+				<td id="wlink{{ w.id }}"><a class="label label-info" href="/sitemngr/editwormhole/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('wormhole', {{ w.id }});">In line</a></td>
 			</tr>
         {% endfor %}
     </tbody>
@@ -284,13 +332,13 @@ Index
             {% else %}
                 <tr class="closed">
             {% endif %}
-                <td><a href="/sitemngr/viewsite/{{ s.id }}">{{ s.scanid }}</a></td>
-                <td>{{ s.name }}</td>
-                <td>{{ s.type }}</td>
-                <td><a href="/sitemngr/system/{{ s.where }}">{{ s.where }}</a></td>
+                <td id="sid{{ s.id }}"><a href="/sitemngr/viewsite/{{ s.id }}">{{ s.scanid }}</a></td>
+                <td id="sname{{ s.id }}">{{ s.name }}</td>
+                <td id="stype{{ s.id }}">{{ s.type }}</td>
+                <td id="swhere{{ s.id }}"><a href="/sitemngr/system/{{ s.where }}">{{ s.where }}</a></td>
                 <td>{% if s.opened %}<span class="g">{{ s.opened }}</span>{% else %}<span class="r">{{ s.opened }}</span>{% endif %}</td>
                 <td>{{ s.date|date:'m/d @ H:i' }}</td>
-                <td id="link{{ s.id }}"><a class="label label-info" href="/sitemngr/editsite/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('site', {{ s.id }});">In line</a></td>
+                <td id="slink{{ s.id }}"><a class="label label-info" href="/sitemngr/editsite/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('site', {{ s.id }});">In line</a></td>
             </tr>
         {% endfor %}
     </tbody>

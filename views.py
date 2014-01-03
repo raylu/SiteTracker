@@ -1150,7 +1150,7 @@ def do_edit_site(p, site, display_name):
         if appendNotes is not None:
             site.notes += appendNotes
         site.save()
-        change = SiteChange(site=site, date=now, user=util.get_display_name(eveigb, request), changedName=changedName, changedScanid=changedScanid,
+        change = SiteChange(site=site, date=now, user=display_name, changedName=changedName, changedScanid=changedScanid,
                             changedType=changedType, changedWhere=changedWhere, changedDate=changedDate, changedOpened=changedOpened,
                             changedClosed=changedClosed, changedNotes=changedNotes)
         change.save()
