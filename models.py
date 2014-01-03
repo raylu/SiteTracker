@@ -15,7 +15,7 @@ class Site(models.Model):
     def __repr__(self):
         return '<Site-%s-%s-%s>' % (self.id, self.scanid, self.where)
     def __unicode__(self):
-        return unicode('{0}-{1}-{2}'.format(self.id, self.scanid, self.where))
+        return '<Site-%s-%s-%s>' % (self.id, self.scanid, self.where)
     def numberOfChanges(self):
         return len(SiteChange.objects.filter(site=self.id))
     def getChanges(self):
@@ -41,7 +41,7 @@ class SiteChange(models.Model):
     def __repr__(self):
         return '<SiteChange-%s-%s-%s>' % (self.id, self.site.id, self.date.strftime('%m/%d/%Y %H:%M:%S'))
     def __unicode__(self):
-        return self.pk
+        return '<SiteChange-%s-%s-%s>' % (self.id, self.site.id, self.date.strftime('%m/%d/%Y %H:%M:%S'))
 
 class Wormhole(models.Model):
     """ Wormhole object for wormholes in w-space """
@@ -59,7 +59,7 @@ class Wormhole(models.Model):
     def __repr__(self):
         return '<Wormhole-%s-%s-%s-%s-%s>' % (self.id, self.scanid, self.start, self.destination, self.status)
     def __unicode__(self):
-        return unicode('{0}-{1}-{2}'.format(self.id, self.scanid, self.start))
+        return '<Wormhole-%s-%s-%s-%s-%s>' % (self.id, self.scanid, self.start, self.destination, self.status)
     def numberOfChanges(self):
         return len(WormholeChange.objects.filter(wormhole=self.pk))
     def getChanges(self):
@@ -92,7 +92,7 @@ class WormholeChange(models.Model):
     def __repr__(self):
         return '<WormholeChange-%s-%s-%s>' % (self.id, self.wormhole.id, self.date.strftime('%m/%d/%Y %H:%M:%S'))
     def __unicode__(self):
-        return self.pk
+        return '<WormholeChange-%s-%s-%s>' % (self.id, self.wormhole.id, self.date.strftime('%m/%d/%Y %H:%M:%S'))
 
 class Settings(models.Model):
     user = models.CharField(max_length=100)
@@ -100,14 +100,14 @@ class Settings(models.Model):
     storeMultiple = models.BooleanField(default=True)
     userBackgroundImage = models.BooleanField(default=True)
     def __unicode__(self):
-        return unicode('Settings for %s' % self.user)
+        return '<Settings-%s>' % self.user
 
 class PasteUpdated(models.Model):
     """ Recording when someone uses the paste feature """
     user = models.CharField(max_length=100)
     date = models.DateTimeField()
     def __unicode__(self):
-        return unicode('PasteUpdated by %s' % self.user)
+        return '<PasteUpdated-%s>' % self.user
 
 # ========================
 
@@ -121,7 +121,7 @@ class PasteData:
         self.isSite = p_isSite
         self.iswormhole = p_isWormhole
     def __unicode__(self):
-        return unicode(self.scanid)
+        return self.scanid
 
 class PasteMatch:
     def __init__(self, scanid, name, p_type, allowed):
@@ -130,7 +130,7 @@ class PasteMatch:
         self.p_type = p_type
         self.allowed = allowed
     def __unicode__(self):
-        return unicode(self.scanid)
+        return self.scanid
 
 class KillReport:
     """ Dynamically constructed class sent to /sitemngr/checkkills """
@@ -141,4 +141,4 @@ class KillReport:
         self.ship = ship
         self.pod = pod
     def __unicode__(self):
-        return unicode(self.system)
+        return self.system

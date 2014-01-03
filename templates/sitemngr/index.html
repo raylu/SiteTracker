@@ -296,9 +296,9 @@ Index
     <tbody>
         {% for w in wormholes %}
 			{% if w.opened %}
-			<tr class="open">
+                <tr class="open">
 			{% else %}
-			<tr class="closed">
+                <tr class="closed">
 			{% endif %}
 				<td id="wid{{ w.id }}"><a href="/sitemngr/viewwormhole/{{ w.id }}">{{ w.scanid }}</a></td>
 				<td id="wstart{{ w.id }}"><a href="/sitemngr/system/{{ w.start }}">{{ w.start }}</a></td>
@@ -338,7 +338,7 @@ Index
                 <td id="swhere{{ s.id }}"><a href="/sitemngr/system/{{ s.where }}">{{ s.where }}</a></td>
                 <td>{% if s.opened %}<span class="g">{{ s.opened }}</span>{% else %}<span class="r">{{ s.opened }}</span>{% endif %}</td>
                 <td>{{ s.date|date:'m/d @ H:i' }}</td>
-                <td id="slink{{ s.id }}"><a class="label label-info" href="/sitemngr/editsite/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('site', {{ s.id }});">In line</a></td>
+                <td id="slink{{ s.id }}"><a class="label label-info" href="/sitemngr/editsite/{{ s.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('site', {{ s.id }});">In line</a></td>
             </tr>
         {% endfor %}
     </tbody>
