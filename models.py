@@ -13,7 +13,7 @@ class Site(models.Model):
     closed = models.BooleanField(default=False, blank=False)
     notes = models.TextField(blank=True)
     def __repr__(self):
-        return ''
+        return '<Site-%s-%s-%s>' % (self.id, self.scanid, self.where)
     def __unicode__(self):
         return unicode('{0}-{1}-{2}'.format(self.id, self.scanid, self.where))
     def numberOfChanges(self):
@@ -38,6 +38,8 @@ class SiteChange(models.Model):
     changedOpened = models.BooleanField(blank=False, default=False)
     changedClosed = models.BooleanField(blank=False, default=False)
     changedNotes = models.BooleanField(blank=False, default=False)
+    def __repr__(self):
+        return '<SiteChange-%s-%s-%s>' % (self.id, self.site.id, self.date.strftime('%m/%d/%Y %H:%M:%S'))
     def __unicode__(self):
         return self.pk
 
@@ -54,6 +56,8 @@ class Wormhole(models.Model):
     opened = models.BooleanField(default=False)
     closed = models.BooleanField(default=False)
     notes = models.TextField()
+    def __repr__(self):
+        return '<Wormhole-%s-%s-%s-%s-%s>' % (self.id, self.scanid, self.start, self.destination, self.status)
     def __unicode__(self):
         return unicode('{0}-{1}-{2}'.format(self.id, self.scanid, self.start))
     def numberOfChanges(self):
@@ -85,6 +89,8 @@ class WormholeChange(models.Model):
     changedOpened = models.BooleanField()
     changedClosed = models.BooleanField(blank=False, default=False)
     changedNotes = models.BooleanField(blank=False, default=False)
+    def __repr__(self):
+        return '<WormholeChange-%s-%s-%s>' % (self.id, self.wormhole.id, self.date.strftime('%m/%d/%Y %H:%M:%S'))
     def __unicode__(self):
         return self.pk
 

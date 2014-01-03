@@ -8,7 +8,7 @@ Index
 {% block javascript %}
 <script type="text/javascript">
 	$(document).ready(function() {
-		console.log('Document ready');
+		// console.log('Document ready');
 		$('#overlay').load('http://tracker.talkinlocal.org/sitemngr/overlay/');
 		$('.message').bind('click', function() {
            $(this).hide(250);
@@ -35,49 +35,53 @@ Index
 	   $("#" + which).toggle(200);
 	}
 	function edit(n) {
-		console.log('Edit ' + n);
-		var id = $('#id' + n).text();
+		// console.log('Edit ' + n);
+        var id = n;
+		var scanid = $('#id' + n).text();
 		var start = $('#start' + n).text();
 		var end = $('#end' + n).text();
 		var status = $('#status' + n).text();
-		console.log(id + ', ' + start + ', ' + end + ', ' + status);
-		$('#id' + n).html('<input type="text" id="id' + n + '_edit" value="' + $('#id' + n).text() + '">');
-		$('#start' + n).html('<input type="text" id="start' + n + '_edit" value="' + $('#start' + n).text() + '">');
-		$('#end' + n).html('<input type="text" id="end' + n + '_edit" value="' + $('#end' + n).text() + '">');
-		$('#status' + n).html('<input type="text" id="status' + n + '_edit" value="' + $('#status' + n).text() + '">');
+		// console.log(id + ', ' + start + ', ' + end + ', ' + status);
+		$('#id' + n).html('<input type="text" id="id' + n + '_edit" value="' + scanid + '">');
+		$('#start' + n).html('<input type="text" id="start' + n + '_edit" value="' + start + '">');
+		$('#end' + n).html('<input type="text" id="end' + n + '_edit" value="' + end + '">');
+		$('#status' + n).html('<input type="text" id="status' + n + '_edit" value="' + status + '">');
 		$('#link' + n).html('<a class="label label-important" onclick="cancel(' + n + ')">Cancel</a> <td><a class="label label-success" onclick="save(' + n + ')">Save</a></td>');
 		// $('#tr' + n).append('<td><a onclick="save(' + n + ')">Save</a></td>');
 	}
 	function cancel(n) {
-		console.log('Cancel  ' + n);
-		var id = $('#id' + n).html().split('"')[5];
+		// console.log('Cancel  ' + n);
+        var id = n;
+		var scanid = $('#id' + n).html().split('"')[5];
 		var start = $('#start' + n).html().split('"')[5];
 		var end = $('#end' + n).html().split('"')[5];
 		var status = $('#status' + n).html().split('"')[5];
-		console.log(id + ', ' + start + ', ' + end + ', ' + status);
+		// console.log(id + ', ' + start + ', ' + end + ', ' + status);
 		$('#link' + n).html('<a class="label label-info" href="/sitemngr/editwormhole/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(' + n + ')">In line</a>');
-		$('#id' + n).html('<a href="/sitemngr/viewwormhole/' + n + '">' + id + '</a>');
+		$('#id' + n).html('<a href="/sitemngr/viewwormhole/' + n + '">' + scanid + '</a>');
 		$('#start' + n).html('<a href="/sitemngr/system/' + start +'">' + start + '</a>');
 		$('#end' + n).html('<a href="/sitemngr/system/' + end +'">' + end + '</a>');
 		$('#status' + n).html(status);
 		// $('#tr' + n + ' td:last-child').remove();
 	}
 	function save(n) {
-		console.log('Save ' + n);
+		// console.log('Save ' + n);
 		$('#js_alerts_out').text('Saving...');
 		$('#js_alerts').fadeIn(250);
-		var id = $('#id' + n + '_edit').val();
+        var id = n;
+		var scanid = $('#id' + n + '_edit').val();
 		var start = $('#start' + n + '_edit').val();
 		var end = $('#end' + n + '_edit').val();
 		var status = $('#status' + n + '_edit').val();
-		console.log(id + ', ' + start + ', ' + end + ', ' + status);
-		var u = String("inlineeditwormhole/" + n);
-		console.log(u);
+		// console.log(id + ', ' + start + ', ' + end + ', ' + status);
+        // var csrftoken = $.cookie('csrftoken');
+        // // console.log(csrftoken);
 		$.ajax({
 		  type: "POST",
-		  url: u,
+		  url: String("inlineeditwormhole/" + n),
 		  data: {
-		      id: id,
+              id: id,
+		      scanid: scanid,
 		      start: start,
 		      end: end,
 		      status: status
@@ -97,7 +101,7 @@ Index
           }
         });
 		$('#link' + n).html('<a class="label label-info" href="/sitemngr/editwormhole/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(' + n + ')">In line</a>');
-		$('#id' + n).html('<a href="/sitemngr/viewwormhole/' + n + '">' + id + '</a>');
+		$('#id' + n).html('<a href="/sitemngr/viewwormhole/' + n + '">' + scanid + '</a>');
 		$('#start' + n).html('<a href="/sitemngr/system/' + start +'">' + start + '</a>');
 		$('#end' + n).html('<a href="/sitemngr/system/' + end +'">' + end + '</a>');
 		$('#status' + n).html(status);
@@ -267,7 +271,7 @@ Index
         </table>
     </div>
     <div class="span6">
-        <h1 id="tt5" data-toggle="tooltip" title="Wormholes start in one system and lead to another - the main method of transportantion for those living in wormhole-space.">Index of {% if status and status == 'open' %}{% else %}closed {% endif %}wormholes</h1>
+        <h1 id="tt5" data-toggle="tooltip" title="Wormholes start in one system and lead to another - the method of transportantion for those living in wormhole-space.">Index of {% if status and status == 'open' %}{% else %}closed {% endif %}wormholes</h1>
         <table class="hovertable">
             <thead>
                 <tr>
@@ -291,8 +295,8 @@ Index
     					<td id="end{{ w.id }}">{% if w.destination == 'Unknown' or w.destination == '' or w.destination == 'Unopened' or w.destination == 'Closed' %}{{ w.destination }}{% else %}<a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>{% endif %}</td>
     					<td>{{ w.date|date:'m/d @ H:i' }}</td>
     					<td id="status{{ w.id }}">{{ w.status }}</td>
-    					<td id="link{{ w.id }}"><a class="label label-info" href="/sitemngr/editwormhole/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a></td>
-    					<!-- <td id="link{{ w.id }}"><a class="label label-info" href="/sitemngr/editwormhole/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit({{ w.id }});">In line</a></td> -->
+    					<!-- <td id="link{{ w.id }}"><a class="label label-info" href="/sitemngr/editwormhole/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a></td> -->
+    					<td id="link{{ w.id }}"><a class="label label-info" href="/sitemngr/editwormhole/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit({{ w.id }});">In line</a></td>
     				</tr>
                 {% endfor %}
             </tbody>

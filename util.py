@@ -214,10 +214,10 @@ class Contributor:
         self.name = name
         self.points = points
 
-
-
 def getBoolean(s):
     """ Returns True if the string represents a boolean equalling True """
+    if type(s) == bool:
+        return s
     return s.lower() in ['true', 't', '1', 'yes', 'on']
 
 def get_display_name(eveigb, request):

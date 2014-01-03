@@ -7,6 +7,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
 
 # sitemngr
 from models import (Site, SiteChange,
@@ -1063,9 +1065,88 @@ def mass_close(request):
 def inline_edit_site(request):
     pass
 
-# TODO: Write
+# TODO: It's working - now commit to database
+@csrf_exempt
 def inline_edit_wormhole(request):
-    pass
+    eveigb = IGBHeaderParser(request)
+    if not util.can_view(eveigb, request):
+        return no_access(request)
+    if request.method == 'POST':
+        p = request.POST.copy()
+        wormhole = get_object_or_404(Wormhole, pk=p['id'])
+        p['opened'] = wormhole.opened
+        p['closed'] = wormhole.closed
+        result = do_edit_wormhole(p, wormhole, util.get_display_name(eveigb, request))
+        if result:
+            return HttpResponse(str(result.__unicode__()))
+        else:
+            return HttpResponse('0')
+    else:
+        return HttpResponse('0')
+
+def do_edit_wormhole(p, wormhole, dispay_name):
+    """ Edits a wormhole """
+    now = datetime.now()
+    changedScanid = False
+    changedStart = False
+    changedDestination = False
+    changedTime = False
+    changedStatus = False
+    changedOpened = False
+    changedClosed = False
+    changedNotes = False
+    appendNotes = None
+    if p.has_key('scanid') and p['scanid']:
+        if p['scanid'] != wormhole.scanid:
+            changedScanid = True
+            appendNotes = ' Scanid: {0} >> {1}'.format(wormhole.scanid, p['scanid'])
+            wormhole.scanid = p['scanid'].upper()
+    if p.has_key('start') and p['start']:
+        if p['start'] != wormhole.start:
+            changedStart = True
+            wormhole.start = p['start']
+    if p.has_key('destination') and p['destination']:
+        if p['destination'] != wormhole.destination:
+            changedDestination = True
+            wormhole.destination = p['destination']
+    if p.has_key('time') and p['time']:
+        if p['time'] != wormhole.time:
+            changedTime = True
+            wormhole.time = p['time']
+    if p.has_key('status') and p['status']:
+        if p['status'] != wormhole.status:
+            changedStatus = True
+            wormhole.status = p['status']
+    if p.has_key('opened') and p['opened']:
+        if util.getBoolean(p['opened']) != wormhole.opened:
+            changedOpened = True
+            wormhole.opened = util.getBoolean(p['opened'])
+    else:
+        if wormhole.opened == True:
+            wormhole.opened = False
+            changedOpened = True
+    if p.has_key('closed') and p['closed']:
+        if util.getBoolean(p['closed']) != wormhole.closed:
+            changedClosed = True
+            wormhole.closed = util.getBoolean(p['closed'])
+    else:
+        if wormhole.closed == True:
+            wormhole.closed = False
+            changedClosed = True
+    if p.has_key('notes') and p['notes']:
+        if util.getBoolean(p['notes']) != wormhole.notes:
+            changedNotes = True
+            wormhole.notes = p['notes']
+    if changedScanid or changedStart or changedDestination or changedTime or changedStatus or changedOpened or changedClosed or changedNotes:
+        if appendNotes is not None:
+            wormhole.notes += appendNotes
+        wormhole.save()
+        change = WormholeChange(wormhole=wormhole, user=dispay_name, date=now, changedScanid=changedScanid, changedType=False, changedStart=changedStart, changedDestination=changedDestination, changedTime=changedTime, changedStatus=changedStatus, changedOpened=changedOpened, changedClosed=changedClosed, changedNotes=changedNotes)
+        change.save()
+        set_dirty()
+        return change
+    else:
+        return False
 
 def no_access(request):
     """ Shown when the viewer is restricted from viewing the page """
