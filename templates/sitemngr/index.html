@@ -100,6 +100,15 @@ Index
                   end: end,
                   status: status
               },
+              success: function(data) {
+                $('#wlink' + n).html('<a class="label label-info" href="/sitemngr/editwormhole/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'wormhole\',' + n + ')">In line</a>');
+                $('#wid' + n).html('<a href="/sitemngr/viewwormhole/' + n + '">' + scanid + '</a>');
+                $('#wstart' + n).html('<a href="/sitemngr/system/' + start +'">' + start + '</a>');
+                $('#wend' + n).html('<a href="/sitemngr/system/' + end +'">' + end + '</a>');
+                $('#wstatus' + n).html(status);
+                $('#js_alerts_out').text('Saved');
+                $('#js_alerts').fadeOut(3000);
+              },
               fail: function(data) {
                   alert('Fail: ' + data);
                   cancel("wormhole", n);
@@ -111,13 +120,6 @@ Index
                   return;
               }
             });
-            $('#wlink' + n).html('<a class="label label-info" href="/sitemngr/editwormhole/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'wormhole\',' + n + ')">In line</a>');
-            $('#wid' + n).html('<a href="/sitemngr/viewwormhole/' + n + '">' + scanid + '</a>');
-            $('#wstart' + n).html('<a href="/sitemngr/system/' + start +'">' + start + '</a>');
-            $('#wend' + n).html('<a href="/sitemngr/system/' + end +'">' + end + '</a>');
-            $('#wstatus' + n).html(status);
-            $('#js_alerts_out').text('Saved');
-            $('#js_alerts').fadeOut(3000);
         }
         else if (type === 'site') {
             var id = n;
@@ -135,6 +137,15 @@ Index
                     type: type,
                     where: where
                 },
+                success: function(data) {
+                    $('#slink' + n).html('<a class="label label-info" href="/sitemngr/editsite/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'site\',' + n + ')">In line</a>');
+                    $('#sid' + n).html('<a href="/sitemngr/viewsite/' + n + '">' + scanid + '</a>');
+                    $('#sname' + n).html(name);
+                    $('#stype' + n).html(type);
+                    $('#swhere' + n).html('<a href="/sitemngr/system/' + where + '">' + where + '</a>');
+                    $('#js_alerts_out').text('Saved');
+                    $('#js_alerts').fadeOut(3000);
+                },
                 fail: function(data) {
                     alert('Fail: ' + data);
                     cancel("site", n);
@@ -146,13 +157,6 @@ Index
                     return;
                 }
             });
-            $('#slink' + n).html('<a class="label label-info" href="/sitemngr/editsite/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'site\',' + n + ')">In line</a>');
-            $('#sid' + n).html('<a href="/sitemngr/viewsite/' + n + '">' + scanid + '</a>');
-            $('#sname' + n).html(name);
-            $('#stype' + n).html(type);
-            $('#swhere' + n).html('<a href="/sitemngr/system/' + where + '">' + where + '</a>');
-            $('#js_alerts_out').text('Saved');
-            $('#js_alerts').fadeOut(3000);
         }
 	}
 </script>
@@ -310,6 +314,7 @@ Index
         {% endfor %}
     </tbody>
 </table>
+<br>
 <h1 id="tt4" data-toggle="tooltip" title="A 'site' is a Cosmic Anomaly or a Cosmic Signature. Both are grouped under this name.">Index of {% if status and status == 'open' %}{% else %}closed {% endif %}sites</h1>
 <table class="hovertable">
     <thead>

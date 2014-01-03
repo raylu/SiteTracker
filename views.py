@@ -947,7 +947,7 @@ def create_account(request):
         if p['password']:
             user = User.objects.create_user(username=eveigb.charname, password=p['password'])
             user.save()
-            messages.add_message(request, messages.INFO, 'Successfully created account on the server')
+            # messages.add_message(request, messages.INFO, 'Successfully created account on the server')
             return redirect('/sitemngr/')
         return login_page(request, 'You must enter a password.')
     return redirect('/sitemngr/')
