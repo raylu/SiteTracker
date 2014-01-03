@@ -1061,11 +1061,24 @@ def mass_close(request):
     wormholes = Wormhole.objects.filter(closed=False)
     return render(request, 'sitemngr/massclose.html', {'displayname': util.get_display_name(eveigb, request), 'wormholes': wormholes, 'data': data})
 
-# TODO: Write
+@csrf_exempt
 def inline_edit_site(request):
-    pass
+    eveigb = IGBHeaderParser(request)
+    if not util.can_view(eveigb, request):
+        return no_access(request)
+    if request.method == 'POST':
+        p = request.POST.copy()
+        site = get_object_or_404(Site, pk=p['id'])
+        p['opened'] = site.opened
+        p['closed'] = site.closed
+        result = do_edit_site(p, site, util.get_display_name(eveigb, request))
+        if result:
+            return HttpResponse(result)
+        else:
+            return HttpResponse('0')
+    else:
+        return HttpResponse('0')
 
-# TODO: It's working - now commit to database
 @csrf_exempt
 def inline_edit_wormhole(request):
     eveigb = IGBHeaderParser(request)
@@ -1078,11 +1091,71 @@ def inline_edit_wormhole(request):
         p['closed'] = wormhole.closed
         result = do_edit_wormhole(p, wormhole, util.get_display_name(eveigb, request))
         if result:
-            return HttpResponse(str(result.__unicode__()))
+            return HttpResponse(result)
         else:
             return HttpResponse('0')
     else:
         return HttpResponse('0')
+
+def do_edit_site(p, site, display_name):
+    """ Edits a site """
+    now = datetime.now()
+    changedName = False
+    changedScanid = False
+    changedType = False
+    changedWhere = False
+    changedDate = False
+    changedOpened = False
+    changedClosed = False
+    changedNotes = False
+    appendNotes = None
+    if p.has_key('name') and p['name']:
+        if p['name'] != site.name:
+            changedName = True
+            site.name = p['name']
+    if p.has_key('scanid') and p['scanid']:
+        if p['scanid'] != site.scanid:
+            changedScanid = True
+            appendNotes = 'Scanid: {0} >> {1}'.format(site.scanid, p['scanid'])
+            site.scanid = p['scanid'].upper()
+    if p.has_key('type') and p['type']:
+        if p['type'] != site.type:
+            changedType = True
+            site.type = p['type']
+    if p.has_key('where') and p['where']:
+        if p['where'] != site.where:
+            changedWhere = True
+            site.where = p['where']
+    if p.has_key('opened') and p['opened']:
+        if util.getBoolean(p['opened']) != site.opened:
+            changedOpened = True
+            site.opened = util.getBoolean(p['opened'])
+    else:
+        if site.opened == True:
+            site.opened = False
+            changedOpened = True
+    if p.has_key('closed') and p['closed']:
+        if util.getBoolean(p['closed']) != site.closed:
+            changedClosed = True
+            site.closed = util.getBoolean(p['closed'])
+    else:
+        if site.closed == True:
+            site.closed = False
+            changedClosed = True 
+    if p.has_key('notes') and p['notes']:
+        if p['notes'] != site.notes:
+            changedNotes = True
+            site.notes = p['notes']
+    if changedName or changedScanid or changedType or changedWhere or changedDate or changedOpened or changedClosed or changedNotes:
+        if appendNotes is not None:
+            site.notes += appendNotes
+        site.save()
+        change = SiteChange(site=site, date=now, user=util.get_display_name(eveigb, request), changedName=changedName, changedScanid=changedScanid,
+                            changedType=changedType, changedWhere=changedWhere, changedDate=changedDate, changedOpened=changedOpened,
+                            changedClosed=changedClosed, changedNotes=changedNotes)
+        change.save()
+        return change
+    return False
 
 def do_edit_wormhole(p, wormhole, dispay_name):
     """ Edits a wormhole """
@@ -1145,8 +1218,7 @@ def do_edit_wormhole(p, wormhole, dispay_name):
         change.save()
         set_dirty()
         return change
-    else:
-        return False
+    return False
 
 def no_access(request):
     """ Shown when the viewer is restricted from viewing the page """
