@@ -1,28 +1,15 @@
 from django.db import models
 import settings
 
-# Site: creator, date, name, scanid, type, where, opened, closed, notes
-# SiteChange: site, user, date, changedScanid, changedName, changedType, changedWhere, changedDate, changedOpen, changedClosed, changedNotes
-# Wormhole: creator, date, scanid, type, start, destination, time, status, opened, closed, notes
-# WormholeChange: wormhole, user, date, changedScanid, changedType, changedStart, changedDestination, changedTime, changedStatus, changedOpened, changedClosed, changedNotes
-
 class Site(models.Model):
     """ Site object for sites in wormhole space """
-    # User who entered the site
     creator = models.CharField(max_length=100)
-    # When the site was added
     date = models.DateTimeField()
-    # Name of the site
     name = models.CharField(max_length=150, blank=False)
-    # Scan id
     scanid = models.CharField(max_length=10, blank=False)
-    # Type of site
     type = models.CharField(max_length=100, blank=False)
-    # Where the site is located
     where = models.CharField(max_length=50, blank=False)
-    # True if the site has been opened
     opened = models.BooleanField(default=False, blank=False)
-    # True if the site is closed (done)
     closed = models.BooleanField(default=False, blank=False)
     notes = models.TextField(blank=True)
     def __repr__(self):
@@ -33,7 +20,6 @@ class Site(models.Model):
         return len(SiteChange.objects.filter(site=self.id))
     def getChanges(self):
         return SiteChange.objects.filter(site=self.id)
-    # Printout for output into MotD or T2MM
     def printOut(self):
         return '{0} [{1}] {2} - {3}'.format(self.scanid, self.type[0], self.name, 'Open' if self.opened else 'Closed')
     def isAnom(self):
@@ -41,9 +27,7 @@ class Site(models.Model):
 
 class SiteChange(models.Model):
     """ SiteChange object for keeping track of changes to sites """
-    # Site in question
     site = models.ForeignKey(Site)
-    # Date of the change
     date = models.DateTimeField(blank=False, default=False)
     user = models.CharField(max_length=100, blank=False, default=False)
     changedName = models.BooleanField(blank=False, default=False)
@@ -59,25 +43,15 @@ class SiteChange(models.Model):
 
 class Wormhole(models.Model):
     """ Wormhole object for wormholes in w-space """
-    # User who entered the wormhole
     creator = models.CharField(max_length=100)
-    # Date first stored in database
     date = models.DateTimeField()
-    # Scan id
     scanid = models.CharField(max_length=10)
-    # Type of wormhole (w id)
     type = models.CharField(max_length=50)
-    # System where the wormhole was opened
     start = models.CharField(max_length=100)
-    # System to where the wormhole leads
     destination = models.CharField(max_length=100)
-    # Time of last recording
     time = models.CharField(max_length=150)
-    # Status at `time`
     status = models.CharField(max_length=400)
-    # True if the wormhole has been opened
     opened = models.BooleanField(default=False)
-    # True if the wormhole is closed (done)
     closed = models.BooleanField(default=False)
     notes = models.TextField()
     def __unicode__(self):
@@ -89,8 +63,6 @@ class Wormhole(models.Model):
     # Printout for output into MotD or T2MM
     def printOut(self):
         return '{0} {1} > {2} ({3})'.format(self.scanid, self.start, self.destination, self.status)
-    def printOutT2MM(self):
-        return '{0} {1} > {2}'.format(self.scanid, self.start, self.destination)
     def get_status_colored(self):
         if self.status in ['Fresh', 'Undecayed']:
             return "<span color='green'>%s</span>" % self.status
@@ -101,9 +73,7 @@ class Wormhole(models.Model):
 
 class WormholeChange(models.Model):
     """ WormholeChange object for keeping track of changes to wormholes """
-    # Wormhole in question
     wormhole = models.ForeignKey(Wormhole)
-    # Date of the change
     user = models.CharField(max_length=100)
     date = models.DateTimeField()
     changedScanid = models.BooleanField()
@@ -128,9 +98,7 @@ class Settings(models.Model):
 
 class PasteUpdated(models.Model):
     """ Recording when someone uses the paste feature """
-    # Who made the paste
     user = models.CharField(max_length=100)
-    # What time the paste was parsed
     date = models.DateTimeField()
     def __unicode__(self):
         return unicode('PasteUpdated by %s' % self.user)

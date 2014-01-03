@@ -17,6 +17,7 @@ from . import settings as appSettings
 from . import util
 from util import (Flag, Result,
                   SpaceObject, Contributor)
+from . import messages
 
 # eve_db
 from eve_db.models import MapSolarSystem
@@ -64,14 +65,14 @@ def index(request, note=None):
         return no_access(request)
     sites = Site.objects.filter(closed=False)
     wormholes = Wormhole.objects.filter(closed=False)
-    notices = []
+    notices = messages.messages
     # check if the wormhole objects and graph are out of sync
     if is_dirty():
         tidy()
         if useGraphing:
             notices.append('Graph updated')
         else:
-            notices.append('Graph would be updated, but it\'s not being used.')
+            notices.append('The graph would be updated, but that feature is disabled.')
     now = datetime.utcnow()
     # get the last updated time and player
     last_update_diff = None
