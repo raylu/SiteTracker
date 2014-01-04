@@ -1071,9 +1071,9 @@ def inline_edit_site(request):
         if result:
             return HttpResponse(result)
         else:
-            return HttpResponse('0')
+            return HttpResponse('Error: Site edit function returned False - no changes made')
     else:
-        return HttpResponse('0')
+        return HttpResponse('Error: Invalid page access.')
 
 @csrf_exempt
 def inline_edit_wormhole(request):
@@ -1089,9 +1089,9 @@ def inline_edit_wormhole(request):
         if result:
             return HttpResponse(result)
         else:
-            return HttpResponse('0')
+            return HttpResponse('Error: Wormhole edit function returned False - no changes made')
     else:
-        return HttpResponse('0')
+        return HttpResponse('Error: Invalid page access.')
 
 def do_edit_site(p, site, display_name):
     """ Edits a site """
