@@ -28,8 +28,7 @@ emap['VoC'] = 'dotted'
 emap['EoL'] = 'dotted'
 emap['Unknown'] = 'solid'
 
-def get_edge_type(start, destination):
-    wormhole = Wormhole.objects.get(start=start, destination=destination)
+def get_edge_type(wormhole):
     if wormhole.status in emap:
         return emap[wormhole.status]
     else:
@@ -89,7 +88,7 @@ def graph():
         elif w.status == 'Unknown' and (now.replace(tzinfo=pytz.utc) - w.date.replace(tzinfo=pytz.utc)).seconds / 60 / 60 > 20:
             g.add_edge(w.start, w.destination, style='dotted', color='red', label=w.scanid)
         else:
-            g.add_edge(w.start, w.destination, style=get_edge_type(w.start, w.destination), color='black', label=w.scanid)
+            g.add_edge(w.start, w.destination, style=get_edge_type(w), color='black', label=w.scanid)
     g.layout()
     try:
         os.remove('/var/www/mysite/sitemngr/static/pictures/graph.png')

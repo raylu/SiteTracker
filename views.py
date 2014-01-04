@@ -73,7 +73,7 @@ def index(request, note=None):
             destination = p['destination']
             status = p['status']
             Wormhole(creator=util.get_display_name(eveigb, request), date=datetime.now(), scanid=scanid, type='null', start=start, destination=destination,
-                            time=datetime.now(), status=status, opened=True, closed=False, notes='').save()
+                            time=datetime.now(), status=status, opened=False if destination.lower() in ['unopened', 'closed'] else True, closed=False, notes='').save()
             notices.append('New wormhole added')
         elif p['data_type'] == 'site':
             scanid = p['scanid'].upper()
