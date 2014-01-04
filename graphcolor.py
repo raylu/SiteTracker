@@ -1,8 +1,6 @@
-import re
 from sitemngr.models import Wormhole
 from eve_db.models import MapSolarSystem
 from pygraphviz import *
-import urllib2
 from time import sleep
 from datetime import datetime
 import pytz
@@ -13,7 +11,6 @@ cmap = {}
 cmap['HS'] = 'gold'
 cmap['LS'] = 'purple'
 cmap['NS'] = 'brown'
-cmap['0'] = 'black'
 cmap['1'] = 'blue'
 cmap['2'] = 'green'
 cmap['3'] = 'yellow'
@@ -45,7 +42,7 @@ def get_color(system_name):
     try:
         system = MapSolarSystem.objects.get(name=system_name)
     except MapSolarSystem.DoesNotExist:
-        return 'black'
+        return 'gray'
     status = system.security_level
     if status > 0.45:
         return cmap['HS']
