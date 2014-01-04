@@ -101,6 +101,7 @@ Index
                   status: status
               },
               success: function(data) {
+                console.log('Ajax wormhole save returned ' + data);
                 $('#wlink' + n).html('<a class="label label-info" href="/sitemngr/editwormhole/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'wormhole\',' + n + ')">In line</a>');
                 $('#wid' + n).html('<a href="/sitemngr/viewwormhole/' + n + '">' + scanid + '</a>');
                 $('#wstart' + n).html('<a href="/sitemngr/system/' + start +'">' + start + '</a>');
@@ -138,6 +139,7 @@ Index
                     where: where
                 },
                 success: function(data) {
+                    console.log('Ajax site save returned ' + data);
                     $('#slink' + n).html('<a class="label label-info" href="/sitemngr/editsite/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'site\',' + n + ')">In line</a>');
                     $('#sid' + n).html('<a href="/sitemngr/viewsite/' + n + '">' + scanid + '</a>');
                     $('#sname' + n).html(name);

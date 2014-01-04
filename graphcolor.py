@@ -26,14 +26,17 @@ emap['Fresh'] = 'bold'
 emap['Undecayed'] = 'bold'
 emap['< 50% mass'] = 'dashed'
 emap['< 50% mass'] = 'dashed'
-emap['< 50% time'] = 'dashes'
+emap['< 50% time'] = 'dashed'
 emap['VoC'] = 'dotted'
 emap['EoL'] = 'dotted'
 emap['Unknown'] = 'solid'
 
 def get_edge_type(start, destination):
     wormhole = Wormhole.objects.get(start=start, destination=destination)
-    return emap[wormhole.status]
+    if wormhole.status in emap:
+        return emap[wormhole.status]
+    else:
+        return 'dotted'
 
 def get_color(system_name):
     system = None
