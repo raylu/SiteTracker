@@ -46,20 +46,20 @@
             <label>Type of site</label>
         </td>
         <td>
-			{% if isForm %}
-				<select name="type">
-					{% if site %}
-						<option>{{ site.type }}</option>
-					{% endif %}
-					<option>Combat</option>
-					<option>Relic</option>
-					<option>Gas</option>
-					<option>Data</option>
-					<option>Ore</option>
-				</select>
-			{% else %}
-				<input type="text" value="{{ site.type }}" readonly>
-			{% endif %}
+            {% if isForm %}
+                <select name="type">
+                    {% if site %}
+                        <option>{{ site.type }}</option>
+                    {% endif %}
+                    <option>Combat</option>
+                    <option>Relic</option>
+                    <option>Gas</option>
+                    <option>Data</option>
+                    <option>Ore</option>
+                </select>
+            {% else %}
+                <input type="text" value="{{ site.type }}" readonly>
+            {% endif %}
             <!-- <input type="text" name="type" placeholder="Combat, gas, data ..." value="{% if site %}{{ site.type }}{% elif g_type %}{{ g_type }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}> -->
         </td>
     </tr>

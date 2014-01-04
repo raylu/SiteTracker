@@ -7,11 +7,11 @@ Add Wormhole
 {% block javascript %}
 <script type="text/javascript">
     $(document).ready(function() {
-		var sid = $('#t_scanid').val();
-		if (sid.length != 3) {
-			$('#submit_button').attr('disabled', 'disabled');
-			$('#l_scanid').css('color', 'red');
-		}
+        var sid = $('#t_scanid').val();
+        if (sid.length != 3) {
+            $('#submit_button').attr('disabled', 'disabled');
+            $('#l_scanid').css('color', 'red');
+        }
         $('#t_scanid').keyup(function() {
             var sid = $('#t_scanid').val();
             if (sid.length == 3)

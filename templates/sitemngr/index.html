@@ -7,33 +7,33 @@ Index
 
 {% block javascript %}
 <script type="text/javascript">
-	$(document).ready(function() {
-		$('#overlay').load('http://tracker.talkinlocal.org/sitemngr/overlay/');
-		$('.message').bind('click', function() {
+    $(document).ready(function() {
+        $('#overlay').load('http://tracker.talkinlocal.org/sitemngr/overlay/');
+        $('.message').bind('click', function() {
            $(this).hide(250);
         });
-		$('#tt1').tooltip();
-		$('#tt2').tooltip();
-		$('#tt3').tooltip();
-		$('#tt4').tooltip();
-		$('#tt5').tooltip();
-		setTimeout(function() {
-			$('#alert_notices').fadeOut(5000);
-			$('#alert_flag').fadeOut(5000);
-		}, 30000);
-	});
-	function get_tags() {
-		var keyword = $('#omnibox').val();
-		var flags = $('#omni_flags').val();
-		if (flags == '')
-		  flags = '_'
-		$('#search_results').show();
-		$('#search_results').load('http://tracker.talkinlocal.org/sitemngr/get_search_results/' + keyword + '/' + flags);
-	}
-	function toggleSection(which) {
-	   $("#" + which).toggle(200);
-	}
-	function edit(type, n) {
+        $('#tt1').tooltip();
+        $('#tt2').tooltip();
+        $('#tt3').tooltip();
+        $('#tt4').tooltip();
+        $('#tt5').tooltip();
+        setTimeout(function() {
+            $('#alert_notices').fadeOut(5000);
+            $('#alert_flag').fadeOut(5000);
+        }, 30000);
+    });
+    function get_tags() {
+        var keyword = $('#omnibox').val();
+        var flags = $('#omni_flags').val();
+        if (flags == '')
+          flags = '_'
+        $('#search_results').show();
+        $('#search_results').load('http://tracker.talkinlocal.org/sitemngr/get_search_results/' + keyword + '/' + flags);
+    }
+    function toggleSection(which) {
+       $("#" + which).toggle(200);
+    }
+    function edit(type, n) {
         if (type === 'wormhole') {
             var scanid = $('#wid' + n).text();
             var start = $('#wstart' + n).text();
@@ -56,8 +56,8 @@ Index
             $('#swhere' + n).html('<input type="text" id="swhere' + n + '_edit" value="' + where + '">');
             $('#slink' + n).html('<a class="label label-important" onclick="cancel(\'site\', ' + n + ')">Cancel</a> <td><a class="label label-success" onclick="save(\'site\', ' + n + ')">Save</a></td>');
         }
-	}
-	function cancel(type, n) {
+    }
+    function cancel(type, n) {
         if (type === 'wormhole') {
             var scanid = $('#wid' + n).html().split('"')[5];
             var start = $('#wstart' + n).html().split('"')[5];
@@ -80,10 +80,10 @@ Index
             $('#stype' + n).html(type);
             $('#swhere' + n).html('<a href="/sitemngr/system/' + where + '">' + where + '</a>');
         }
-	}
-	function save(type, n) {
-		$('#js_alerts_out').text('Saving...');
-		$('#js_alerts').fadeIn(250);
+    }
+    function save(type, n) {
+        $('#js_alerts_out').text('Saving...');
+        $('#js_alerts').fadeIn(250);
         if (type === 'wormhole') {
             var id = n;
             var scanid = $('#wid' + n + '_edit').val();
@@ -160,20 +160,47 @@ Index
                 }
             });
         }
-	}
+    }
+    function checkNew(type) {
+        console.log('Check new for ' + type + ' called');
+        if (type === 'wormhole') {
+            if ($('#w_new_scanid').val().length== 3 && $('#w_new_start').val().length > 0 && $('#w_new_end').val().length > 0)
+                $('#w_new_submit').removeAttr("disabled");
+            else
+                $('#w_new_submit').attr('disabled', 'disabled');
+        }
+        else if (type === 'site') {
+            if ($('#s_new_scanid').val().length == 3 && $('#s_new_name').val().length > 0 && $('#s_new_where').val().length > 0)
+                $('#s_new_submit').removeAttr("disabled");
+            else
+                $('#s_new_submit').attr('disabled', 'disabled');   
+        }
+    }
 </script>
 {% endblock %}
 
 {% block extraHead %}
 <style>
-	input[type="text"] {
-		text-align: center;
-		width: 75%;
-	}
+    input[type="text"] {
+        text-align: center;
+        width: 75%;
+    }
+    #w_new_scanid {
+        text-transform: uppercase;
+    }
+    #s_new_scanid {
+        text-transform: uppercase;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
+
+<!--
+{% for n in notices %}{{ n }}{% endfor %}
+
+{{ notices }}
+-->
 
 <center>
 
@@ -200,15 +227,15 @@ Index
     </div>
 {% endif %}
 <div class="alert" id="js_alerts" hidden>
-	<button type="button" class="close" onclick="$('#js_alerts').fadeOut(250);">&times;</button>
-	<p id="js_alerts_out"></p>
+    <button type="button" class="close" onclick="$('#js_alerts').fadeOut(250);">&times;</button>
+    <p id="js_alerts_out"></p>
 </div>
 
 <div class="btn-group">
-	<button class="btn" onclick="toggleSection('graph');">Toggle graph</button>
-	<button class="btn" onclick="toggleSection('overlay');">Show Overview</button>
-	<button class="btn" onclick="toggleSection('search');">Search</button>
-	<button class="btn" onclick="toggleSection('index_paste');">Paste</button>
+    <button class="btn" onclick="toggleSection('graph');">Toggle graph</button>
+    <button class="btn" onclick="toggleSection('overlay');">Show Overview</button>
+    <button class="btn" onclick="toggleSection('search');">Search</button>
+    <button class="btn" onclick="toggleSection('index_paste');">Paste</button>
 </div>
 
 <br><br>
@@ -236,21 +263,21 @@ Index
         </ul>
         If you do not want to filter, leave the flags box blank.
     </div>
-	<input type="text" id="omnibox" style="margin-top: 10px;" onkeyup="get_tags();" placeholder="Search...">
-	<input type="text" id="omni_flags" style="margin-top: 10px; width: 10%;" onkeyup="get_tags();" placeholder="Flags">
-	<img src="http://i.imgur.com/WWZwIWk.png" width="30" height="30" onclick="$('#omnibox').val(''); $('#omni_flags').val(''); $('#search_results').hide(); $('#search_results').html('');"><br>
-	<div id="search_results" style="height: 200px; width: 50%; overflow: auto; display: none;"></div>
+    <input type="text" id="omnibox" style="margin-top: 10px;" onkeyup="get_tags();" placeholder="Search...">
+    <input type="text" id="omni_flags" style="margin-top: 10px; width: 10%;" onkeyup="get_tags();" placeholder="Flags">
+    <img src="http://i.imgur.com/WWZwIWk.png" width="30" height="30" onclick="$('#omnibox').val(''); $('#omni_flags').val(''); $('#search_results').hide(); $('#search_results').html('');"><br>
+    <div id="search_results" style="height: 200px; width: 50%; overflow: auto; display: none;"></div>
 </div>
 <div id="overlay" style="width: 100%; border: 1px solid black; display: none;">
     <span style="color: gray; text-align: left;">Loading ...</span>
 </div>
 <div id="graph" style="border: 1px solid gray; display: none;">
-	<img src="{% static 'pictures/graph.png' %}" alt="Current graph not found"></img><br>
-	<p>
-    	<b>System outline colors</b>: HS = gold, LS = purple, NS = brown, C1 = blue, C2 = green, C3 = yellow, C4 = orange, C5 = red, C6 = black, not found = black<br>
-		<b>Line styles</b>: Fresh = bold, < 50% mass & < 50% time = dashed, EoL & VoC = dotted, Unknown = standard<br>
-		<i>Note</i>: Dotted red lines mean that the wormhole has been "Fresh" or "Unknown" for more than 16 hours
-	</p>
+    <img src="{% static 'pictures/graph.png' %}" alt="Current graph not found"></img><br>
+    <p>
+        <b>System outline colors</b>: HS = gold, LS = purple, NS = brown, C1 = blue, C2 = green, C3 = yellow, C4 = orange, C5 = red, C6 = black, not found = black<br>
+        <b>Line styles</b>: Fresh = bold, < 50% mass & < 50% time = dashed, EoL & VoC = dotted, Unknown = standard<br>
+        <i>Note</i>: Dotted red lines mean that the wormhole has been "Fresh" or "Unknown" for more than 16 hours
+    </p>
 </div>
 <div id="index_paste" style="border: 1px solid gray; display: none;">
     <h4>This is the same thing as the paste page, without having to load that separate page before pasting.</h4>
@@ -262,7 +289,7 @@ Index
                     <label><b>System</b>:</label>
                 </td>
                 <td>
-                    <input type="text" name="system" value="{% if system %}{{ system }}{% elif eveigb.is_igb %}{{ eveigb.solarsystemname }}{% else %}J132814{% endif %}">
+                    <input type="text" name="system" value="{% if system %}{{ system }}{% elif eveigb.is_igb %}{{ eveigb.solarsystemname }}{% else %}{{ homesystem }}{% endif %}">
                 </td>
             </tr>
         </table><br>
@@ -273,9 +300,9 @@ Index
                     <label><b>After downtime?</b></label>
                 </td>
                 <td>
-					<label class="checkbox">
-						<input type="checkbox" name="downtime" id="c_paste_downtime">
-					</label>
+                    <label class="checkbox">
+                        <input type="checkbox" name="downtime" id="c_paste_downtime">
+                    </label>
                 </td>
             </tr>
         </table><br>
@@ -301,19 +328,31 @@ Index
     </thead>
     <tbody>
         {% for w in wormholes %}
-			{% if w.opened %}
+            {% if w.opened %}
                 <tr class="open">
-			{% else %}
+            {% else %}
                 <tr class="closed">
-			{% endif %}
-				<td id="wid{{ w.id }}"><a href="/sitemngr/viewwormhole/{{ w.id }}">{{ w.scanid }}</a></td>
-				<td id="wstart{{ w.id }}"><a href="/sitemngr/system/{{ w.start }}">{{ w.start }}</a></td>
-				<td id="wend{{ w.id }}">{% if w.destination == 'Unknown' or w.destination == '' or w.destination == 'Unopened' or w.destination == 'Closed' %}{{ w.destination }}{% else %}<a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>{% endif %}</td>
-				<td>{{ w.date|date:'m/d @ H:i' }}</td>
-				<td id="wstatus{{ w.id }}">{{ w.status }}</td>
-				<td id="wlink{{ w.id }}"><a class="label label-info" href="/sitemngr/editwormhole/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('wormhole', {{ w.id }});">In line</a></td>
-			</tr>
+            {% endif %}
+                <td id="wid{{ w.id }}"><a href="/sitemngr/viewwormhole/{{ w.id }}">{{ w.scanid }}</a></td>
+                <td id="wstart{{ w.id }}"><a href="/sitemngr/system/{{ w.start }}">{{ w.start }}</a></td>
+                <td id="wend{{ w.id }}">{% if w.destination == 'Unknown' or w.destination == '' or w.destination == 'Unopened' or w.destination == 'Closed' %}{{ w.destination }}{% else %}<a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>{% endif %}</td>
+                <td>{{ w.date|date:'m/d @ H:i' }}</td>
+                <td id="wstatus{{ w.id }}">{{ w.status }}</td>
+                <td id="wlink{{ w.id }}"><a class="label label-info" href="/sitemngr/editwormhole/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('wormhole', {{ w.id }});">In line</a></td>
+            </tr>
         {% endfor %}
+        <tr>
+            <form action="" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="data_type" value="wormhole">
+                <td><input onkeyup="checkNew('wormhole');" style="margin: 0 0 0 0; padding: 0 0 0 0;" type="text" id="w_new_scanid" name="scanid" value="" placeholder="id"></td>
+                <td><input onkeyup="checkNew('wormhole');" style="margin: 0 0 0 0; padding: 0 0 0 0;" type="text" id="w_new_start" name="start" value="" placeholder="start"></td>
+                <td><input onkeyup="checkNew('wormhole');" style="margin: 0 0 0 0; padding: 0 0 0 0;" type="text" id="w_new_end" name="destination" value="" placeholder="end"></td>
+                <td></td>
+                <td><select style="margin: 0 0 0 0; padding: 0 0 0 0; width: 100%;" id="w_new_status" name="status"><option>Undecayed</option><option>Fresh</option><option>&#60 50% mass</option><option>&#60 50% time</option><option>VoC</option><option>EoL</option><option>Unknown</option><option>Closed</option></select></td>
+                <td><input style="margin: 0 0 0 0; padding: 0 0 0 0;" id="w_new_submit" type="submit" class="btn btn-mini btn-primary" value="Add New" disabled></td>
+            </form>
+        </tr>
     </tbody>
 </table>
 <br>
@@ -348,6 +387,19 @@ Index
                 <td id="slink{{ s.id }}"><a class="label label-info" href="/sitemngr/editsite/{{ s.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('site', {{ s.id }});">In line</a></td>
             </tr>
         {% endfor %}
+        <tr>
+            <form action="" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="data_type" value="site">
+                <td><input onkeyup="checkNew('site');" style="margin: 0 0 0 0; padding: 0 0 0 0;" type="text" id="s_new_scanid" name="scanid" value="" placeholder="id"></td>
+                <td><input onkeyup="checkNew('site');" style="margin: 0 0 0 0; padding: 0 0 0 0;" type="text" id="s_new_name" name="name" value="" placeholder="name"></td>
+                <td><select style="margin: 0 0 0 0; padding: 0 0 0 0; width: 100%;" id="s_new_type" name="type"><option>Combat</option><option>Relic</option><option>Gas</option><option>Data</option><option>Ore</option></select></td>
+                <td><input onkeyup="checkNew('site');" style="margin: 0 0 0 0; padding: 0 0 0 0;" type="text" id="s_new_where" name="where" value="{{ homesystem }}" placeholder="where"></td>
+                <td></td>
+                <td></td>
+                <td><input style="margin: 0 0 0 0; padding: 0 0 0 0;" id="s_new_submit" type="submit" class="btn btn-mini btn-primary" value="Add New" disabled></td>
+            </form>
+        </tr>
     </tbody>
 </table>
 <br><br><br>

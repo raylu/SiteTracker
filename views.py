@@ -65,9 +65,26 @@ def index(request, note=None):
     eveigb = IGBHeaderParser(request)
     if not util.can_view(eveigb, request):
         return no_access(request)
+    notices = ['No messages here!']
+    if request.method == 'POST':
+        p = request.POST
+        if p['data_type'] == 'wormhole':
+            scanid = p['scanid'].upper()
+            start = p['start']
+            destination = p['destination']
+            status = p['status']
+            Wormhole(creator=util.get_display_name(eveigb, request), date=datetime.now(), scanid=scanid, type='null', start=start, destination=destination,
+                            time=datetime.now(), status=status, opened=True, closed=False, notes='').save()
+            notices.append('New wormhole added')
+        elif p['data_type'] == 'site':
+            scanid = p['scanid'].upper()
+            name = p['name']
+            type = p['type']
+            where = p['where']
+            Site(name=name, scanid=scanid, type=type, where=where, creator=util.get_display_name(eveigb, request), date=datetime.now(), opened=False, closed=False, notes='').save()
+            notices.append('New site added')
     sites = Site.objects.filter(closed=False)
     wormholes = Wormhole.objects.filter(closed=False)
-    notices = noticeMessages.messages
     # check if the wormhole objects and graph are out of sync
     if is_dirty():
         tidy()

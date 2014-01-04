@@ -69,11 +69,11 @@ System Info
             </th>
         </tr>
         {% for w in openwormholes %}
-			{% if w.opened %}
-			<tr class="open">
-			{% else %}
-			<tr class="closed">
-			{% endif %}
+            {% if w.opened %}
+            <tr class="open">
+            {% else %}
+            <tr class="closed">
+            {% endif %}
                 <td>
                     <a href="/sitemngr/viewwormhole/{{ w.id }}">{{ w.scanid }}</a>
                 </td>
@@ -121,13 +121,13 @@ System Info
             </th>
         </tr>
         {% for s in opensites %}
-			{% if s.isAnom %}
-			<tr class="anom">
-			{% elif s.opened %}
-			<tr class="open">
-			{% else %}
-			<tr class="closed">
-			{% endif %}
+            {% if s.isAnom %}
+            <tr class="anom">
+            {% elif s.opened %}
+            <tr class="open">
+            {% else %}
+            <tr class="closed">
+            {% endif %}
                 <td>
                     <a href="/sitemngr/viewsite/{{ s.id }}">{{ s.scanid }}</a>
                 </td>
@@ -161,13 +161,13 @@ System Info
             </th>
         </tr>
         {% for s in unopenedsites %}
-			{% if s.isAnom %}
-			<tr class="anom">
-			{% elif s.opened %}
-			<tr class="open">
-			{% else %}
-			<tr class="closed">
-			{% endif %}
+            {% if s.isAnom %}
+            <tr class="anom">
+            {% elif s.opened %}
+            <tr class="open">
+            {% else %}
+            <tr class="closed">
+            {% endif %}
                 <td>
                     <a href="/sitemngr/viewsite/{{ s.id }}">{{ s.scanid }}</a>
                 </td>
