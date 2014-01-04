@@ -19,7 +19,6 @@ from . import settings as appSettings
 from . import util
 from util import (Flag, Result,
                   SpaceObject, Contributor)
-from . import messages as noticeMessages
 
 # eve_db
 from eve_db.models import MapSolarSystem
@@ -65,7 +64,7 @@ def index(request, note=None):
     eveigb = IGBHeaderParser(request)
     if not util.can_view(eveigb, request):
         return no_access(request)
-    notices = ['No messages here!']
+    notices = ['Be sure to check out the video tutorial series, posted on the forums!']
     if request.method == 'POST':
         p = request.POST
         if p['data_type'] == 'wormhole':
