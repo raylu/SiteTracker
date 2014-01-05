@@ -15,10 +15,8 @@ from models import (Site, SiteChange,
                     Wormhole, WormholeChange,
                     PasteData, PasteUpdated,
                     KillReport, PasteMatch, Settings)
-from . import settings as appSettings
-from . import util
-from util import (Flag, Result,
-                  SpaceObject, Contributor)
+import settings as appSettings
+import util
 
 # eve_db
 from eve_db.models import MapSolarSystem
@@ -142,65 +140,8 @@ def edit_site(request, siteid):
     site = get_object_or_404(Site, pk=siteid)
     if request.method == 'POST':
         p = request.POST
-        now = datetime.now()
-        changedName = False
-        changedScanid = False
-        changedType = False
-        changedWhere = False
-        changedDate = False
-        changedOpened = False
-        changedClosed = False
-        changedNotes = False
-        appendNotes = None
-        if p.has_key('name') and p['name']:
-            if p['name'] != site.name:
-                changedName = True
-                site.name = p['name']
-        if p.has_key('scanid') and p['scanid']:
-            if p['scanid'] != site.scanid:
-                changedScanid = True
-                appendNotes = 'Scanid: {0} >> {1}'.format(site.scanid, p['scanid'])
-                site.scanid = p['scanid'].upper()
-        if p.has_key('type') and p['type']:
-            if p['type'] != site.type:
-                changedType = True
-                site.type = p['type']
-        if p.has_key('where') and p['where']:
-            if p['where'] != site.where:
-                changedWhere = True
-                site.where = p['where']
-        if p.has_key('opened') and p['opened']:
-            if util.getBoolean(p['opened']) != site.opened:
-                changedOpened = True
-                site.opened = util.getBoolean(p['opened'])
-        else:
-            if site.opened == True:
-                site.opened = False
-                changedOpened = True
-        if p.has_key('closed') and p['closed']:
-            if util.getBoolean(p['closed']) != site.closed:
-                changedClosed = True
-                site.closed = util.getBoolean(p['closed'])
-        else:
-            if site.closed == True:
-                site.closed = False
-                changedClosed = True 
-        if p.has_key('notes') and p['notes']:
-            if p['notes'] != site.notes:
-                changedNotes = True
-                site.notes = p['notes']
-        # ensure that at least one piece of data was changed
-        if changedName or changedScanid or changedType or changedWhere or changedDate or changedOpened or changedClosed or changedNotes:
-            if appendNotes is not None:
-                site.notes += appendNotes
-            # save the changes made to the site object
-            site.save()
-            # construct a change for this edit
-            change = SiteChange(site=site, date=now, user=util.get_display_name(eveigb, request), changedName=changedName, changedScanid=changedScanid,
-                                changedType=changedType, changedWhere=changedWhere, changedDate=changedDate, changedOpened=changedOpened,
-                                changedClosed=changedClosed, changedNotes=changedNotes)
-            change.save()
-        return redirect('/sitemngr/')
+        if util.do_edit_site(p, site, util.get_display_name(eveigb, request)):
+            return redirect('/sitemngr/')
     return render(request, 'sitemngr/editsite.html', {'displayname': util.get_display_name(eveigb, request), 'isForm': True, 'site': site, 'finish_msg': 'Store changes back into the database:'})
 
 def add_site(request):
@@ -208,35 +149,22 @@ def add_site(request):
     eveigb = IGBHeaderParser(request)
     if not util.can_view(eveigb, request):
         return no_access(request)
-    g_scanid = ''
-    g_system = ''
-    g_type = ''
-    g_name = ''
+    g_scanid = None
+    g_system = None
+    g_type = None
+    g_name = None
     now = datetime.now()
     if request.method == 'POST':
         p = request.POST
-        s_name = 'null'
-        s_scanid = 'null'
-        s_type = 'null'
-        s_where = 'null'
-        s_opened = False
-        s_closed = False
-        s_notes = ''
-        if p.has_key('name') and p['name']:
-            s_name = p['name']
-        if p.has_key('scanid') and p['scanid']:
-            s_scanid = p['scanid'].upper()
-        if p.has_key('type') and p['type']:
-            s_type = p['type']
-        if p.has_key('where') and p['where']:
-            s_where = p['where']
-        if p.has_key('opened') and p['opened']:
-            s_opened = util.getBoolean(p['opened'])
-        if p.has_key('closed') and p['closed']:
-            s_closed = util.getBoolean(p['closed'])
-        if p.has_key('notes') and p['notes']:
-            s_notes = p['notes']
+        s_scanid = p['scanid']
+        s_name = p['name'] if 'name' in p else 'Unknown'
+        s_type = p['type']
+        s_where = p['where'] if 'where' in p else 'Unknown'
+        s_opened = True if 'opened' in p else False
+        s_closed = True if 'closed' in p else False
+        s_notes = p['notes'] if 'notes' in p else ''
         try:
+            # check for the same site already in the database and unclosed
             Site.objects.get(scanid=s_scanid, where=s_where, type=s_type, name=s_name)
             messages.add_message(request, messages.INFO, 'That exact site already exists in the database! You can use the masterlist page to find it.')
             return redirect('/sitemngr/')
@@ -253,14 +181,10 @@ def add_site(request):
     # fill in passed information from the paste page
     elif request.method == 'GET':
         g = request.GET
-        if g.has_key('scanid') and g['scanid']:
-            g_scanid = g['scanid']
-        if g.has_key('system') and g['system']:
-            g_system = g['system']
-        if g.has_key('type') and g['type']:
-            g_type = g['type']
-        if g.has_key('name') and g['name']:
-            g_name = g['name']
+        g_scanid = g['scanid'] if 'scanid' in g else None
+        g_system = g['system'] if 'system' in g else None
+        g_tyge = g['type'] if 'type' in g else None
+        g_name = g['name'] if 'name' in g else None
     return render(request, 'sitemngr/addsite.html', {'request': request, 'displayname': util.get_display_name(eveigb, request),
              'isForm': True, 'finish_msg': 'Store new site into the database:', 'g_scanid': g_scanid, 'g_system': g_system, 'g_type': g_type, 'g_name': g_name, 'timenow': now})
 
@@ -285,69 +209,9 @@ def edit_wormhole(request, wormholeid):
     wormhole = get_object_or_404(Wormhole, pk=wormholeid)
     if request.method == 'POST':
         p = request.POST
-        now = datetime.now()
-        changedScanid = False
-        changedStart = False
-        changedDestination = False
-        changedTime = False
-        changedStatus = False
-        changedOpened = False
-        changedClosed = False
-        changedNotes = False
-        appendNotes = None
-        if p.has_key('scanid') and p['scanid']:
-            if p['scanid'] != wormhole.scanid:
-                changedScanid = True
-                appendNotes = ' Scanid: {0} >> {1}'.format(wormhole.scanid, p['scanid'])
-                wormhole.scanid = p['scanid'].upper()
-        if p.has_key('start') and p['start']:
-            if p['start'] != wormhole.start:
-                changedStart = True
-                wormhole.start = p['start']
-        if p.has_key('destination') and p['destination']:
-            if p['destination'] != wormhole.destination:
-                changedDestination = True
-                wormhole.destination = p['destination']
-        if p.has_key('time') and p['time']:
-            if p['time'] != wormhole.time:
-                changedTime = True
-                wormhole.time = p['time']
-        if p.has_key('status') and p['status']:
-            if p['status'] != wormhole.status:
-                changedStatus = True
-                wormhole.status = p['status']
-        if p.has_key('opened') and p['opened']:
-            if util.getBoolean(p['opened']) != wormhole.opened:
-                changedOpened = True
-                wormhole.opened = util.getBoolean(p['opened'])
-        else:
-            if wormhole.opened == True:
-                wormhole.opened = False
-                changedOpened = True
-        if p.has_key('closed') and p['closed']:
-            if util.getBoolean(p['closed']) != wormhole.closed:
-                changedClosed = True
-                wormhole.closed = util.getBoolean(p['closed'])
-        else:
-            if wormhole.closed == True:
-                wormhole.closed = False
-                changedClosed = True
-        if p.has_key('notes') and p['notes']:
-            if util.getBoolean(p['notes']) != wormhole.notes:
-                changedNotes = True
-                wormhole.notes = p['notes']
-        # ensure that at least one piece of data was changed
-        if changedScanid or changedStart or changedDestination or changedTime or changedStatus or changedOpened or changedClosed or changedNotes:
-            if appendNotes is not None:
-                wormhole.notes += appendNotes
-            # save the changes made to the wormhole object
-            wormhole.save()
-            # construct a change for this edit
-            change = WormholeChange(wormhole=wormhole, user=util.get_display_name(eveigb, request), date=now, changedScanid=changedScanid, changedType=False, changedStart=changedStart, changedDestination=changedDestination, changedTime=changedTime, changedStatus=changedStatus, changedOpened=changedOpened, changedClosed=changedClosed, changedNotes=changedNotes)
-            change.save()
-            # make the new view of the index page update the graph
+        if util.do_edit_wormhole(p, wormhole, util.get_display_name(eveigb, request)):
             set_dirty()
-        return redirect('/sitemngr/')
+            return redirect('/sitemngr/')
     return render(request, 'sitemngr/editwormhole.html', {'displayname': util.get_display_name(eveigb, request), 'isForm': True,
           'wormhole': wormhole, 'finish_msg': 'Store changes back into the database'})
 
@@ -363,31 +227,16 @@ def add_wormhole(request):
     now = datetime.now()
     if request.method == 'POST':
         p = request.POST
-        s_scanid = 'null'
-        s_start = 'null'
-        s_destination = 'null'
+        s_scanid = p['scanid']
+        s_start = p['start'] if 'start' in p else 'Unknown'
+        s_destination = p['destination'] if 'destination' in p else 'Unknown'
         s_time = now
-        s_status = 'Fresh'
-        s_opened = False
-        s_closed = False
-        s_notes = ''
-        if p.has_key('scanid') and p['scanid']:
-            s_scanid = p['scanid'].upper()
-        if p.has_key('start') and p['start']:
-            s_start = p['start']
-        if p.has_key('destination') and p['destination']:
-            s_destination = p['destination']
-        if p.has_key('time') and p['time']:
-            s_time = p['time']
-        if p.has_key('status') and p['status']:
-            s_status = p['status']
-        if p.has_key('opened') and p['opened']:
-            s_opened = util.getBoolean(p['opened'])
-        if p.has_key('closed') and p['closed']:
-            s_closed = util.getBoolean(p['closed'])
-        if p.has_key('notes') and p['notes']:
-            s_notes = p['notes']
+        s_status = p['status']
+        s_opened = True if 'opened' in p else False
+        s_closed = True if 'closed' in p else False
+        s_notes = p['notes'] if 'notes' in p else ''
         try:
+            # check for the same wormhole already in the database and unclosed
             Wormhole.objects.get(start=s_start, destination=s_destination, opened=True, closed=False)
             messages.add_message(request, messages.INFO, 'That exact wormhole already exists in the database! You can use the masterlist page to find it.')
             return redirect('/sitemngr/')
@@ -407,14 +256,10 @@ def add_wormhole(request):
     # fill in passed information from the paste page
     elif request.method == 'GET':
         g = request.GET
-        if g.has_key('scanid') and g['scanid']:
-            g_scanid = g['scanid']
-        if g.has_key('start') and g['start']:
-            g_start = g['start']
-        if g.has_key('end') and g['end']:
-            g_end = g['end']
-        if g.has_key('name') and g['name']:
-            g_name = g['name']
+        g_scanid = g['scanid'] if 'scanid' in g else None
+        g_start = g['start'] if 'start' in g else None
+        g_end = g['end'] if 'end' in g else None
+        g_name = g['name'] if 'name' in g else None
     return render(request, 'sitemngr/addwormhole.html', {'request': request, 'displayname': util.get_display_name(eveigb, request),
                  'isForm': True, 'finish_msg': 'Store new wormhole into the database:', 'g_scanid': g_scanid, 'g_start': g_start, 'g_end': g_end, 'g_name': g_name, 'timenow': now.strftime('%m/%d @ %H:%M')})
 
@@ -477,11 +322,11 @@ def paste(request):
                     wormholes.append(wormhole)
                     paste_data.append(PasteMatch(scanid=wormhole.scanid, name='%s > %s' % (wormhole.start, wormhole.destination), p_type='wormhole', allowed=new_sites))
             for a in new_anoms:
-                newids.append(SpaceObject(a, 'Anomaly', names[a]))
+                newids.append(util.SpaceObject(a, 'Anomaly', names[a]))
             for s in new_sites:
-                newids.append(SpaceObject(s, 'Signature', names[s]))
+                newids.append(util.SpaceObject(s, 'Signature', names[s]))
             for w in new_wormholes:
-                newids.append(SpaceObject(w, 'Wormhole', ''))
+                newids.append(util.SpaceObject(w, 'Wormhole', ''))
             return render(request, 'sitemngr/pastescandowntime.html', {'system': system, 'pastedata': paste_data, 'sites': sites, 'wormholes': wormholes, 'newids': newids,
                            'displayname': util.get_display_name(eveigb, request), 'newTab': util.get_settings(util.get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': util.get_settings(util.get_display_name(eveigb, request)).userBackgroundImage})
         elif post.has_key('afterdowntime') and post['afterdowntime']:
@@ -804,7 +649,7 @@ def stats(request):
     conList = []
     con = sorted(con.items(), key=lambda kv: kv[1])
     for name, count in con:
-        conList.append(Contributor(name, count))
+        conList.append(util.Contributor(name, count))
     return render(request, 'sitemngr/stats.html', {'displayname': util.get_display_name(eveigb, request), 'numSites': numSites,
                'numWormholes': numWormholes, 'numPastes': numPastes, 'numEdits': numEdits, 'numContributors': numContributors, 'allContributors': conList})
 
@@ -998,7 +843,7 @@ def settings(request):
 
 def get_search_results(request, keyword, flags):
     """ Returns a list of links for use by the search feature on the index page """
-    flags = Flag(flags)
+    flags = util.Flag(flags)
     ret = []
     raw = []
     wormholes = []
@@ -1023,30 +868,30 @@ def get_search_results(request, keyword, flags):
         # check system names in the chain
         for system in util.get_chain_systems():
             if system.startswith(keyword) and not system in raw:
-                ret.append(Result('system/%s' % system, system))
+                ret.append(util.Result('system/%s' % system, system))
                 raw.append(system)
         # check tradehub system names
         if flags.universe and not flags.chain:
             for system in util.get_tradehub_system_names():
                 if system.startswith(keyword) and not system in raw:
-                    ret.append(Result('system/%s' % system, system))
+                    ret.append(util.Result('system/%s' % system, system))
     # check site names and locations, and scanids
     for site in sites:
         if site.where.startswith(keyword) or site.name.startswith(keyword) or site.scanid.startswith(keyword) or site.scanid == keyword:
-            ret.append(Result('viewsite/%s' % site.id, 'Site %s' % site))
+            ret.append(util.Result('viewsite/%s' % site.id, 'Site %s' % site))
             raw.append(site)
     # check wormhole start and destination system names, and scanids
     for wormhole in wormholes:
         if wormhole.start.startswith(keyword) or wormhole.destination.startswith(keyword) or wormhole.scanid.startswith(keyword) or wormhole.scanid == keyword:
-            ret.append(Result('viewwormhole/%s' % wormhole.id, 'Wormhole %s' % wormhole))
+            ret.append(util.Result('viewwormhole/%s' % wormhole.id, 'Wormhole %s' % wormhole))
             raw.append(wormhole)
     # if we've found nothing else, then check system names from all of the universe if we can include systems
     if flags.universe or (len(ret) == 0 and not flags.wormholes and not flags.sites and not flags.chain):
         for system in MapSolarSystem.objects.all():
             if system.name.startswith(keyword):
-                ret.append(Result('system/%s' % system.name, system.name))
+                ret.append(util.Result('system/%s' % system.name, system.name))
     if len(ret) == 0:
-        ret.append(Result('', 'No results'))
+        ret.append(util.Result('', 'No results'))
     return render(request, 'sitemngr/search_results.html', {'results': ret, 'flags': flags})
 
 def refresh_graph(request):
@@ -1083,7 +928,7 @@ def inline_edit_site(request):
         site = get_object_or_404(Site, pk=p['id'])
         p['opened'] = site.opened
         p['closed'] = site.closed
-        result = do_edit_site(p, site, util.get_display_name(eveigb, request))
+        result = util.do_edit_site(p, site, util.get_display_name(eveigb, request))
         if result:
             return HttpResponse(result)
         else:
@@ -1101,136 +946,14 @@ def inline_edit_wormhole(request):
         wormhole = get_object_or_404(Wormhole, pk=p['id'])
         p['opened'] = wormhole.opened
         p['closed'] = wormhole.closed
-        result = do_edit_wormhole(p, wormhole, util.get_display_name(eveigb, request))
+        result = util.do_edit_wormhole(p, wormhole, util.get_display_name(eveigb, request))
         if result:
+            set_dirty()
             return HttpResponse(result)
         else:
             return HttpResponse('Error: Wormhole edit function returned False - no changes made')
     else:
         return HttpResponse('Error: Invalid page access.')
-
-def do_edit_site(p, site, display_name):
-    """ Edits a site """
-    now = datetime.now()
-    changedName = False
-    changedScanid = False
-    changedType = False
-    changedWhere = False
-    changedDate = False
-    changedOpened = False
-    changedClosed = False
-    changedNotes = False
-    appendNotes = None
-    if p.has_key('name') and p['name']:
-        if p['name'] != site.name:
-            changedName = True
-            site.name = p['name']
-    if p.has_key('scanid') and p['scanid']:
-        if p['scanid'] != site.scanid:
-            changedScanid = True
-            appendNotes = 'Scanid: {0} >> {1}'.format(site.scanid, p['scanid'])
-            site.scanid = p['scanid'].upper()
-    if p.has_key('type') and p['type']:
-        if p['type'] != site.type:
-            changedType = True
-            site.type = p['type']
-    if p.has_key('where') and p['where']:
-        if p['where'] != site.where:
-            changedWhere = True
-            site.where = p['where']
-    if p.has_key('opened') and p['opened']:
-        if util.getBoolean(p['opened']) != site.opened:
-            changedOpened = True
-            site.opened = util.getBoolean(p['opened'])
-    else:
-        if site.opened == True:
-            site.opened = False
-            changedOpened = True
-    if p.has_key('closed') and p['closed']:
-        if util.getBoolean(p['closed']) != site.closed:
-            changedClosed = True
-            site.closed = util.getBoolean(p['closed'])
-    else:
-        if site.closed == True:
-            site.closed = False
-            changedClosed = True 
-    if p.has_key('notes') and p['notes']:
-        if p['notes'] != site.notes:
-            changedNotes = True
-            site.notes = p['notes']
-    if changedName or changedScanid or changedType or changedWhere or changedDate or changedOpened or changedClosed or changedNotes:
-        if appendNotes is not None:
-            site.notes += appendNotes
-        site.save()
-        change = SiteChange(site=site, date=now, user=display_name, changedName=changedName, changedScanid=changedScanid,
-                            changedType=changedType, changedWhere=changedWhere, changedDate=changedDate, changedOpened=changedOpened,
-                            changedClosed=changedClosed, changedNotes=changedNotes)
-        change.save()
-        return change
-    return False
-
-def do_edit_wormhole(p, wormhole, dispay_name):
-    """ Edits a wormhole """
-    now = datetime.now()
-    changedScanid = False
-    changedStart = False
-    changedDestination = False
-    changedTime = False
-    changedStatus = False
-    changedOpened = False
-    changedClosed = False
-    changedNotes = False
-    appendNotes = None
-    if p.has_key('scanid') and p['scanid']:
-        if p['scanid'] != wormhole.scanid:
-            changedScanid = True
-            appendNotes = ' Scanid: {0} >> {1}'.format(wormhole.scanid, p['scanid'])
-            wormhole.scanid = p['scanid'].upper()
-    if p.has_key('start') and p['start']:
-        if p['start'] != wormhole.start:
-            changedStart = True
-            wormhole.start = p['start']
-    if p.has_key('destination') and p['destination']:
-        if p['destination'] != wormhole.destination:
-            changedDestination = True
-            wormhole.destination = p['destination']
-    if p.has_key('time') and p['time']:
-        if p['time'] != wormhole.time:
-            changedTime = True
-            wormhole.time = p['time']
-    if p.has_key('status') and p['status']:
-        if p['status'] != wormhole.status:
-            changedStatus = True
-            wormhole.status = p['status']
-    if p.has_key('opened') and p['opened']:
-        if util.getBoolean(p['opened']) != wormhole.opened:
-            changedOpened = True
-            wormhole.opened = util.getBoolean(p['opened'])
-    else:
-        if wormhole.opened == True:
-            wormhole.opened = False
-            changedOpened = True
-    if p.has_key('closed') and p['closed']:
-        if util.getBoolean(p['closed']) != wormhole.closed:
-            changedClosed = True
-            wormhole.closed = util.getBoolean(p['closed'])
-    else:
-        if wormhole.closed == True:
-            wormhole.closed = False
-            changedClosed = True
-    if p.has_key('notes') and p['notes']:
-        if util.getBoolean(p['notes']) != wormhole.notes:
-            changedNotes = True
-            wormhole.notes = p['notes']
-    if changedScanid or changedStart or changedDestination or changedTime or changedStatus or changedOpened or changedClosed or changedNotes:
-        if appendNotes is not None:
-            wormhole.notes += appendNotes
-        wormhole.save()
-        change = WormholeChange(wormhole=wormhole, user=dispay_name, date=now, changedScanid=changedScanid, changedType=False, changedStart=changedStart, changedDestination=changedDestination, changedTime=changedTime, changedStatus=changedStatus, changedOpened=changedOpened, changedClosed=changedClosed, changedNotes=changedNotes)
-        change.save()
-        set_dirty()
-        return change
-    return False
 
 def no_access(request):
     """ Shown when the viewer is restricted from viewing the page """

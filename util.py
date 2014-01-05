@@ -1,6 +1,7 @@
 # Python
 import re
 import urllib2
+from datetime import datetime
 
 # sitemngr
 from models import (Site, SiteChange,
@@ -280,3 +281,125 @@ def get_settings(username):
         settings = Settings(user=username, editsInNewTabs=True, storeMultiple=True)
         settings.save()
     return settings
+
+def do_edit_site(p, site, display_name):
+    """ Edits a site """
+    now = datetime.now()
+    changedName = False
+    changedScanid = False
+    changedType = False
+    changedWhere = False
+    changedDate = False
+    changedOpened = False
+    changedClosed = False
+    changedNotes = False
+    appendNotes = None
+    if p.has_key('name') and p['name']:
+        if p['name'] != site.name:
+            changedName = True
+            site.name = p['name']
+    if p.has_key('scanid') and p['scanid']:
+        if p['scanid'] != site.scanid:
+            changedScanid = True
+            appendNotes = 'Scanid: {0} >> {1}'.format(site.scanid, p['scanid'])
+            site.scanid = p['scanid'].upper()
+    if p.has_key('type') and p['type']:
+        if p['type'] != site.type:
+            changedType = True
+            site.type = p['type']
+    if p.has_key('where') and p['where']:
+        if p['where'] != site.where:
+            changedWhere = True
+            site.where = p['where']
+    if p.has_key('opened') and p['opened']:
+        if getBoolean(p['opened']) != site.opened:
+            changedOpened = True
+            site.opened = getBoolean(p['opened'])
+    else:
+        if site.opened == True:
+            site.opened = False
+            changedOpened = True
+    if p.has_key('closed') and p['closed']:
+        if getBoolean(p['closed']) != site.closed:
+            changedClosed = True
+            site.closed = getBoolean(p['closed'])
+    else:
+        if site.closed == True:
+            site.closed = False
+            changedClosed = True 
+    if p.has_key('notes') and p['notes']:
+        if p['notes'] != site.notes:
+            changedNotes = True
+            site.notes = p['notes']
+    if changedName or changedScanid or changedType or changedWhere or changedDate or changedOpened or changedClosed or changedNotes:
+        if appendNotes is not None:
+            site.notes += appendNotes
+        site.save()
+        change = SiteChange(site=site, date=now, user=display_name, changedName=changedName, changedScanid=changedScanid,
+                            changedType=changedType, changedWhere=changedWhere, changedDate=changedDate, changedOpened=changedOpened,
+                            changedClosed=changedClosed, changedNotes=changedNotes)
+        change.save()
+        return change
+    return False
+
+def do_edit_wormhole(p, wormhole, dispay_name):
+    """ Edits a wormhole """
+    now = datetime.now()
+    changedScanid = False
+    changedStart = False
+    changedDestination = False
+    changedTime = False
+    changedStatus = False
+    changedOpened = False
+    changedClosed = False
+    changedNotes = False
+    appendNotes = None
+    if p.has_key('scanid') and p['scanid']:
+        if p['scanid'] != wormhole.scanid:
+            changedScanid = True
+            appendNotes = ' Scanid: {0} >> {1}'.format(wormhole.scanid, p['scanid'])
+            wormhole.scanid = p['scanid'].upper()
+    if p.has_key('start') and p['start']:
+        if p['start'] != wormhole.start:
+            changedStart = True
+            wormhole.start = p['start']
+    if p.has_key('destination') and p['destination']:
+        if p['destination'] != wormhole.destination:
+            changedDestination = True
+            wormhole.destination = p['destination']
+    if p.has_key('time') and p['time']:
+        if p['time'] != wormhole.time:
+            changedTime = True
+            wormhole.time = p['time']
+    if p.has_key('status') and p['status']:
+        if p['status'] != wormhole.status:
+            changedStatus = True
+            wormhole.status = p['status']
+    if p.has_key('opened') and p['opened']:
+        if getBoolean(p['opened']) != wormhole.opened:
+            changedOpened = True
+            wormhole.opened = getBoolean(p['opened'])
+    else:
+        if wormhole.opened == True:
+            wormhole.opened = False
+            changedOpened = True
+    if p.has_key('closed') and p['closed']:
+        if getBoolean(p['closed']) != wormhole.closed:
+            changedClosed = True
+            wormhole.closed = getBoolean(p['closed'])
+    else:
+        if wormhole.closed == True:
+            wormhole.closed = False
+            changedClosed = True
+    if p.has_key('notes') and p['notes']:
+        if getBoolean(p['notes']) != wormhole.notes:
+            changedNotes = True
+            wormhole.notes = p['notes']
+    if changedScanid or changedStart or changedDestination or changedTime or changedStatus or changedOpened or changedClosed or changedNotes:
+        if appendNotes is not None:
+            wormhole.notes += appendNotes
+        wormhole.save()
+        change = WormholeChange(wormhole=wormhole, user=dispay_name, date=now, changedScanid=changedScanid, changedType=False, changedStart=changedStart, changedDestination=changedDestination, changedTime=changedTime, changedStatus=changedStatus, changedOpened=changedOpened, changedClosed=changedClosed, changedNotes=changedNotes)
+        change.save()
+        return change
+    return False
