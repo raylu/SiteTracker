@@ -8,7 +8,7 @@ Index
 {% block javascript %}
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#overlay').load('http://tracker.talkinlocal.org/sitemngr/overlay/');
+        $('#overlay').load('/sitemngr/overlay/');
         $('.message').bind('click', function() {
            $(this).hide(250);
         });
@@ -28,7 +28,7 @@ Index
         if (flags == '')
           flags = '_'
         $('#search_results').show();
-        $('#search_results').load('http://tracker.talkinlocal.org/sitemngr/get_search_results/' + keyword + '/' + flags);
+        $('#search_results').load('/sitemngr/get_search_results/' + keyword + '/' + flags);
     }
     function toggleSection(which) {
        $("#" + which).toggle(200);

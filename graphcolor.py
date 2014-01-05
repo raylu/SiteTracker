@@ -7,6 +7,9 @@ import pytz
 import os
 from . import util
 
+BASE = os.getcwd()
+SAVE = BASE + '/sitemngr/static/pictures/graph.png/'
+
 cmap = {}
 cmap['HS'] = 'gold'
 cmap['LS'] = 'purple'
@@ -94,7 +97,7 @@ def graph():
         os.remove('/var/www/mysite/sitemngr/static/pictures/graph.png')
     except OSError:
         pass
-    g.draw('/var/www/mysite/sitemngr/static/pictures/graph.png')
+    g.draw(SAVE)
     print 'Graphed', datetime.now().strftime('%m/%d/%Y %H:%M:%S')
 
 def repeat():

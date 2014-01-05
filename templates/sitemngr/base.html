@@ -96,7 +96,7 @@
                 </ul>
                 <ul class="nav pull-right">
                     {% if eveigb.is_igb and not eveigb.trusted %}
-                        <li><a onclick="CCPEVE.requestTrust('http://tracker.talkinlocal.org/sitemngr/*');">Click to trust</a></li>
+                        <li><a onclick="CCPEVE.requestTrust('/sitemngr/*');">Click to trust</a></li>
                     {% else %}
                         <li><a>Welcome, {{ displayname }}</a></li>
                     {% endif %}

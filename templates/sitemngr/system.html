@@ -9,7 +9,7 @@ System Info
     $(document).ready(function()
     {
         {% if kspace %}
-            $('#jumps').load('http://tracker.talkinlocal.org/sitemngr/get_tradehub_jumps/{{ system }}/');
+            $('#jumps').load('/sitemngr/get_tradehub_jumps/{{ system }}/');
         {% endif %}
     });
 </script>
