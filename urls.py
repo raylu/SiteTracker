@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.conf.urls import patterns, url
-from django.conf.urls.static import static
 
 urlpatterns = patterns('',
    url(r'^$', 'sitemngr.views.index'),
@@ -36,4 +35,4 @@ urlpatterns = patterns('',
    url(r'^deletewormhole/(\d+)', 'sitemngr.views.delete_wormhole'),
    url(r'^inlineeditsite/', 'sitemngr.views.inline_edit_site'),
    url(r'^inlineeditwormhole/', 'sitemngr.views.inline_edit_wormhole'),
-) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+)
