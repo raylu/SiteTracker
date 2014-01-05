@@ -22,7 +22,7 @@
             <label id="l_scanid">Scan ID</label>
         </td>
         <td>
-            <input type="text" id="t_scanid" name="scanid" placeholder="AAA, BBB, LOL ..." value="{% if site %}{{ site.scanid }}{% elif g_scanid %}{{ g_scanid }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+            <input type="text" id="t_scanid" onkeyup="validate();" name="scanid" placeholder="AAA, BBB, LOL ..." value="{% if site %}{{ site.scanid }}{% elif g_scanid %}{{ g_scanid }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
         </td>
     </tr>
     <tr>
@@ -30,7 +30,7 @@
             <label>Location of site</label>
         </td>
         <td>
-            <input type="text" name="where" placeholder="Jita, J123456 ..." value="{% if site %}{{ site.where }}{% elif g_system %}{{ g_system }}{% else %}{{ eveigb.solarsystemname }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+            <input type="text" id="t_where" onkeyup="validate();" name="where" placeholder="Jita, J123456 ..." value="{% if site %}{{ site.where }}{% elif g_system %}{{ g_system }}{% else %}{{ eveigb.solarsystemname }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
         </td>
     </tr>
     <tr>
@@ -38,7 +38,7 @@
             <label>Name of site</label>
         </td>
         <td>
-            <input type="text" name="name" placeholder="Core Stronghold, Quarantine Area ..." value="{% if site %}{{ site.name }}{% elif g_name %}{{ g_name }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+            <input type="text" id="t_name" onkeyup="validate();" name="name" placeholder="Core Stronghold, Quarantine Area ..." value="{% if site %}{{ site.name }}{% elif g_name %}{{ g_name }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
         </td>
     </tr>
     <tr>

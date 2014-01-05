@@ -7,25 +7,16 @@ Add Site
 {% block javascript %}
 <script type="text/javascript">
     $(document).ready(function() {
-        var sid = $('#t_scanid').val();
-        if (sid.length != 3) {
-            $('#submit_button').attr('disabled', 'disabled');
-            $('#l_scanid').css('color', 'red');
-        }
-        $('#t_scanid').keyup(function() {
-            var sid = $('#t_scanid').val();
-            if (sid.length == 3)
-            {
-                $('#submit_button').removeAttr("disabled");
-                $('#l_scanid').css('color', 'black');
-            }
-            else
-            {
-                $('#submit_button').attr('disabled', 'disabled');
-                $('#l_scanid').css('color', 'red');
-            }
-        });
+        validate();
     });
+    function validate() {
+        if ($('#t_scanid').val().length == 3 && $('#t_name').val().length > 0 && $('#t_where').val().length > 0) {
+            $('#submit_button').removeAttr("disabled");
+        }
+        else {
+            $('#submit_button').attr('disabled', 'disabled');
+        }
+    }
 </script>
 {% endblock %}
 

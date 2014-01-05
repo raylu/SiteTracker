@@ -22,7 +22,7 @@
             <label id="l_scanid">Scan ID</label>
         </td>
         <td>
-            <input type="text" id="t_scanid" name="scanid" placeholder="AAA, BBB, LOL ..." value="{% if wormhole %}{{ wormhole.scanid }}{% elif g_scanid %}{{ g_scanid }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+            <input type="text" id="t_scanid" onkeyup="validate();" name="scanid" placeholder="AAA, BBB, LOL ..." value="{% if wormhole %}{{ wormhole.scanid }}{% elif g_scanid %}{{ g_scanid }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
         </td>
     </tr>
     <tr>
@@ -30,7 +30,7 @@
             <label>Started in</label>
         </td>
         <td>
-            <input type="text" name="start" placeholder="Jita, J123456 ..." value="{% if wormhole %}{{ wormhole.start }}{% elif g_start %}{{ g_start }}{% else %}{{ eveigb.solarsystemname }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+            <input type="text" id="t_start" onkeyup="validate();" name="start" placeholder="Jita, J123456 ..." value="{% if wormhole %}{{ wormhole.start }}{% elif g_start %}{{ g_start }}{% else %}{{ eveigb.solarsystemname }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
         </td>
     </tr>
     <tr>
@@ -38,7 +38,7 @@
             <label>Leads to</label>
         </td>
         <td>
-            <input type="text" name="destination" placeholder="Jita, J123456 ..." value="{% if wormhole %}{{ wormhole.destination }}{% elif g_end %}{{ g_end }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
+            <input type="text" id="t_destination" onkeyup="validate();" name="destination" placeholder="Jita, J123456 ..." value="{% if wormhole %}{{ wormhole.destination }}{% elif g_end %}{{ g_end }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}>
         </td>
     </tr>
     <tr>

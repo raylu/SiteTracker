@@ -162,7 +162,6 @@ Index
         }
     }
     function checkNew(type) {
-        console.log('Check new for ' + type + ' called');
         if (type === 'wormhole') {
             if ($('#w_new_scanid').val().length== 3 && $('#w_new_start').val().length > 0 && $('#w_new_end').val().length > 0)
                 $('#w_new_submit').removeAttr("disabled");
