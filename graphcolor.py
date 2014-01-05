@@ -8,7 +8,7 @@ import os
 from . import util
 
 BASE = os.getcwd()
-SAVE = BASE + '/sitemngr/static/pictures/graph.png/'
+SAVE = BASE + '/sitemngr/static/pictures/graph.png'
 
 cmap = {}
 cmap['HS'] = 'gold'
