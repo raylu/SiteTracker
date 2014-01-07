@@ -21,6 +21,9 @@ Index
             $('#alert_notices').fadeOut(5000);
             $('#alert_flag').fadeOut(5000);
         }, 30000);
+        setInterval(function() {
+            $('#img_graph').load('/static/pictures/graph.png');
+        });
     });
     function get_tags() {
         var keyword = $('#omnibox').val();
@@ -271,7 +274,7 @@ Index
     <span style="color: gray; text-align: left;">Loading ...</span>
 </div>
 <div id="graph" style="border: 1px solid gray; display: none;">
-    <img src="{% static 'pictures/graph.png' %}" alt="Current graph not found"></img><br>
+    <img id="img_graph" src="{% static 'pictures/graph.png' %}" alt="Current graph not found"></img><br>
     <p>
         <b>System outline colors</b>: HS = gold, LS = purple, NS = brown, C1 = blue, C2 = green, C3 = yellow, C4 = orange, C5 = red, C6 = black, not found = gray<br>
         <b>Line styles</b>: Fresh = bold, < 50% mass & < 50% time = dashed, EoL & VoC = dotted, Unknown = standard<br>
