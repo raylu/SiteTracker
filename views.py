@@ -183,7 +183,7 @@ def add_site(request):
         g = request.GET
         g_scanid = g['scanid'] if 'scanid' in g else None
         g_system = g['system'] if 'system' in g else None
-        g_tyge = g['type'] if 'type' in g else None
+        g_type = g['type'] if 'type' in g else None
         g_name = g['name'] if 'name' in g else None
     return render(request, 'sitemngr/addsite.html', {'request': request, 'displayname': util.get_display_name(eveigb, request),
              'isForm': True, 'finish_msg': 'Store new site into the database:', 'g_scanid': g_scanid, 'g_system': g_system, 'g_type': g_type, 'g_name': g_name, 'timenow': now})

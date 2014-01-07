@@ -50,6 +50,8 @@
                 <select name="type">
                     {% if site %}
                         <option>{{ site.type }}</option>
+                    {% elif g_type %}
+                        <option>{{ g_type }}</option>
                     {% endif %}
                     <option>Combat</option>
                     <option>Relic</option>
