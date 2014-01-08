@@ -5,7 +5,3 @@ A Django app for managing anomalies and signatures in EVE Online for the OI alli
 ## Credits
 
 All EVE Online and CCP references belong to CCP.
-
-## License
-
-http://creativecommons.org/licenses/by-nc-sa/3.0/deed.en_US
