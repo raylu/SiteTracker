@@ -580,13 +580,15 @@ def recent_scan_edits(request):
     wormholes = []
     count = 0
     for s in SiteChange.objects.filter(changedScanid=True).order_by('-id'):
-        sites.append(s.site)
+        if not site in sites:
+            sites.append(s.site)
         count += 1
         if count == int(appSettings.RECENT_EDITS_LIMIT) + 1:
             break
     count = 0
     for w in WormholeChange.objects.filter(changedScanid=True).order_by('-id'):
-        wormholes.append(w.wormhole)
+        if not wormhole in wormholes:
+            wormholes.append(w.wormhole)
         count += 1
         if count == int(appSettings.RECENT_EDITS_LIMIT) + 1:
             break
