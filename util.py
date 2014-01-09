@@ -107,7 +107,7 @@ def p_get_all_data(line):
             data['issite'] = False
             data['type'] = section.replace('\r', '').replace('\n', '')
             continue
-        if '%' in section or 'AU' in section:
+        if '%' in section or 'AU' in section or re.match(r'^\d+ km$', section.strip()):
             continue
         data['name'] = section.replace('\r', '').replace('\n', '')
     return data
