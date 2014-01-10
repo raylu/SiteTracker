@@ -7,7 +7,7 @@ from datetime import datetime
 from models import (Site, SiteSnapshot,
                      Wormhole, WormholeSnapshot,
                      PasteUpdated, Settings)
-from . import settings as appSettings
+import settings as appSettings
 
 # eve_db
 from eve_db.models import MapSolarSystem
@@ -78,7 +78,7 @@ def get_last_update():
 def p_get_all_data(line):
     """ Parses all information from a line from the discovery scanner """
     siteTypes = ['Cosmic Signature', 'Data', 'Relic', 'Gas']
-    anomTypes = ['Cosmic Anomaly', 'Combat Site', 'Ore Site']  # 'Gas Site' ?
+    anomTypes = ['Cosmic Anomaly', 'Combat Site', 'Ore Site']
     wormholeTypes = ['Wormhole', 'Unstable Wormhole']
     data = {}
     # defaults to ensure that we don't get a KeyError trying to access information not pulled from the line
@@ -183,6 +183,7 @@ class Result:
         return '<Result %s-%s>' % (self.link, self.text)
 
 class Flag:
+    """ Search limiter for use by the get_search_results method """
     def __init__(self, flags):
         self.open_only = 'o' in flags
         self.closed_only = 'c' in flags
@@ -282,9 +283,26 @@ def get_settings(username):
         settings.save()
     return settings
 
+def snapshot(model):
+    """
+        Create and return SiteSnapshot/WormholeSnapshot
+        Note: The returned snapshot is NOT SAVED!
+    """
+    if isinstance(model, Site):
+        snap = SiteSnapshot(site=model, date=datetime.utcnow(), user=model.user, scanid=model.scanid,
+            type=model.type, where=model.where, opened=model.opened, closed=model.closed, notes=model.notes)
+        return snap
+    elif isinstance(model, Wormhole):
+        snap = WormholeSnapshot(wormhole=model, date=datetime.utcnow(), scanid=model.scanid,
+            start=model.start, destination=model.destination, time=model.time, status=model.status,
+            opened=model.opened, closed=model.closed, notes=model.notes)
+        return snap
+    return None
+
 def do_edit_site(p, site, display_name):
     """ Edits a site """
-    now = datetime.now()
+    snap = snapshot(site)
+    snap.save()
     changedName = False
     changedScanid = False
     changedType = False
@@ -335,17 +353,13 @@ def do_edit_site(p, site, display_name):
         if appendNotes is not None:
             site.notes += appendNotes
         site.save()
-        # TODO Refactor out SiteChange for SiteSnapshot
-        change = SiteChange(site=site, date=now, user=display_name, changedName=changedName, changedScanid=changedScanid,
-                            changedType=changedType, changedWhere=changedWhere, changedDate=changedDate, changedOpened=changedOpened,
-                            changedClosed=changedClosed, changedNotes=changedNotes)
-        change.save()
-        return change
+        return snap
     return False
 
 def do_edit_wormhole(p, wormhole, dispay_name):
     """ Edits a wormhole """
-    now = datetime.now()
+    snap = snapshot(wormhole)
+    snap.save()
     changedScanid = False
     changedStart = False
     changedDestination = False
@@ -400,10 +414,7 @@ def do_edit_wormhole(p, wormhole, dispay_name):
         if appendNotes is not None:
             wormhole.notes += appendNotes
         wormhole.save()
-        # TODO: Refactor out WormholeChange for WormholeSnapshot
-        change = WormholeChange(wormhole=wormhole, user=dispay_name, date=now, changedScanid=changedScanid, changedType=False, changedStart=changedStart, changedDestination=changedDestination, changedTime=changedTime, changedStatus=changedStatus, changedOpened=changedOpened, changedClosed=changedClosed, changedNotes=changedNotes)
-        change.save()
-        return change
+        return snap
     return False
 
 class PasteData:
@@ -419,6 +430,7 @@ class PasteData:
         return '<PasteData-%s-%s>' % (self.scanid, self.system)
 
 class PasteMatch:
+    """ Used by the after downtime scan page to match a scanid with its allowed matches """
     def __init__(self, scanid, name, p_type, allowed):
         self.scanid = scanid
         self.name = name
