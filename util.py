@@ -4,9 +4,9 @@ import urllib2
 from datetime import datetime
 
 # sitemngr
-from models import (Site, SiteChange,
-                             Wormhole, WormholeChange,
-                             PasteUpdated, Settings)
+from models import (Site, SiteSnapshot,
+                     Wormhole, WormholeSnapshot,
+                     PasteUpdated, Settings)
 from . import settings as appSettings
 
 # eve_db
@@ -37,9 +37,9 @@ def get_last_update():
     """ Returns the object that has the most recent date """
     # add the last of each type of data to the list
     site = Site.objects.last()
-    s_change = SiteChange.objects.last()
+    s_change = SiteSnapshot.objects.last()
     wormhole = Wormhole.objects.last()
-    w_change = WormholeChange.objects.last()
+    w_change = WormholeSnapshot.objects.last()
     paste = PasteUpdated.objects.last()
     dates = []
     # only add dates belonging to actual objects (prevents trying to get the data of a None object)
@@ -68,11 +68,11 @@ def get_last_update():
             return Wormhole.objects.get(date=date)
         except Wormhole.DoesNotExist:
             try:
-                return SiteChange.objects.get(date=date)
-            except SiteChange.DoesNotExist:
+                return SiteSnapshot.objects.get(date=date)
+            except SiteSnapshot.DoesNotExist:
                 try:
-                    return WormholeChange.objects.get(date=date)
-                except WormholeChange.DoesNotExist:
+                    return WormholeSnapshot.objects.get(date=date)
+                except WormholeSnapshot.DoesNotExist:
                     return PasteUpdated.objects.get(date=date)
 
 def p_get_all_data(line):
@@ -118,8 +118,8 @@ class SpaceObject:
         self.id = i
         self.what = what
         self.name = name
-    def __unicode__(self):
-        return unicode('%s: %s %s' % (self.id, self.what, self.name))
+    def __repr__(self):
+        return '<SpaceObject-%s-%s-%s>' % (self.id, self.what, self.name)
 
 def is_system_in_chain(system):
     """ Returns if the syetem is directly in the chain """
@@ -179,8 +179,8 @@ class Result:
     def __init__(self, link, text):
         self.link = 'http://tracker.talkinlocal.org/sitemngr/' + link
         self.text = text
-    def __unicode__(self):
-        return unicode('<Result %s-%s>' % (self.link, self.text))
+    def __repr__(self):
+        return '<Result %s-%s>' % (self.link, self.text)
 
 class Flag:
     def __init__(self, flags):
@@ -192,7 +192,7 @@ class Flag:
         self.sites = 's' in flags
         self.universe = 'u' in flags
         self.all = flags == '_'
-    def __unicode__(self):
+    def __repr__(self):
         return 'Flag: Open=%s Closed=%s Chain=%s Universe=%s Systems=%s Wormholes=%s Sites=%s' % (self.open_only, self.closed_only, self.chain, self.universe, self.systems, self.wormholes, self.sites)
 
 def get_system_name(systemid):
@@ -335,6 +335,7 @@ def do_edit_site(p, site, display_name):
         if appendNotes is not None:
             site.notes += appendNotes
         site.save()
+        # TODO Refactor out SiteChange for SiteSnapshot
         change = SiteChange(site=site, date=now, user=display_name, changedName=changedName, changedScanid=changedScanid,
                             changedType=changedType, changedWhere=changedWhere, changedDate=changedDate, changedOpened=changedOpened,
                             changedClosed=changedClosed, changedNotes=changedNotes)
@@ -399,7 +400,40 @@ def do_edit_wormhole(p, wormhole, dispay_name):
         if appendNotes is not None:
             wormhole.notes += appendNotes
         wormhole.save()
+        # TODO: Refactor out WormholeChange for WormholeSnapshot
         change = WormholeChange(wormhole=wormhole, user=dispay_name, date=now, changedScanid=changedScanid, changedType=False, changedStart=changedStart, changedDestination=changedDestination, changedTime=changedTime, changedStatus=changedStatus, changedOpened=changedOpened, changedClosed=changedClosed, changedNotes=changedNotes)
         change.save()
         return change
     return False
+
+class PasteData:
+    """ Dynamically constructed class sent to /sitemngr/addsite and  /sitemngr/addwormhole from /sitemngr/paste  """
+    def __init__(self, p_scanid='', p_system=str(appSettings.HOME_SYSTEM), p_name='', p_type='Anomoly', p_isSite=True, p_isWormhole=False):
+        self.scanid = p_scanid
+        self.system = p_system
+        self.name = p_name
+        self.type = p_type
+        self.isSite = p_isSite
+        self.iswormhole = p_isWormhole
+    def __repr__(self):
+        return '<PasteData-%s-%s>' % (self.scanid, self.system)
+
+class PasteMatch:
+    def __init__(self, scanid, name, p_type, allowed):
+        self.scanid = scanid
+        self.name = name
+        self.p_type = p_type
+        self.allowed = allowed
+    def __repr__(self):
+        return '<PasteMatch-%s-%s-%s-%s>' % (self.scanid, self.name, self.p_type, self.allowed)
+
+class KillReport:
+    """ Dynamically constructed class sent to /sitemngr/checkkills """
+    def __init__(self, system=appSettings.HOME_SYSTEM, systemid=appSettings.HOME_SYSTEM_ID, npc=0, ship=0, pod=0):
+        self.system = system
+        self.systemid = systemid
+        self.npc = npc
+        self.ship = ship
+        self.pod = pod
+    def __repr__(self):
+        return '<KillReport-%s-%s-%s-%s-%s>' % (self.system, self.systemid, self.npc, self.ship, self.pod)

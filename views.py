@@ -1,4 +1,3 @@
-# Python
 from datetime import datetime
 import re
 import pytz
@@ -12,10 +11,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
 # sitemngr
-from models import (Site, SiteChange,
-                    Wormhole, WormholeChange,
-                    PasteData, PasteUpdated,
-                    KillReport, PasteMatch, Settings)
+from models import (Site, SiteSnapshot,
+                    Wormhole, WormholeSnapshot,
+                    PasteUpdated, Settings)
 import settings as appSettings
 import util
 
@@ -334,18 +332,18 @@ def paste(request):
                     if n == site.name:
                         exact_matches.append(i)
                 if site.isAnom():
-                    paste_data.append(PasteMatch(scanid=site.scanid, name=site.name, p_type='anom', allowed=[a + ': ' + names[a] for a in new_anoms] if len(exact_matches) == 0 else [e + ':' + names[e] for e in exact_matches]))
+                    paste_data.append(util.PasteMatch(scanid=site.scanid, name=site.name, p_type='anom', allowed=[a + ': ' + names[a] for a in new_anoms] if len(exact_matches) == 0 else [e + ':' + names[e] for e in exact_matches]))
                 else:
-                    paste_data.append(PasteMatch(scanid=site.scanid, name=site.name, p_type='site', allowed=[s + ': ' + names[s] for s in new_sites] if len(exact_matches) == 0 else [e + ':' + names[e] for e in exact_matches]))
+                    paste_data.append(util.PasteMatch(scanid=site.scanid, name=site.name, p_type='site', allowed=[s + ': ' + names[s] for s in new_sites] if len(exact_matches) == 0 else [e + ':' + names[e] for e in exact_matches]))
             allWormholes = Wormhole.objects.filter(start=system, closed=False)
             if len(new_wormholes) > 0:
                 for wormhole in allWormholes:
                     wormholes.append(wormhole)
-                    paste_data.append(PasteMatch(scanid=wormhole.scanid, name='%s > %s' % (wormhole.start, wormhole.destination), p_type='wormhole', allowed=new_wormholes))
+                    paste_data.append(util.PasteMatch(scanid=wormhole.scanid, name='%s > %s' % (wormhole.start, wormhole.destination), p_type='wormhole', allowed=new_wormholes))
             else:
                 for wormhole in allWormholes:
                     wormholes.append(wormhole)
-                    paste_data.append(PasteMatch(scanid=wormhole.scanid, name='%s > %s' % (wormhole.start, wormhole.destination), p_type='wormhole', allowed=new_sites))
+                    paste_data.append(util.PasteMatch(scanid=wormhole.scanid, name='%s > %s' % (wormhole.start, wormhole.destination), p_type='wormhole', allowed=new_sites))
             for a in new_anoms:
                 newids.append(util.SpaceObject(a, 'Anomaly', names[a]))
             for s in new_sites:
@@ -371,6 +369,7 @@ def paste(request):
                     if v == '-CLOSE-':
                         site.closed = True
                         site.save()
+                        # TODO: Refactor out SiteChange for SiteSnapshot
                         change = SiteChange(site=site, date=now, user=util.get_display_name(eveigb, request), changedName=False, changedScanid=False,
                                     changedType=False, changedWhere=False, changedDate=False, changedOpened=False,
                                     changedClosed=True, changedNotes=False)
@@ -379,6 +378,7 @@ def paste(request):
                         site.notes += ' Scanid: {0} >> {1}'.format(site.scanid, v)
                         site.scanid = v
                         site.save()
+                        # TODO: Refactor out SiteChange for SiteSnapshot
                         change = SiteChange(site=site, date=now, user=util.get_display_name(eveigb, request), changedName=False, changedScanid=True,
                                     changedType=False, changedWhere=False, changedDate=False, changedOpened=False,
                                     changedClosed=False, changedNotes=False)
@@ -388,6 +388,7 @@ def paste(request):
                     if v == '-CLOSE-':
                         wormhole.closed = True
                         wormhole.save()
+                        # TODO: Refactor out WormholeChange for WormholeSnapshot
                         change = WormholeChange(wormhole=wormhole, user=util.get_display_name(eveigb, request), date=now, changedScanid=False, changedType=False,
                                      changedStart=False, changedDestination=False, changedTime=False, changedStatus=False,
                                      changedOpened=False, changedClosed=True, changedNotes=False)
@@ -396,6 +397,7 @@ def paste(request):
                         wormhole.notes += 'Scanid: {0} >> {1}'.format(wormhole.scanid, v)
                         wormhole.scanid = v
                         wormhole.save()
+                        # TODO: Refactor out WormholeChange for WormholeSnapshot
                         change = WormholeChange(wormhole=wormhole, user=util.get_display_name(eveigb, request), date=now, changedScanid=True, changedType=False,
                                      changedStart=False, changedDestination=False, changedTime=False, changedStatus=False,
                                      changedOpened=False, changedClosed=False, changedNotes=False)
@@ -415,7 +417,7 @@ def paste(request):
                 notfound.extend(Wormhole.objects.filter(start=system, closed=False))
                 for line in paste.split('\n'):
                     found = False
-                    newP = PasteData(p_system=system)
+                    newP = util.PasteData(p_system=system)
                     data = util.p_get_all_data(line)
                     newP.isSite = True if data['issite'] else False
                     newP.isWormhole = True if data['iswormhole'] else False
@@ -604,6 +606,7 @@ def recent_scan_edits(request):
     sites = []
     wormholes = []
     count = 0
+    # TODO: Refactor out SiteChange for SiteSnapshot
     for s in SiteChange.objects.filter(changedScanid=True).order_by('-id'):
         if not s.site in sites:
             sites.append(s.site)
@@ -644,6 +647,7 @@ def stats(request):
         return no_access(request)
     numSites = len(Site.objects.all())
     numWormholes = len(Wormhole.objects.all())
+    # TODO: Refactor out SiteChange for SiteSnapshot
     numEdits = len(SiteChange.objects.all()) + len(WormholeChange.objects.all())
     numPastes = len(PasteUpdated.objects.all())
     con = {}
@@ -657,6 +661,7 @@ def stats(request):
             con[wormhole_change.creator] += 1
         else:
             con[wormhole_change.creator] = 1
+    # TODO: Refactor out SiteChange for SiteSnapshot
     for site_change in SiteChange.objects.all():
         if site_change.user in con:
             con[site_change.user] += 1
@@ -699,7 +704,7 @@ def check_kills(request):
         kills = evemap.kills_by_system()[0]
         for k in kills.iteritems():
             if k[0] in retSys:
-                r = KillReport(system=util.get_system_name(k[0]), systemid=k[0], npc=k[1]['faction'], ship=k[1]['ship'], pod=k[1]['pod'])
+                r = util.KillReport(system=util.get_system_name(k[0]), systemid=k[0], npc=k[1]['faction'], ship=k[1]['ship'], pod=k[1]['pod'])
                 reports.append(r)
     return render(request, 'sitemngr/checkkills.html', {'displayname': util.get_display_name(eveigb, request), 'systems': systems, 'reports': reports})
 
@@ -940,6 +945,7 @@ def mass_close(request):
             wormhole = Wormhole.objects.get(id=k)
             wormhole.closed = True
             wormhole.save()
+            # TODO: Refactor out WormholeChange for WormholeSnapshot
             WormholeChange(wormhole=wormhole, user=util.get_display_name(eveigb, request), date=datetime.utcnow(), changedScanid=False, changedType=False, changedStart=False, changedDestination=False, changedTime=False, changedStatus=False, changedOpened=False, changedClosed=True, changedNotes=False).save()
         set_dirty()
     wormholes = Wormhole.objects.filter(closed=False)
