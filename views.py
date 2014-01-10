@@ -147,13 +147,13 @@ def add(request):
 # ==============================
 
 def view_site(request, siteid):
-    """ Views all the data on a particular site, including a list of changes """
+    """ Views all the data on a particular site, including a list of snapshots """
     eveigb = IGBHeaderParser(request)
     if not util.can_view(eveigb, request):
         return no_access(request)
     site = get_object_or_404(Site, pk=siteid)
-    changes = site.getChanges()
-    return render(request, 'sitemngr/viewsite.html', {'displayname': util.get_display_name(eveigb, request), 'isForm': False, 'site': site, 'changes': changes})
+    snapshots = site.get_snapshots()
+    return render(request, 'sitemngr/viewsite.html', {'displayname': util.get_display_name(eveigb, request), 'isForm': False, 'site': site, 'snapshots': snapshots})
 
 def edit_site(request, siteid):
     """ Edit site page for changing data """
@@ -216,13 +216,13 @@ def add_site(request):
 # ==============================
 
 def view_wormhole(request, wormholeid):
-    """ Views all the data on a particular wormhole, including a list of changes """
+    """ Views all the data on a particular wormhole, including a list of snapshots """
     eveigb = IGBHeaderParser(request)
     if not util.can_view(eveigb, request):
         return no_access(request)
     wormhole = get_object_or_404(Wormhole, pk=wormholeid)
-    changes = wormhole.getChanges()
-    return render(request, 'sitemngr/viewwormhole.html', {'displayname': util.get_display_name(eveigb, request), 'isForm': False, 'wormhole': wormhole, 'changes': changes})
+    snapshots = wormhole.get_snapshots()
+    return render(request, 'sitemngr/viewwormhole.tml', {'displayname': util.get_display_name(eveigb, request), 'isForm': False, 'wormhole': wormhole, 'snapshots': snapshots})
 
 def edit_wormhole(request, wormholeid):
     """ Edit wormhole page for changing data """

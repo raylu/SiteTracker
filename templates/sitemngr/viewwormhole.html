@@ -19,80 +19,37 @@ View Wormhole
 
 <br><hr>
 
-<h3>Changes</h3>
-<h5>A tick in the box denotes a change in that data</h5>
+<h3>Snapshots</h3>
 
-{% if changes %}
+{% if snapshots %}
     <table>
         <tr>
-            <th>
-                Who
-            </th>
-            <th>
-                When
-            </th>
-            <th>
-                Scanid
-            </th>
-            <th>
-                Start
-            </th>
-            <th>
-                Destination
-            </th>
-            <th>
-                Time
-            </th>
-            <th>
-                Status
-            </th>
-            <th>
-                Opened
-            </th>
-            <th>
-                Closed
-            </th>
-            <th>
-                Notes
-            </th>
+            <th>User</th>
+            <th>Date</th>
+            <th>Scanid</th>
+            <th>Start</th>
+            <th>Destination</th>
+            <th>Status</th>
+            <th>Opened</th>
+            <th>Closed</th>
+            <th>Notes</th>
         </tr>
-        {% for c in changes %}
+        {% for snap in snapshots %}
             <tr>
-                <td>
-                    {{ c.user }}
-                </td>
-                <td>
-                    {{ c.date|date:'H:i, M d, y' }}
-                </td>
-                <td>
-                    <input type="checkbox" {% if c.changedScanid %}checked="checked"{% endif %}>
-                </td>
-                <td>
-                    <input type="checkbox" {% if c.changedStart %}checked="checked"{% endif %}>
-                </td>
-                <td>
-                    <input type="checkbox" {% if c.changedDestination %}checked="checked"{% endif %}>
-                </td>
-                <td>
-                    <input type="checkbox" {% if c.changedTime %}checked="checked"{% endif %}>
-                </td>
-                <td>
-                    <input type="checkbox" {% if c.changedStatus %}checked="checked"{% endif %}>
-                </td>
-                <td>
-                    <input type="checkbox" {% if c.changedOpened %}checked="checked"{% endif %}>
-                </td>
-                <td>
-                    <input type="checkbox" {% if c.changedClosed %}checked="checked"{% endif %}>
-                </td>
-                <td>
-                    <input type="checkbox" {% if c.changedNotes %}checked="checked"{% endif %}>
-                </td>
+                <td>{{ snap.user }}</td>
+                <td>{{ snap.date|date:'H:i, M d, y' }}</td>
+                <td>{{ snap.scanid }}</td>
+                <td>{{ snap.start }}</td>
+                <td>{{ snap.destination }}</td>
+                <td>{{ snap.status }}</td>
+                <td>{{ snap.opened }}</td>
+                <td>{{ snap.closed }}</td>
+                <td>{{ snap.notes }}</td>
             </tr>
         {% endfor %}
     </table>
 {% else %}
-    <p>No changes</p>
+    <p>No snapshots - this model has not been changed</p>
 {% endif %}
 
 </center>

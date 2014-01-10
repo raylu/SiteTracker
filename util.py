@@ -294,7 +294,7 @@ def snapshot(model):
         return snap
     elif isinstance(model, Wormhole):
         snap = WormholeSnapshot(wormhole=model, date=datetime.utcnow(), scanid=model.scanid,
-            start=model.start, destination=model.destination, time=model.time, status=model.status,
+            start=model.start, destination=model.destination, status=model.status,
             opened=model.opened, closed=model.closed, notes=model.notes)
         return snap
     return None
@@ -382,10 +382,6 @@ def do_edit_wormhole(p, wormhole, dispay_name):
         if p['destination'] != wormhole.destination:
             changedDestination = True
             wormhole.destination = p['destination']
-    if p.has_key('time') and p['time']:
-        if p['time'] != wormhole.time:
-            changedTime = True
-            wormhole.time = p['time']
     if p.has_key('status') and p['status']:
         if p['status'] != wormhole.status:
             changedStatus = True
