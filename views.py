@@ -366,42 +366,23 @@ def paste(request):
                     continue
                 if util.is_site(k):
                     site = util.get_site(k)
+                    util.snapshot(site).save()
                     if v == '-CLOSE-':
                         site.closed = True
                         site.save()
-                        # TODO: Refactor out SiteChange for SiteSnapshot
-                        change = SiteChange(site=site, date=now, user=util.get_display_name(eveigb, request), changedName=False, changedScanid=False,
-                                    changedType=False, changedWhere=False, changedDate=False, changedOpened=False,
-                                    changedClosed=True, changedNotes=False)
-                        change.save()
                     else:
                         site.notes += ' Scanid: {0} >> {1}'.format(site.scanid, v)
                         site.scanid = v
-                        site.save()
-                        # TODO: Refactor out SiteChange for SiteSnapshot
-                        change = SiteChange(site=site, date=now, user=util.get_display_name(eveigb, request), changedName=False, changedScanid=True,
-                                    changedType=False, changedWhere=False, changedDate=False, changedOpened=False,
-                                    changedClosed=False, changedNotes=False)
-                        change.save()
                 else:
                     wormhole = util.get_wormhole(k)
+                    util.snapshot(wormhole).save()
                     if v == '-CLOSE-':
                         wormhole.closed = True
                         wormhole.save()
-                        # TODO: Refactor out WormholeChange for WormholeSnapshot
-                        change = WormholeChange(wormhole=wormhole, user=util.get_display_name(eveigb, request), date=now, changedScanid=False, changedType=False,
-                                     changedStart=False, changedDestination=False, changedTime=False, changedStatus=False,
-                                     changedOpened=False, changedClosed=True, changedNotes=False)
-                        change.save()
                     else:
                         wormhole.notes += 'Scanid: {0} >> {1}'.format(wormhole.scanid, v)
                         wormhole.scanid = v
                         wormhole.save()
-                        # TODO: Refactor out WormholeChange for WormholeSnapshot
-                        change = WormholeChange(wormhole=wormhole, user=util.get_display_name(eveigb, request), date=now, changedScanid=True, changedType=False,
-                                     changedStart=False, changedDestination=False, changedTime=False, changedStatus=False,
-                                     changedOpened=False, changedClosed=False, changedNotes=False)
-                        change.save()
             set_dirty()
             return redirect('/sitemngr/')
         else:
@@ -575,7 +556,7 @@ def delete_wormhole(request, wormholeid):
         return redirect('/sitemngr/')
     try:
         wormhole = Wormhole.objects.get(id=wormholeid)
-        for c in WormholeChange.objects.filter(wormhole=wormhole):
+        for c in WormholeSnapshot.objects.filter(wormhole=wormhole):
             c.delete()
         wormhole.delete()
         messages.add_message(request, messages.INFO, 'Wormhole and its changes permanently deleted from the database')
@@ -606,17 +587,16 @@ def recent_scan_edits(request):
     sites = []
     wormholes = []
     count = 0
-    # TODO: Refactor out SiteChange for SiteSnapshot
-    for s in SiteChange.objects.filter(changedScanid=True).order_by('-id'):
-        if not s.site in sites:
-            sites.append(s.site)
+    for snap in SiteSnapshot.objects.all().order_by('-id'):
+        if not snap.site in sites:
+            sites.append(snap.site)
         count += 1
         if count == int(appSettings.RECENT_EDITS_LIMIT) + 1:
             break
     count = 0
-    for w in WormholeChange.objects.filter(changedScanid=True).order_by('-id'):
-        if not w.wormhole in wormholes:
-            wormholes.append(w.wormhole)
+    for snap in WormholeSnapshot.objects.all().order_by('-id'):
+        if not snap.wormhole in wormholes:
+            wormholes.append(snap.wormhole)
         count += 1
         if count == int(appSettings.RECENT_EDITS_LIMIT) + 1:
             break
@@ -647,8 +627,7 @@ def stats(request):
         return no_access(request)
     numSites = len(Site.objects.all())
     numWormholes = len(Wormhole.objects.all())
-    # TODO: Refactor out SiteChange for SiteSnapshot
-    numEdits = len(SiteChange.objects.all()) + len(WormholeChange.objects.all())
+    numEdits = len(SiteSnapshot.objects.all()) + len(WormholeSnapshot.objects.all())
     numPastes = len(PasteUpdated.objects.all())
     con = {}
     for site_change in Site.objects.all():
@@ -661,17 +640,16 @@ def stats(request):
             con[wormhole_change.creator] += 1
         else:
             con[wormhole_change.creator] = 1
-    # TODO: Refactor out SiteChange for SiteSnapshot
-    for site_change in SiteChange.objects.all():
-        if site_change.user in con:
-            con[site_change.user] += 1
+    for snap in SiteSnapshot.objects.all():
+        if snap.user in con:
+            con[snap.user] += 1
         else:
-            con[site_change.user] = 1
-    for wormhole_change in WormholeChange.objects.all():
-        if wormhole_change.user in con:
-            con[wormhole_change.user] += 1
+            con[snap.user] = 1
+    for snap in WormholeSnapshot.objects.all():
+        if snap.user in con:
+            con[snap.user] += 1
         else:
-            con[wormhole_change.user] = 1
+            con[snap.user] = 1
     for paste in PasteUpdated.objects.all():
         if paste.user in con:
             con[paste.user] += 1
@@ -943,10 +921,9 @@ def mass_close(request):
             if k == 'csrfmiddlewaretoken':
                 continue
             wormhole = Wormhole.objects.get(id=k)
+            util.snapshot(wormhole).save()
             wormhole.closed = True
             wormhole.save()
-            # TODO: Refactor out WormholeChange for WormholeSnapshot
-            WormholeChange(wormhole=wormhole, user=util.get_display_name(eveigb, request), date=datetime.utcnow(), changedScanid=False, changedType=False, changedStart=False, changedDestination=False, changedTime=False, changedStatus=False, changedOpened=False, changedClosed=True, changedNotes=False).save()
         set_dirty()
     wormholes = Wormhole.objects.filter(closed=False)
     return render(request, 'sitemngr/massclose.html', {'displayname': util.get_display_name(eveigb, request), 'wormholes': wormholes, 'data': data})
