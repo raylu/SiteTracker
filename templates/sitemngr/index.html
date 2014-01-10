@@ -21,11 +21,32 @@ Index
             $('#alert_notices').fadeOut(5000);
             $('#alert_flag').fadeOut(5000);
         }, 30000);
-        /*
-        setInterval(function() {
-            $('#img_graph').load('/static/pictures/graph.png');
-        }, 30000);
-        */
+        var counter = setInterval(timer, 1000);
+        function timer() {
+            var elements = $('td.countdowntimer');
+            elements.each(function() {
+                var current = $(this).text();
+                var next = current.split(':');
+                if (next[0] == 0 && next[1] == 0 && next[2] == 0) {
+                    // do nothing
+                }
+                else {
+                    if (next[2] == 0) {
+                        next[1] --;
+                        next[2] = 59;
+                    }
+                    else if (next[1] == 0) {
+                        next[0] --;
+                        next[1] = 59;
+                        next[2] = 59;
+                    }
+                    else {
+                        next[2] --;
+                    }
+                    $(this).text(next[0] + ':' + next[1] + ':' + next[2]);
+                }
+            });
+        }
     });
     function get_tags() {
         var keyword = $('#omnibox').val();
@@ -327,6 +348,7 @@ Index
             <th>Leads to</th>
             <th>Entered</th>
             <th>Status</th>
+            <th>Max Time</th>
             <th>Edit</th>
         </tr>
     </thead>
@@ -342,6 +364,7 @@ Index
                 <td id="wend{{ w.id }}">{% if w.destination == 'Unknown' or w.destination == '' or w.destination == 'Unopened' or w.destination == 'Closed' %}{{ w.destination }}{% else %}<a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>{% endif %}</td>
                 <td>{{ w.date|date:'m/d @ H:i' }}</td>
                 <td id="wstatus{{ w.id }}">{{ w.status }}</td>
+                <td class="countdowntimer">{% for k,v in maxTimers.items %}{% if k == w.id %}{{ v }}{% endif %}{% endfor %}</td>
                 <td id="wlink{{ w.id }}"><a class="label label-info" href="/sitemngr/editwormhole/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('wormhole', {{ w.id }});">In line</a></td>
             </tr>
         {% endfor %}
@@ -354,6 +377,7 @@ Index
                 <td><input onkeyup="checkNew('wormhole');" style="margin: 0 0 0 0; padding: 0 0 0 0;" type="text" id="w_new_end" name="destination" value="" placeholder="end"></td>
                 <td></td>
                 <td><select style="margin: 0 0 0 0; padding: 0 0 0 0; width: 100%;" id="w_new_status" name="status"><option>Undecayed</option><option>Fresh</option><option>&#60 50% mass</option><option>&#60 50% time</option><option>VoC</option><option>EoL</option><option>Unknown</option><option>Closed</option></select></td>
+                <td></td>
                 <td><input style="margin: 0 0 0 0; padding: 0 0 0 0;" id="w_new_submit" type="submit" class="btn btn-mini btn-primary" value="Add New" disabled></td>
             </form>
         </tr>

@@ -1,6 +1,7 @@
 # Python
 from datetime import datetime
 import re
+import pytz
 
 # Django
 from django.shortcuts import render, get_object_or_404, redirect
@@ -57,6 +58,26 @@ def tidy():
 #     Index
 # ==============================
 
+timemap = {
+    'Fresh': '24:00',
+    'Undecayed': '20:00',
+    '< 50% time': '12:00',
+    'Unknown': '99:99',
+    'EoL': '4:00',
+}
+
+def maxTimeLeft(wormhole):
+    now = datetime.now(pytz.utc)
+    if not wormhole.status in timemap:
+        return '99:99'
+    max_time = timemap[wormhole.status]
+    diff = (now - wormhole.date)
+    m, s = divmod(diff.seconds, 60)
+    h, m = divmod(m, 60)
+    print h, m, s
+    left = str((int(max_time.split(':')[0]) - h)) + ':' + str(abs(60 - m)) + ':' + str(abs(60 - s))
+    return str(left)
+
 def index(request, note=None):
     """ Index page - lists all open sites """
     eveigb = IGBHeaderParser(request)
@@ -70,18 +91,23 @@ def index(request, note=None):
             start = p['start']
             destination = p['destination']
             status = p['status']
-            Wormhole(creator=util.get_display_name(eveigb, request), date=datetime.now(), scanid=scanid, type='null', start=start, destination=destination,
-                            time=datetime.now(), status=status, opened=False if destination.lower() in ['unopened', 'closed'] else True, closed=False, notes='').save()
+            Wormhole(creator=util.get_display_name(eveigb, request), date=datetime.utcnow(), scanid=scanid, type='null', start=start, destination=destination,
+                            time=datetime.utcnow(), status=status, opened=False if destination.lower() in ['unopened', 'closed'] else True, closed=False, notes='').save()
             notices.append('New wormhole added')
         elif p['data_type'] == 'site':
             scanid = p['scanid'].upper()
             name = p['name']
             type = p['type']
             where = p['where']
-            Site(name=name, scanid=scanid, type=type, where=where, creator=util.get_display_name(eveigb, request), date=datetime.now(), opened=False, closed=False, notes='').save()
+            Site(name=name, scanid=scanid, type=type, where=where, creator=util.get_display_name(eveigb, request), date=datetime.utcnow(), opened=False, closed=False, notes='').save()
             notices.append('New site added')
     sites = Site.objects.filter(closed=False)
     wormholes = Wormhole.objects.filter(closed=False)
+    
+    maxTimers = {}
+    for wormhole in wormholes:
+        maxTimers[wormhole.id] = maxTimeLeft(wormhole)
+
     # check if the wormhole objects and graph are out of sync
     if is_dirty():
         tidy()
@@ -93,7 +119,7 @@ def index(request, note=None):
     except TypeError:
         last_update_diff = '-never-'
     last_update_user = util.get_last_update_user()
-    return render(request, 'sitemngr/index.html', {'displayname': util.get_display_name(eveigb, request), 'homepage': True, 'homesystem': appSettings.HOME_SYSTEM, 'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': util.get_settings(util.get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': util.get_settings(util.get_display_name(eveigb, request)).userBackgroundImage, 'flag': note, 'last_update_diff': last_update_diff, 'last_update_user': last_update_user})
+    return render(request, 'sitemngr/index.html', {'maxTimers': maxTimers, 'displayname': util.get_display_name(eveigb, request), 'homepage': True, 'homesystem': appSettings.HOME_SYSTEM, 'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': util.get_settings(util.get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': util.get_settings(util.get_display_name(eveigb, request)).userBackgroundImage, 'flag': note, 'last_update_diff': last_update_diff, 'last_update_user': last_update_user})
 
 def view_all(request):
     """ Index page, but with the closed objects instead of the open """
@@ -102,7 +128,7 @@ def view_all(request):
         return no_access(request)
     sites = Site.objects.filter(closed=True)
     wormholes = Wormhole.objects.filter(closed=True)
-    return render(request, 'sitemngr/index.html', {'displayname': util.get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'status': 'closed'})
+    return render(request, 'sitemngr/index.html', {'maxTimeLeft': maxTimeLeft, 'displayname': util.get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'status': 'closed'})
 
 def add(request):
     """
@@ -153,7 +179,7 @@ def add_site(request):
     g_system = None
     g_type = None
     g_name = None
-    now = datetime.now()
+    now = datetime.utcnow()
     if request.method == 'POST':
         p = request.POST
         s_scanid = p['scanid']
@@ -224,7 +250,7 @@ def add_wormhole(request):
     g_start = ''
     g_end = ''
     g_name = ''
-    now = datetime.now()
+    now = datetime.utcnow()
     if request.method == 'POST':
         p = request.POST
         s_scanid = p['scanid']
@@ -275,12 +301,12 @@ def paste(request):
     eveigb = IGBHeaderParser(request)
     if not util.can_view(eveigb, request):
         return no_access(request)
-    now = datetime.now()
+    now = datetime.utcnow()
     if request.method == 'POST':
         post = request.POST
         if post.has_key('downtime') and post['downtime']:
             # After paste and checking after downtime checkbox - prepare data for user to make changes after downtime
-            PasteUpdated(user=util.get_display_name(eveigb, request), date=datetime.now()).save()
+            PasteUpdated(user=util.get_display_name(eveigb, request), date=datetime.utcnow()).save()
             sites = []
             wormholes = []
             newids = []
@@ -331,7 +357,7 @@ def paste(request):
                            'displayname': util.get_display_name(eveigb, request), 'newTab': util.get_settings(util.get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': util.get_settings(util.get_display_name(eveigb, request)).userBackgroundImage})
         elif post.has_key('afterdowntime') and post['afterdowntime']:
             # After downtime paste page after submitting database changes
-            PasteUpdated(user=util.get_display_name(eveigb, request), date=datetime.now()).save()
+            PasteUpdated(user=util.get_display_name(eveigb, request), date=datetime.utcnow()).save()
             for k, v in post.iteritems():
                 if ' ' in k:
                     k = k.split(' ')[0]
@@ -379,7 +405,7 @@ def paste(request):
             return redirect('/sitemngr/')
         else:
             # Parse data to return to normal paste page
-            PasteUpdated(user=util.get_display_name(eveigb, request), date=datetime.now()).save()
+            PasteUpdated(user=util.get_display_name(eveigb, request), date=datetime.utcnow()).save()
             present = []
             findnew = []
             notfound = []
@@ -430,7 +456,7 @@ def system_landing(request):
     eveigb = IGBHeaderParser(request)
     if not util.can_view(eveigb, request):
         return no_access(request)
-    now = datetime.now()
+    now = datetime.utcnow()
     systems = []
     for site in Site.objects.filter(closed=False):
         if not site.where in systems:
@@ -915,7 +941,7 @@ def mass_close(request):
             wormhole = Wormhole.objects.get(id=k)
             wormhole.closed = True
             wormhole.save()
-            WormholeChange(wormhole=wormhole, user=util.get_display_name(eveigb, request), date=datetime.now(), changedScanid=False, changedType=False, changedStart=False, changedDestination=False, changedTime=False, changedStatus=False, changedOpened=False, changedClosed=True, changedNotes=False).save()
+            WormholeChange(wormhole=wormhole, user=util.get_display_name(eveigb, request), date=datetime.utcnow(), changedScanid=False, changedType=False, changedStart=False, changedDestination=False, changedTime=False, changedStatus=False, changedOpened=False, changedClosed=True, changedNotes=False).save()
         set_dirty()
     wormholes = Wormhole.objects.filter(closed=False)
     return render(request, 'sitemngr/massclose.html', {'displayname': util.get_display_name(eveigb, request), 'wormholes': wormholes, 'data': data})
