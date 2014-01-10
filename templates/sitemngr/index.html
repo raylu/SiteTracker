@@ -17,6 +17,7 @@ Index
         $('#tt3').tooltip();
         $('#tt4').tooltip();
         $('#tt5').tooltip();
+        $('#tt6').tooltip();
         setTimeout(function() {
             $('#alert_notices').fadeOut(5000);
             $('#alert_flag').fadeOut(5000);
@@ -348,7 +349,7 @@ Index
             <th>Leads to</th>
             <th>Entered</th>
             <th>Status</th>
-            <th>Max Time</th>
+            <th id="tt6" data-toggle="tooltip" title="This is the ellapsed time - entered time, with respect to the status">Max Time</th>
             <th>Edit</th>
         </tr>
     </thead>

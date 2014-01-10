@@ -74,7 +74,6 @@ def maxTimeLeft(wormhole):
     diff = (now - wormhole.date)
     m, s = divmod(diff.seconds, 60)
     h, m = divmod(m, 60)
-    print h, m, s
     left = str((int(max_time.split(':')[0]) - h)) + ':' + str(abs(60 - m)) + ':' + str(abs(60 - s))
     return str(left)
 
