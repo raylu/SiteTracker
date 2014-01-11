@@ -1,5 +1,4 @@
-from sitemngr.models import Wormhole
-from eve_db.models import MapSolarSystem
+from sitemngr.models import Wormhole, System
 from pygraphviz import *
 from time import sleep
 from datetime import datetime
@@ -42,8 +41,8 @@ def get_color(system_name):
     if util.is_system_wspace(system_name):
         return get_color_wh(system_name)
     try:
-        system = MapSolarSystem.objects.get(name=system_name)
-    except MapSolarSystem.DoesNotExist:
+        system = System.objects.get(name=system_name)
+    except System.DoesNotExist:
         return 'gray'
     status = system.security_level
     if status > 0.45:

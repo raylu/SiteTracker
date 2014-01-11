@@ -16,7 +16,7 @@ class Site(models.Model):
     def printOut(self):
         return '{0} [{1}] {2} - {3}'.format(self.scanid, self.type[0], self.name, 'Open' if self.opened else 'Closed')
     def isAnom(self):
-        return self.name in ['Average Frontier Deposit', 'Exceptional Core Deposit', 'Unexceptional Frontier Reservoir', 'Ordinary Permiter Deposit', 'Core Garrison', 'Core Stronghold', 'Oruze Osobnyk', 'Quarantine Area', 'Ordinary Perimeter Deposit', 'Rarified Core Deposit', 'Unexceptional Frontier Deposit']
+        return self.name in ['Common Perimeter Deposit', 'Average Frontier Deposit', 'Exceptional Core Deposit', 'Unexceptional Frontier Reservoir', 'Ordinary Permiter Deposit', 'Core Garrison', 'Core Stronghold', 'Oruze Osobnyk', 'Quarantine Area', 'Ordinary Perimeter Deposit', 'Rarified Core Deposit', 'Unexceptional Frontier Deposit']
     def get_snapshots(self):
         return SiteSnapshot.objects.filter(site=self.id)
 
@@ -81,7 +81,7 @@ class System(models.Model):
     """ A system in the map """
     name = models.CharField(max_length=100, blank=False, null=False)
     mapid = models.IntegerField(blank=False, null=False)
-    security_level = models.CharField(max_length=10, blank=False, null=False)
+    security_level = models.CharField(max_length=20, blank=False, null=False)
     def __repr__(self):
         return '<System-%s-%s>' % (self.name, self.security_level)
 
