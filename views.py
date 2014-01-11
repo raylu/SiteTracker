@@ -12,12 +12,9 @@ from django.http import HttpResponse
 # sitemngr
 from models import (Site, SiteSnapshot,
                     Wormhole, WormholeSnapshot,
-                    PasteUpdated, Settings)
+                    PasteUpdated, Settings, System)
 import settings as appSettings
 import util
-
-# eve_db
-from eve_db.models import MapSolarSystem
 
 # eveigb
 from eveigb import IGBHeaderParser
@@ -454,9 +451,9 @@ def system(request, systemid):
     # otherwise, it has a security level
     else:
         try:
-            security = round(MapSolarSystem.objects.get(name=systemid).security_level, 1)
+            security = 2
             is_kspace = True
-        except MapSolarSystem.DoesNotExist:
+        except System.DoesNotExist:
                 pass
     is_in_chain = util.is_system_in_chain(systemid)
     closest_chain = None
@@ -604,10 +601,10 @@ def stats(request):
     eveigb = IGBHeaderParser(request)
     if not util.can_view(eveigb, request):
         return no_access(request)
-    numSites = len(Site.objects.all())
-    numWormholes = len(Wormhole.objects.all())
-    numEdits = len(SiteSnapshot.objects.all()) + len(WormholeSnapshot.objects.all())
-    numPastes = len(PasteUpdated.objects.all())
+    numSites = Site.objects.count()
+    numWormholes = Wormhole.objects.count()
+    numEdits = SiteSnapshot.objects.count() + WormholeSnapshot.objects.count()
+    numPastes = PasteUpdated.objects.count()
     con = {}
     for site_change in Site.objects.all():
         if site_change.creator in con:
@@ -726,11 +723,11 @@ def overlay(request):
                 jita_jumps = jumps
             # ensure that the system is actually in Eve, and not a user typo
             try:
-                obj = MapSolarSystem.objects.get(name=wormhole.destination)
+                obj = System.objects.get(name=wormhole.destination)
                 status = obj.security_level
                 if status > 0.45:
                     hs.append(wormhole.destination)
-            except MapSolarSystem.DoesNotExist:
+            except System.DoesNotExist:
                 continue
     # kills in the home system
     kills_npc = kills_ship = kills_pod = 0
@@ -876,7 +873,7 @@ def get_search_results(request, keyword, flags):
             raw.append(wormhole)
     # if we've found nothing else, then check system names from all of the universe if we can include systems
     if flags.universe or (len(ret) == 0 and not flags.wormholes and not flags.sites and not flags.chain):
-        for system in MapSolarSystem.objects.all():
+        for system in System.objects.all():
             if system.name.startswith(keyword):
                 ret.append(util.Result('system/%s' % system.name, system.name))
     if len(ret) == 0:

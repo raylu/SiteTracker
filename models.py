@@ -8,9 +8,9 @@ class Site(models.Model):
     scanid = models.CharField(max_length=10, blank=False)
     type = models.CharField(max_length=100, blank=False)
     where = models.CharField(max_length=50, blank=False)
-    opened = models.BooleanField(default=False, blank=False)
-    closed = models.BooleanField(default=False, blank=False)
-    notes = models.TextField(blank=True)
+    opened = models.BooleanField(blank=False)
+    closed = models.BooleanField(blank=False)
+    notes = models.TextField(blank=True, null=True)
     def __repr__(self):
         return '<Site-%s-%s-%s>' % (self.id, self.scanid, self.where)
     def printOut(self):
@@ -23,15 +23,15 @@ class Site(models.Model):
 class SiteSnapshot(models.Model):
     """ A snapshot of a Site object, used for recording changes in data """
     site = models.ForeignKey(Site)
-    user = models.CharField(max_length=100, blank=False, default=False)
-    date = models.DateTimeField(blank=False, default=False)
+    user = models.CharField(max_length=100, blank=False)
+    date = models.DateTimeField(blank=False)
     name = models.CharField(max_length=150, blank=False)
     scanid = models.CharField(max_length=10, blank=False)
     type = models.CharField(max_length=100, blank=False)
     where = models.CharField(max_length=50, blank=False)
-    opened = models.BooleanField(default=False, blank=False)
-    closed = models.BooleanField(default=False, blank=False)
-    notes = models.TextField(blank=True)
+    opened = models.BooleanField(blank=False)
+    closed = models.BooleanField(blank=False)
+    notes = models.TextField(blank=True, null=True)
     def __repr__(self):
         return '<SiteSnapshot-%s-%s>' % (self.id, self.site.id)
 
@@ -43,9 +43,9 @@ class Wormhole(models.Model):
     start = models.CharField(max_length=100)
     destination = models.CharField(max_length=100)
     status = models.CharField(max_length=400)
-    opened = models.BooleanField(default=False)
-    closed = models.BooleanField(default=False)
-    notes = models.TextField()
+    opened = models.BooleanField()
+    closed = models.BooleanField()
+    notes = models.TextField(blank=True, null=True)
     def __repr__(self):
         return '<Wormhole-%s-%s-%s-%s-%s>' % (self.id, self.scanid, self.start, self.destination, self.status)
     def printOut(self):
@@ -56,25 +56,34 @@ class Wormhole(models.Model):
 class WormholeSnapshot(models.Model):
     """ A snapshot of a Wormhole object, used for recording changes in data """
     wormhole = models.ForeignKey(Wormhole)
-    user = models.CharField(max_length=100, blank=False, default=False)
+    user = models.CharField(max_length=100, blank=False)
     date = models.DateTimeField()
     scanid = models.CharField(max_length=10)
     start = models.CharField(max_length=100)
     destination = models.CharField(max_length=100)
     status = models.CharField(max_length=400)
-    opened = models.BooleanField(default=False)
-    closed = models.BooleanField(default=False)
-    notes = models.TextField()
+    opened = models.BooleanField()
+    closed = models.BooleanField()
+    notes = models.TextField(blank=True, null=True)
     def __repr__(self):
         return '<WormholeSnapshot-%s-%s>' % (self.id, self.wormhole.id)
 
 class Settings(models.Model):
+    """ User settings for sitemngr """
     user = models.CharField(max_length=100)
     editsInNewTabs = models.BooleanField(default=True)
     storeMultiple = models.BooleanField(default=True)
     userBackgroundImage = models.BooleanField(default=True)
     def __repr__(self):
         return '<Settings-%s>' % self.user
+
+class System(models.Model):
+    """ A system in the map """
+    name = models.CharField(max_length=100, blank=False, null=False)
+    mapid = models.IntegerField(blank=False, null=False)
+    security_level = models.CharField(max_length=10, blank=False, null=False)
+    def __repr__(self):
+        return '<System-%s-%s>' % (self.name, self.security_level)
 
 class PasteUpdated(models.Model):
     """ Recording when someone uses the paste feature """

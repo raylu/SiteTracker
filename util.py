@@ -5,11 +5,8 @@ from datetime import datetime
 import pytz
 
 # sitemngr
-from models import (Site, SiteSnapshot, Wormhole, WormholeSnapshot, PasteUpdated, Settings)
+from models import (Site, SiteSnapshot, Wormhole, WormholeSnapshot, PasteUpdated, Settings, System)
 import settings as appSettings
-
-# eve_db
-from eve_db.models import MapSolarSystem
 
 def get_time_difference_formatted(old, recent):
     """ Formats the difference between two datetime objects """
@@ -161,9 +158,9 @@ def get_jumps_between(start, finish):
 def is_system(system):
     """ Returns True if the string is the name of a system """
     try:
-        MapSolarSystem.objects.get(name=system)
+        System.objects.get(name=system)
         return True
-    except MapSolarSystem.DoesNotExist:
+    except System.DoesNotExist:
         return False
 
 def get_wormhole_class(system):
@@ -201,15 +198,15 @@ class Flag:
 def get_system_name(systemid):
     """ Returns the common name for the system from the Eve API's systemid representation """
     try:
-        return MapSolarSystem.objects.get(id=systemid).name
-    except MapSolarSystem.DoesNotExist:
+        return System.objects.get(mapid=systemid).name
+    except System.DoesNotExist:
         return 'null'
 
 def get_system_ID(systemname):
     """ Returns the systemid for use in the Eve API corresponding to the systemname """
     try:
-        return MapSolarSystem.objects.get(name=systemname).id
-    except MapSolarSystem.DoesNotExist:
+        return System.objects.get(name=systemname).id
+    except System.DoesNotExist:
         return 'null'
 
 class Contributor:
@@ -229,10 +226,8 @@ def get_display_name(eveigb, request):
     if request is not None:
         if request.user is not None:
             if request.user.is_active and request.user.is_authenticated:
-                print 'User: ' + request.user.username
                 return request.user.username
     if eveigb and eveigb.trusted:
-        print 'Browser: ' + eveigb.charname
         return eveigb.charname
     return 'someone'
 
@@ -297,7 +292,7 @@ def snapshot(model):
             type=model.type, where=model.where, opened=model.opened, closed=model.closed, notes=model.notes)
         return snap
     elif isinstance(model, Wormhole):
-        snap = WormholeSnapshot(wormhole=model, date=datetime.utcnow(), scanid=model.scanid,
+        snap = WormholeSnapshot(wormhole=model, date=datetime.utcnow(), user=model.creator, scanid=model.scanid,
             start=model.start, destination=model.destination, status=model.status,
             opened=model.opened, closed=model.closed, notes=model.notes)
         return snap
@@ -306,7 +301,6 @@ def snapshot(model):
 def do_edit_site(p, site, display_name):
     """ Edits a site """
     snap = snapshot(site)
-    snap.save()
     changedName = False
     changedScanid = False
     changedType = False
@@ -315,7 +309,6 @@ def do_edit_site(p, site, display_name):
     changedOpened = False
     changedClosed = False
     changedNotes = False
-    appendNotes = None
     if p.has_key('name') and p['name']:
         if p['name'] != site.name:
             changedName = True
@@ -323,7 +316,6 @@ def do_edit_site(p, site, display_name):
     if p.has_key('scanid') and p['scanid']:
         if p['scanid'] != site.scanid:
             changedScanid = True
-            appendNotes = 'Scanid: {0} >> {1}'.format(site.scanid, p['scanid'])
             site.scanid = p['scanid'].upper()
     if p.has_key('type') and p['type']:
         if p['type'] != site.type:
@@ -354,16 +346,14 @@ def do_edit_site(p, site, display_name):
             changedNotes = True
             site.notes = p['notes']
     if changedName or changedScanid or changedType or changedWhere or changedDate or changedOpened or changedClosed or changedNotes:
-        if appendNotes is not None:
-            site.notes += appendNotes
         site.save()
+        snap.save()
         return snap
     return False
 
 def do_edit_wormhole(p, wormhole, dispay_name):
     """ Edits a wormhole """
     snap = snapshot(wormhole)
-    snap.save()
     changedScanid = False
     changedStart = False
     changedDestination = False
@@ -372,11 +362,9 @@ def do_edit_wormhole(p, wormhole, dispay_name):
     changedOpened = False
     changedClosed = False
     changedNotes = False
-    appendNotes = None
     if p.has_key('scanid') and p['scanid']:
         if p['scanid'] != wormhole.scanid:
             changedScanid = True
-            appendNotes = ' Scanid: {0} >> {1}'.format(wormhole.scanid, p['scanid'])
             wormhole.scanid = p['scanid'].upper()
     if p.has_key('start') and p['start']:
         if p['start'] != wormhole.start:
@@ -407,13 +395,12 @@ def do_edit_wormhole(p, wormhole, dispay_name):
             wormhole.closed = False
             changedClosed = True
     if p.has_key('notes') and p['notes']:
-        if getBoolean(p['notes']) != wormhole.notes:
+        if p['notes'] != wormhole.notes:
             changedNotes = True
             wormhole.notes = p['notes']
     if changedScanid or changedStart or changedDestination or changedTime or changedStatus or changedOpened or changedClosed or changedNotes:
-        if appendNotes is not None:
-            wormhole.notes += appendNotes
         wormhole.save()
+        snap.save()
         return snap
     return False
 
