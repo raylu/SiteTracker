@@ -20,39 +20,19 @@ Check Kills
 {% if reports %}
     <table class="table-striped">
         <tr>
-            <th>
-                SystemName
-            </th>
-            <th>
-                SystemID
-            </th>
-            <th>
-                NPC
-            </th>
-            <th>
-                Ship
-            </th>
-            <th>
-                Pod
-            </th>
+            <th>SystemName</th>
+            <th>SystemID</th>
+            <th>NPC</th>
+            <th>Ship</th>
+            <th>Pod</th>
         </tr>
         {% for r in reports %}
         <tr>
-            <td>
-                {% if r.system == eveigb.solarsystemname %}<strong>Current system: {{ r.system }}</strong>{% else %}{{ r.system }}{% endif %}
-            </td>
-            <td>
-                {{ r.systemid }}
-            </td>
-            <td>
-                {{ r.npc }}
-            </td>
-            <td>
-                {{ r.ship }}
-            </td>
-            <td>
-                {{ r.pod }}
-            </td>
+            <td>{% if r.system == eveigb.solarsystemname %}<strong>Current system: {{ r.system }}</strong>{% else %}{{ r.system }}{% endif %}</td>
+            <td>{{ r.systemid }}</td>
+            <td>{{ r.npc }}</td>
+            <td>{{ r.ship }}</td>
+            <td>{{ r.pod }}</td>
         </tr>
         {% endfor %}
     </table>

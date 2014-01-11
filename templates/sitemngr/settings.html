@@ -17,34 +17,19 @@ Settings
 {% csrf_token %}
     <table>
         <tr>
-            <td>
-                Edit links open into a new tab
-            </td>
-            <td>
-                <input type="checkbox" name="edit" {% if edit %}checked="checked"{% endif %}>
-            </td>
+            <td>Edit links open into a new tab</td>
+            <td><input type="checkbox" name="edit" {% if edit %}checked="checked"{% endif %}></td>
         </tr>
         <tr>
-            <td>
-                Store buttons redirect to the same page
-            </td>
-            <td>
-                <input type="checkbox" name="store" {% if store %}checked="checked"{% endif %}>
-            </td>
+            <td>Store buttons redirect to the same page</td>
+            <td><input type="checkbox" name="store" {% if store %}checked="checked"{% endif %}></td>
         </tr>
         <tr>
-            <td>
-                Use background image
-            </td>
-            <td>
-                <input type="checkbox" name="image" {% if image %}checked="checked"{% endif %}>
-            </td>
+            <td>Use background image</td>
+            <td><input type="checkbox" name="image" {% if image %}checked="checked"{% endif %}></td>
         </tr>
         <tr>
-            <td></td>
-            <td>
-                <input type="submit" value="Save" class="btn btn-primary" data-loading-text="Saving..." onclick="$(this).button('loading');">
-            </td>
+            <td><input type="submit" value="Save" class="btn btn-primary" data-loading-text="Saving..." onclick="$(this).button('loading');"></td>
         </tr>
     </table>
 </form>

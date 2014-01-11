@@ -52,21 +52,11 @@ System Info
 {% if openwormholes %}
     <table>
         <tr>
-            <th>
-                Scan id
-            </th>
-            <th>
-                Date entered
-            </th>
-            <th>
-                Last updated
-            </th>
-            <th>
-                From
-            </th>
-            <th>
-                Leads to
-            </th>
+            <th>Scan id</th>
+            <th>Date entered</th>
+            <th>Last updated</th>
+            <th>From</th>
+            <th>Leads to</th>
         </tr>
         {% for w in openwormholes %}
             {% if w.opened %}
@@ -74,15 +64,9 @@ System Info
             {% else %}
             <tr class="closed">
             {% endif %}
-                <td>
-                    <a href="/sitemngr/viewwormhole/{{ w.id }}">{{ w.scanid }}</a>
-                </td>
-                <td>
-                    {{ w.date|date:'H:i, M d, y' }}
-                </td>
-                <td>
-                    {{ w.time }}
-                </td>
+                <td><a href="/sitemngr/viewwormhole/{{ w.id }}">{{ w.scanid }}</a></td>
+                <td>{{ w.date|date:'H:i, M d, y' }}</td>
+                <td>{{ w.time }}</td>
                 <td>
                     {% if system == w.start %}
                        <i>{{ w.start }}</i>
@@ -91,7 +75,7 @@ System Info
                     {% endif %}
                 </td>
                 <td>
-                {% if system == w.destination %}
+                    {% if system == w.destination %}
                         <i>{{ w.destination }}</i>
                     {% else %}
                         <a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>
@@ -110,15 +94,9 @@ System Info
 {% if opensites %}
     <table>
         <tr>
-            <th>
-                Scan id
-            </th>
-            <th>
-                Date entered
-            </th>
-            <th>
-                Name
-            </th>
+            <th>Scan id</th>
+            <th>Date entered</th>
+            <th>Name</th>
         </tr>
         {% for s in opensites %}
             {% if s.isAnom %}
@@ -128,15 +106,9 @@ System Info
             {% else %}
             <tr class="closed">
             {% endif %}
-                <td>
-                    <a href="/sitemngr/viewsite/{{ s.id }}">{{ s.scanid }}</a>
-                </td>
-                <td>
-                    {{ s.date|date:'H:i, M d, y' }}
-                </td>
-                <td>
-                    {{ s.name }}
-                </td>
+                <td><a href="/sitemngr/viewsite/{{ s.id }}">{{ s.scanid }}</a></td>
+                <td>{{ s.date|date:'H:i, M d, y' }}</td>
+                <td>{{ s.name }}</td>
             </tr>
         {% endfor %}
     </table>
@@ -150,15 +122,9 @@ System Info
 {% if unopenedsites %}
     <table>
         <tr>
-            <th>
-                Scan id
-            </th>
-            <th>
-                Date entered
-            </th>
-            <th>
-                Name
-            </th>
+            <th>Scan id</th>
+            <th>Date entered</th>
+            <th>Name</th>
         </tr>
         {% for s in unopenedsites %}
             {% if s.isAnom %}
@@ -168,15 +134,9 @@ System Info
             {% else %}
             <tr class="closed">
             {% endif %}
-                <td>
-                    <a href="/sitemngr/viewsite/{{ s.id }}">{{ s.scanid }}</a>
-                </td>
-                <td>
-                    {{ s.date|date:'H:i, M d, y' }}
-                </td>
-                <td>
-                    {{ s.name }}
-                </td>
+                <td><a href="/sitemngr/viewsite/{{ s.id }}">{{ s.scanid }}</a></td>
+                <td>{{ s.date|date:'H:i, M d, y' }}</td>
+                <td>{{ s.name }}</td>
             </tr>
         {% endfor %}
     </table>
@@ -190,33 +150,17 @@ System Info
 {% if closedwormholes %}
     <table>
         <tr>
-        <th>
-            Scan id
-        </th>
-        <th>
-            Date entered
-        </th>
-        <th>
-            Last updated
-        </th>
-        <th>
-            Leads to
-        </th>
+        <th>Scan id</th>
+        <th>Date entered</th>
+        <th>Last updated</th>
+        <th>Leads to</th>
     </tr>
     {% for w in closedwormholes %}
         <tr>
-            <td>
-                <a href="/sitemngr/editwormhole/{{ w.id }}/">{{ w.scanid }}</a>
-            </td>
-            <td>
-                {{ w.date|date:'H:i, M d, y' }}
-            </td>
-            <td>
-                {{ w.time }}
-            </td>
-            <td>
-                <a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>
-            </td>
+            <td><a href="/sitemngr/editwormhole/{{ w.id }}/">{{ w.scanid }}</a></td>
+            <td>{{ w.date|date:'H:i, M d, y' }}</td>
+            <td>{{ w.time }}</td>
+            <td><a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a></td>
         </tr>
     {% endfor %}
     </table>

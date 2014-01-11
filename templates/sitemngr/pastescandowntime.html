@@ -43,24 +43,14 @@ Paste
     <input type="hidden" name="afterdowntime" value="1">
     <table class="table-striped">
         <tr>
-            <th>
-                Old ID
-            </th>
-            <th>
-                Type
-            </th>
-            <th>
-                New ID
-            </th>
+            <th>Old ID</th>
+            <th>Type</th>
+            <th>New ID</th>
         </tr>
         {% for p in pastedata %}
             <tr>
-                <td>
-                    <input type="text" value="{{ p }}: {{ p.name }}" readonly>
-                </td>
-                <td>
-                    {{ p.p_type }}
-                </td>
+                <td><input type="text" value="{{ p }}: {{ p.name }}" readonly></td>
+                <td>{{ p.p_type }}</td>
                 <td>
                     <select name="{{ p.scanid }}">
                         <option>-IGNORE-</option>
@@ -74,9 +64,7 @@ Paste
         {% endfor %}
         <tr>
             <td></td>
-            <td>
-                <input type="submit" class="btn btn-primary" value="Store" data-loading-text="Commiting..." onclick="$(this).button('loading');">
-            </td>
+            <td><input type="submit" class="btn btn-primary" value="Store" data-loading-text="Commiting..." onclick="$(this).button('loading');"></td>
             <td></td>
         </tr>
     </table>

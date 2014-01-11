@@ -13,19 +13,14 @@ Paste
 {% csrf_token %}
     <table style="border: none;">
         <tr style="border: none;">
-            <td>
-                <label><b>System</b>:</label>
-            </td>
-            <td>
-                <input type="text" name="system" value="{% if system %}{{ system }}{% elif eveigb.is_igb %}{{ eveigb.solarsystemname }}{% else %}J132814{% endif %}">
-            </td>
+            <td><label><b>System</b>:</label></td>
+            <td><input type="text" name="system" value="{% if system %}{{ system }}{% elif eveigb.is_igb %}{{ eveigb.solarsystemname }}{% else %}J132814{% endif %}"></td>
         </tr>
     </table><br>
     <textarea name="pastedata" rows="20" id="ta_pastedata">{% if raw %}{{ raw }}{% endif %}</textarea><br>
     <table style="border: none;">
         <tr style="border: none;">
-            <td>
-                <label><b>After downtime?</b></label>
+            <td><label><b>After downtime?</b></label>
             </td>
             <td>
                 <label class="checkbox">
@@ -54,12 +49,8 @@ Paste
                 </tr>
                 {% for p in present %}
                 <tr>
-                    <td>
-                        {{ p.scanid }}
-                    </td>
-                    <td>
-                        <a href="/sitemngr/lookup/{{ p.scanid }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
-                    </td>
+                    <td>{{ p.scanid }}</td>
+                    <td><a href="/sitemngr/lookup/{{ p.scanid }}" {% if newTab %}target="_blank"{% endif %}>Link</a></td>
                 </tr>
                 {% endfor %}
             </table>
@@ -72,20 +63,14 @@ Paste
         {% if notfound %}
             <table class="table-striped">
                 <tr>
-                    <th>
-                        Scan ID
-                    </th>
-                    <th>
-                        Edit
-                    </th>
+                    <th>Scan ID</th>
+                    <th>Edit</th>
                 </tr>
                 {% for n in notfound %}
                 <tr>
-                    <td>
-                        {{ n.scanid }}
+                    <td>{{ n.scanid }}
                     </td>
-                    <td>
-                        <a href="/sitemngr/lookup/{{ n.scanid }}/?system={{ system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
+                    <td><a href="/sitemngr/lookup/{{ n.scanid }}/?system={{ system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -99,18 +84,12 @@ Paste
         {% if findnew %}
             <table class="table-striped">
                 <tr>
-                    <th>
-                        Scan ID
-                    </th>
-                    <th>
-                        Link to add
-                    </th>
+                    <th>Scan ID</th>
+                    <th>Link to add</th>
                 </tr>
                 {% for f in findnew %}
                 <tr>
-                    <td>
-                        {{ f.scanid }}
-                    </td>
+                    <td>{{ f.scanid }}</td>
                     <td>
                         {% if f.isWormhole %}
                             <a href="/sitemngr/addwormhole/?scanid={{ f.scanid }}&timenow={{ timenow }}&start={{ f.system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
