@@ -1,6 +1,5 @@
 from datetime import datetime
 import re
-import pytz
 
 # Django
 from django.shortcuts import render, get_object_or_404, redirect
@@ -56,25 +55,6 @@ def tidy():
 #     Index
 # ==============================
 
-timemap = {
-    'Fresh': '24:00',
-    'Undecayed': '20:00',
-    '< 50% time': '12:00',
-    'Unknown': '99:99',
-    'EoL': '4:00',
-}
-
-def maxTimeLeft(wormhole):
-    now = datetime.now(pytz.utc)
-    if not wormhole.status in timemap:
-        return '99:99'
-    max_time = timemap[wormhole.status]
-    diff = (now - wormhole.date)
-    m, s = divmod(diff.seconds, 60)
-    h, m = divmod(m, 60)
-    left = str((int(max_time.split(':')[0]) - h)) + ':' + str(abs(60 - m)) + ':' + str(abs(60 - s))
-    return str(left)
-
 def index(request, note=None):
     """ Index page - lists all open sites """
     eveigb = IGBHeaderParser(request)
@@ -88,8 +68,8 @@ def index(request, note=None):
             start = p['start']
             destination = p['destination']
             status = p['status']
-            Wormhole(creator=util.get_display_name(eveigb, request), date=datetime.utcnow(), scanid=scanid, type='null', start=start, destination=destination,
-                            time=datetime.utcnow(), status=status, opened=False if destination.lower() in ['unopened', 'closed'] else True, closed=False, notes='').save()
+            Wormhole(creator=util.get_display_name(eveigb, request), date=datetime.utcnow(), scanid=scanid, start=start, destination=destination,
+                            status=status, opened=False if destination.lower() in ['unopened', 'closed'] else True, closed=False, notes='').save()
             notices.append('New wormhole added')
         elif p['data_type'] == 'site':
             scanid = p['scanid'].upper()
@@ -103,7 +83,7 @@ def index(request, note=None):
     
     maxTimers = {}
     for wormhole in wormholes:
-        maxTimers[wormhole.id] = maxTimeLeft(wormhole)
+        maxTimers[wormhole.id] = util.maxTimeLeft(wormhole)
 
     # check if the wormhole objects and graph are out of sync
     if is_dirty():
@@ -125,7 +105,7 @@ def view_all(request):
         return no_access(request)
     sites = Site.objects.filter(closed=True)
     wormholes = Wormhole.objects.filter(closed=True)
-    return render(request, 'sitemngr/index.html', {'maxTimeLeft': maxTimeLeft, 'displayname': util.get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'status': 'closed'})
+    return render(request, 'sitemngr/index.html', {'displayname': util.get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'status': 'closed'})
 
 def add(request):
     """
@@ -179,7 +159,7 @@ def add_site(request):
     now = datetime.utcnow()
     if request.method == 'POST':
         p = request.POST
-        s_scanid = p['scanid']
+        s_scanid = p['scanid'].upper()
         s_name = p['name'] if 'name' in p else 'Unknown'
         s_type = p['type']
         s_where = p['where'] if 'where' in p else 'Unknown'
@@ -222,7 +202,7 @@ def view_wormhole(request, wormholeid):
         return no_access(request)
     wormhole = get_object_or_404(Wormhole, pk=wormholeid)
     snapshots = wormhole.get_snapshots()
-    return render(request, 'sitemngr/viewwormhole.tml', {'displayname': util.get_display_name(eveigb, request), 'isForm': False, 'wormhole': wormhole, 'snapshots': snapshots})
+    return render(request, 'sitemngr/viewwormhole.html', {'displayname': util.get_display_name(eveigb, request), 'isForm': False, 'wormhole': wormhole, 'snapshots': snapshots})
 
 def edit_wormhole(request, wormholeid):
     """ Edit wormhole page for changing data """
@@ -250,10 +230,9 @@ def add_wormhole(request):
     now = datetime.utcnow()
     if request.method == 'POST':
         p = request.POST
-        s_scanid = p['scanid']
+        s_scanid = p['scanid'].upper()
         s_start = p['start'] if 'start' in p else 'Unknown'
         s_destination = p['destination'] if 'destination' in p else 'Unknown'
-        s_time = now
         s_status = p['status']
         s_opened = True if 'opened' in p else False
         s_closed = True if 'closed' in p else False
@@ -265,8 +244,8 @@ def add_wormhole(request):
             return redirect('/sitemngr/')
         except Wormhole.DoesNotExist:
             pass
-        wormhole = Wormhole(creator=util.get_display_name(eveigb, request), date=now, scanid=s_scanid, type='null', start=s_start, destination=s_destination,
-                            time=s_time, status=s_status, opened=s_opened, closed=s_closed, notes=s_notes)
+        wormhole = Wormhole(creator=util.get_display_name(eveigb, request), date=now, scanid=s_scanid, start=s_start, destination=s_destination,
+                            status=s_status, opened=s_opened, closed=s_closed, notes=s_notes)
         wormhole.save()
         # make the new view of the index page update the graph
         set_dirty()

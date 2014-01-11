@@ -18,13 +18,14 @@ class Site(models.Model):
     def isAnom(self):
         return self.name in ['Average Frontier Deposit', 'Exceptional Core Deposit', 'Unexceptional Frontier Reservoir', 'Ordinary Permiter Deposit', 'Core Garrison', 'Core Stronghold', 'Oruze Osobnyk', 'Quarantine Area', 'Ordinary Perimeter Deposit', 'Rarified Core Deposit', 'Unexceptional Frontier Deposit']
     def get_snapshots(self):
-        return SiteSnapshop.objects.filter(site=self.id)
+        return SiteSnapshot.objects.filter(site=self.id)
 
-class SiteSnapshop(models.Model):
+class SiteSnapshot(models.Model):
     """ A snapshot of a Site object, used for recording changes in data """
     site = models.ForeignKey(Site)
-    date = models.DateTimeField(blank=False, default=False)
     user = models.CharField(max_length=100, blank=False, default=False)
+    date = models.DateTimeField(blank=False, default=False)
+    name = models.CharField(max_length=150, blank=False)
     scanid = models.CharField(max_length=10, blank=False)
     type = models.CharField(max_length=100, blank=False)
     where = models.CharField(max_length=50, blank=False)
@@ -32,7 +33,7 @@ class SiteSnapshop(models.Model):
     closed = models.BooleanField(default=False, blank=False)
     notes = models.TextField(blank=True)
     def __repr__(self):
-        return '<SiteSnapshop-%s-%s>' % (self.id, self.site.id)
+        return '<SiteSnapshot-%s-%s>' % (self.id, self.site.id)
 
 class Wormhole(models.Model):
     """ Wormhole object for wormholes in w-space """
@@ -49,10 +50,13 @@ class Wormhole(models.Model):
         return '<Wormhole-%s-%s-%s-%s-%s>' % (self.id, self.scanid, self.start, self.destination, self.status)
     def printOut(self):
         return '{0} {1} > {2} ({3})'.format(self.scanid, self.start, self.destination, self.status)
+    def get_snapshots(self):
+        return WormholeSnapshot.objects.filter(wormhole=self.id)
 
 class WormholeSnapshot(models.Model):
     """ A snapshot of a Wormhole object, used for recording changes in data """
     wormhole = models.ForeignKey(Wormhole)
+    user = models.CharField(max_length=100, blank=False, default=False)
     date = models.DateTimeField()
     scanid = models.CharField(max_length=10)
     start = models.CharField(max_length=100)

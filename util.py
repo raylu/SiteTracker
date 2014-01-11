@@ -2,11 +2,10 @@
 import re
 import urllib2
 from datetime import datetime
+import pytz
 
 # sitemngr
-from models import (Site, SiteSnapshot,
-                     Wormhole, WormholeSnapshot,
-                     PasteUpdated, Settings)
+from models import (Site, SiteSnapshot, Wormhole, WormholeSnapshot, PasteUpdated, Settings)
 import settings as appSettings
 
 # eve_db
@@ -59,6 +58,9 @@ def get_last_update():
         date = sorted(dates)[-1]
     except IndexError:
         # if nothing was added to the list, i.e. new database
+        return None
+    except TypeError:
+        # one of more of the fields was filled, and one or more was None
         return None
     # get the object whose date was selected
     try:
@@ -227,8 +229,10 @@ def get_display_name(eveigb, request):
     if request is not None:
         if request.user is not None:
             if request.user.is_active and request.user.is_authenticated:
+                print 'User: ' + request.user.username
                 return request.user.username
     if eveigb and eveigb.trusted:
+        print 'Browser: ' + eveigb.charname
         return eveigb.charname
     return 'someone'
 
@@ -289,7 +293,7 @@ def snapshot(model):
         Note: The returned snapshot is NOT SAVED!
     """
     if isinstance(model, Site):
-        snap = SiteSnapshot(site=model, date=datetime.utcnow(), user=model.user, scanid=model.scanid,
+        snap = SiteSnapshot(site=model, date=datetime.utcnow(), user=model.creator, scanid=model.scanid, name=model.name,
             type=model.type, where=model.where, opened=model.opened, closed=model.closed, notes=model.notes)
         return snap
     elif isinstance(model, Wormhole):
@@ -412,6 +416,25 @@ def do_edit_wormhole(p, wormhole, dispay_name):
         wormhole.save()
         return snap
     return False
+
+timemap = {
+    'Fresh': '24:00',
+    'Undecayed': '20:00',
+    '< 50% time': '12:00',
+    'Unknown': '99:99',
+    'EoL': '4:00',
+}
+
+def maxTimeLeft(wormhole):
+    now = datetime.now(pytz.utc)
+    if not wormhole.status in timemap:
+        return '99:99'
+    max_time = timemap[wormhole.status]
+    diff = (now - wormhole.date)
+    m, s = divmod(diff.seconds, 60)
+    h, m = divmod(m, 60)
+    left = str((int(max_time.split(':')[0]) - h)) + ':' + str(abs(60 - m)) + ':' + str(abs(60 - s))
+    return str(left)
 
 class PasteData:
     """ Dynamically constructed class sent to /sitemngr/addsite and  /sitemngr/addwormhole from /sitemngr/paste  """
