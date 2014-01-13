@@ -49,13 +49,13 @@ Paste
         </tr>
         {% for p in pastedata %}
             <tr>
-                <td><input type="text" value="{{ p }}: {{ p.name }}" readonly></td>
+                <td><input type="text" value="{{ p.scanid }}: {{ p.name }}" readonly></td>
                 <td>{{ p.p_type }}</td>
                 <td>
                     <select name="{{ p.scanid }}">
                         <option>-IGNORE-</option>
                         {% for allowed in p.allowed %}
-                            <option>{{ allowed.as_string }}</option>
+                            <option>{{ allowed }}</option>
                         {% endfor %}
                         <option>-CLOSE-</option>
                     </select>
