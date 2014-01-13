@@ -76,6 +76,7 @@ def get_last_update():
 
 def p_get_all_data(line):
     """ Parses all information from a line from the discovery scanner """
+    baseTypes = ['Cosmic Anomoly', 'Cosmic Signature']
     siteTypes = ['Data Site', 'Relic Site', 'Gas Site']
     anomTypes = ['Combat Site', 'Ore Site']
     wormholeTypes = ['Wormhole', 'Unstable Wormhole']
@@ -90,25 +91,27 @@ def p_get_all_data(line):
     for section in line.split('\t'):
         if section is None:
             continue
-        if re.match(r'^[a-zA-Z]{3}-\d{3}$', section):
-            data['scanid'] = section[:3].upper().replace('\r', '').replace('\n', '')
+        section = section.replace('\r', '').replace('\n', '')
+        if re.match(r'^[A-Z]{3}-\d{3}$', section):
+            data['scanid'] = section[:3].upper()
             continue
         if section in siteTypes and not data['iswormhole']:
             data['issite'] = True
-            data['type'] = section.replace('\r', '').replace('\n', '').split(' ')[0]
+            data['type'] = section.split(' ')[0]
             continue
         if section in anomTypes:
             data['isanom'] = True
-            data['type'] = section.replace('\r', '').replace('\n', '').split(' ')[0]
+            data['type'] = section.split(' ')[0]
             continue
         if section in wormholeTypes:
             data['iswormhole'] = True
             data['issite'] = False
-            data['type'] = section.replace('\r', '').replace('\n', '')
+            data['type'] = section
             continue
         if '%' in section or 'AU' in section or re.match(r'^\d+ km$', section.strip()):
             continue
-        data['name'] = section.replace('\r', '').replace('\n', '')
+        if not section in baseTypes:
+            data['name'] = section
     return data
 
 class SpaceObject:

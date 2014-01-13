@@ -279,7 +279,6 @@ def paste(request):
         post = request.POST
         if post.has_key('downtime') and post['downtime']:
             # After paste and checking after downtime checkbox - prepare data for user to make changes after downtime
-            PasteUpdated(user=util.get_display_name(eveigb, request), date=datetime.utcnow()).save()
             sites = []
             wormholes = []
             newids = []
