@@ -432,12 +432,16 @@ timemap = {
 
 def maxTimeLeft(wormhole):
     now = datetime.now(pytz.utc)
-    if not wormhole.status in timemap:
-        return '16:00:00'
     max_time = None
-    if len(wormhole.get_snapshots()) > 0:
-        max_time = timemap[wormhole.get_snapshots()[0].status]
+    snapshots = wormhole.get_snapshots()
+    if len(snapshots) > 0:
+        if not snapshots[0].status in timemap:
+            return '16:00:00'
+        else:
+            max_time = timemap[snapshots[0].status]
     else:
+        if not wormhole.status in timemap:
+            return '16:00:00'
         max_time = timemap[wormhole.status]
     diff = (now - wormhole.date)
     m, s = divmod(diff.seconds, 60)

@@ -1,3 +1,8 @@
+Directions toggle div on addsite/addwormhole pages is ugly
+Index page countdown - views.py - no negatives! Subtract from next over.
+Somewhere, notes is being used for scanid changes
+Recent scanid page needs more information
+After downtime paste page does not save data - seems to be saving its original scanid
 System page needs recent kills
 Different times for different wormhole connection types
 Look up site types based off of their names
