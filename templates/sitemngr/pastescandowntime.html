@@ -55,7 +55,7 @@ Paste
                     <select name="{{ p.scanid }}">
                         <option>-IGNORE-</option>
                         {% for allowed in p.allowed %}
-                            <option>{{ allowed }}</option>
+                            <option>{{ allowed.as_string }}</option>
                         {% endfor %}
                         <option>-CLOSE-</option>
                     </select>

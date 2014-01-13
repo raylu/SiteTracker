@@ -66,7 +66,7 @@ Index
             var start = $('#wstart' + n).text();
             var end = $('#wend' + n).text();
             var status = $('#wstatus' + n).text();
-            $('#wid' + n).html('<input type="text" id="wid' + n + '_edit" value="' + scanid + '">');
+            $('#wid' + n).html('<input type="text" class="uppercase" id="wid' + n + '_edit" value="' + scanid + '">');
             $('#wstart' + n).html('<input type="text" id="wstart' + n + '_edit" value="' + start + '">');
             $('#wend' + n).html('<input type="text" id="wend' + n + '_edit" value="' + end + '">');
             $('#wstatus' + n).html('<input type="text" id="wstatus' + n + '_edit" value="' + status + '">');
@@ -77,7 +77,7 @@ Index
             var name = $('#sname' + n).text();
             var type = $('#stype' + n).text();
             var where = $('#swhere' + n).text();
-            $('#sid' + n).html('<input type="text" id="sid' + n + '_edit" value="' + scanid + '">');
+            $('#sid' + n).html('<input type="text" class="uppercase" id="sid' + n + '_edit" value="' + scanid + '">');
             $('#sname' + n).html('<input type="text" id="sname' + n + '_edit" value="' + name + '">');
             $('#stype' + n).html('<input type="text" id="stype' + n + '_edit" value="' + type + '">');
             $('#swhere' + n).html('<input type="text" id="swhere' + n + '_edit" value="' + where + '">');
@@ -128,7 +128,6 @@ Index
                   status: status
               },
               success: function(data) {
-                console.log('Ajax wormhole save returned ' + data);
                 $('#wlink' + n).html('<a class="label label-info" href="/sitemngr/editwormhole/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'wormhole\',' + n + ')">In line</a>');
                 $('#wid' + n).html('<a href="/sitemngr/viewwormhole/' + n + '">' + scanid + '</a>');
                 $('#wstart' + n).html('<a href="/sitemngr/system/' + start +'">' + start + '</a>');
@@ -166,7 +165,6 @@ Index
                     where: where
                 },
                 success: function(data) {
-                    console.log('Ajax site save returned ' + data);
                     $('#slink' + n).html('<a class="label label-info" href="/sitemngr/editsite/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'site\',' + n + ')">In line</a>');
                     $('#sid' + n).html('<a href="/sitemngr/viewsite/' + n + '">' + scanid + '</a>');
                     $('#sname' + n).html(name);
@@ -215,6 +213,9 @@ Index
         text-transform: uppercase;
     }
     #s_new_scanid {
+        text-transform: uppercase;
+    }
+    .uppercase {
         text-transform: uppercase;
     }
 </style>

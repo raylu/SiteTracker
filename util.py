@@ -76,8 +76,8 @@ def get_last_update():
 
 def p_get_all_data(line):
     """ Parses all information from a line from the discovery scanner """
-    siteTypes = ['Cosmic Signature', 'Data', 'Relic', 'Gas']
-    anomTypes = ['Cosmic Anomaly', 'Combat Site', 'Ore Site']
+    siteTypes = ['Data Site', 'Relic Site', 'Gas Site']
+    anomTypes = ['Combat Site', 'Ore Site']
     wormholeTypes = ['Wormhole', 'Unstable Wormhole']
     data = {}
     # defaults to ensure that we don't get a KeyError trying to access information not pulled from the line
@@ -95,11 +95,11 @@ def p_get_all_data(line):
             continue
         if section in siteTypes and not data['iswormhole']:
             data['issite'] = True
-            data['type'] = section.replace('\r', '').replace('\n', '')
+            data['type'] = section.replace('\r', '').replace('\n', '').split(' ')[0]
             continue
         if section in anomTypes:
             data['isanom'] = True
-            data['type'] = section.replace('\r', '').replace('\n', '')
+            data['type'] = section.replace('\r', '').replace('\n', '').split(' ')[0]
             continue
         if section in wormholeTypes:
             data['iswormhole'] = True
@@ -405,18 +405,22 @@ def do_edit_wormhole(p, wormhole, dispay_name):
     return False
 
 timemap = {
-    'Fresh': '24:00',
-    'Undecayed': '20:00',
-    '< 50% time': '12:00',
-    'Unknown': '99:99',
-    'EoL': '4:00',
+    'Fresh': '24:00:00',
+    'Undecayed': '20:00:00',
+    '< 50% time': '12:00:00',
+    'Unknown': '99:99:00',
+    'EoL': '4:00:00',
 }
 
 def maxTimeLeft(wormhole):
     now = datetime.now(pytz.utc)
     if not wormhole.status in timemap:
-        return '99:99'
-    max_time = timemap[wormhole.status]
+        return '99:99:99'
+    max_time = None
+    if len(wormhole.get_snapshots()) > 0:
+        max_time = timemap[wormhole.get_snapshots()[0].status]
+    else:
+        max_time = timemap[wormhole.status]
     diff = (now - wormhole.date)
     m, s = divmod(diff.seconds, 60)
     h, m = divmod(m, 60)
@@ -444,6 +448,8 @@ class PasteMatch:
         self.allowed = allowed
     def __repr__(self):
         return '<PasteMatch-%s-%s-%s-%s>' % (self.scanid, self.name, self.p_type, self.allowed)
+    def as_string(self):
+        return '%s: %s' % (self.scanid, self.name)
 
 class KillReport:
     """ Dynamically constructed class sent to /sitemngr/checkkills """

@@ -566,14 +566,14 @@ def recent_scan_edits(request):
     for snap in SiteSnapshot.objects.all().order_by('-id'):
         if not snap.site in sites:
             sites.append(snap.site)
-        count += 1
+            count += 1
         if count == int(appSettings.RECENT_EDITS_LIMIT) + 1:
             break
     count = 0
     for snap in WormholeSnapshot.objects.all().order_by('-id'):
         if not snap.wormhole in wormholes:
             wormholes.append(snap.wormhole)
-        count += 1
+            count += 1
         if count == int(appSettings.RECENT_EDITS_LIMIT) + 1:
             break
     return render(request, 'sitemngr/recentscanedits.html', {'displayname': util.get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes})
