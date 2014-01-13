@@ -61,22 +61,37 @@ def get_last_update():
         return None
     # get the object whose date was selected
     try:
-        return Site.objects.get(date=date)
+        if len(Site.objects.filter(date=date)) > 0:
+            return Site.objects.filter(date=date)[0]
+        else:
+            return Site.objects.get(date=date)
     except Site.DoesNotExist:
         try:
-            return Wormhole.objects.get(date=date)
+            if len(Wormhole.objects.filter(date=date)) > 0:
+                return Wormhole.objects.filter(date=date)[0]
+            else:
+                return Wormhole.objects.get(date=date)
         except Wormhole.DoesNotExist:
             try:
-                return SiteSnapshot.objects.get(date=date)
+                if len(SiteSnapshot.objects.filter(date=date)) > 0:
+                    return SiteSnapshot.objects.filter(date=date)[0]
+                else:
+                    return SiteSnapshot.objects.get(date=date)
             except SiteSnapshot.DoesNotExist:
                 try:
-                    return WormholeSnapshot.objects.get(date=date)
+                    if len(WormholeSnapshot.objects.filter(date=date)) > 0:
+                        return WormholeSnapshot.objects.filter(date=date)[0]
+                    else:
+                        return WormholeSnapshot.objects.get(date=date)
                 except WormholeSnapshot.DoesNotExist:
-                    return PasteUpdated.objects.get(date=date)
+                    if len(PasteUpdated.objects.filter(date=date)) > 0:
+                        return PasteUpdated.objects.filter(date=date)[0]
+                    else:
+                        return PasteUpdated.objects.get(date=date)
 
 def p_get_all_data(line):
     """ Parses all information from a line from the discovery scanner """
-    baseTypes = ['Cosmic Anomoly', 'Cosmic Signature']
+    baseTypes = ['Cosmic Anomaly', 'Cosmic Signature']
     siteTypes = ['Data Site', 'Relic Site', 'Gas Site']
     anomTypes = ['Combat Site', 'Ore Site']
     wormholeTypes = ['Wormhole', 'Unstable Wormhole']
