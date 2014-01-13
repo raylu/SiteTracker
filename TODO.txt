@@ -1,0 +1,3 @@
+System page needs recent kills
+Different times for different wormhole connection types
+Look up site types based off of their names

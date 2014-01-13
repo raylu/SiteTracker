@@ -363,11 +363,11 @@ def paste(request):
             return redirect('/sitemngr/')
         else:
             # Parse data to return to normal paste page
-            PasteUpdated(user=util.get_display_name(eveigb, request), date=datetime.utcnow()).save()
-            present = []
-            findnew = []
-            notfound = []
             if 'pastedata' in post and post['pastedata'] and 'system' in post and post['system']:
+                PasteUpdated(user=util.get_display_name(eveigb, request), date=datetime.utcnow()).save()
+                present = []
+                findnew = []
+                notfound = []
                 paste = post['pastedata']
                 system = post['system']
                 notfound.extend(Site.objects.filter(where=system, closed=False))
