@@ -1,4 +1,5 @@
 Set up tests
+Wormhole remaining time should be calculated in original/first snapshot that is not status="Closed"
 WormholeSnapshot date fields being auto updated?
 Index page countdown - views.py - no negatives! Subtract from next over.
 After downtime paste page does not save data - seems to be saving its original scanid
