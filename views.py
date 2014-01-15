@@ -382,7 +382,7 @@ def paste(request):
                     newP.name = data['name']
                     if util.is_site(newP.scanid):
                         site = util.get_site(newP.scanid)
-                        if site.where == system:
+                        if site.where == system and not site.closed:
                             # Should not have to call this
                             if site in notfound:
                                 notfound.remove(site)
@@ -390,7 +390,7 @@ def paste(request):
                             present.append(site)
                     elif util.is_wormhole(newP.scanid):
                         wormhole = util.get_wormhole(newP.scanid)
-                        if wormhole.start == system:
+                        if wormhole.start == system and not wormhole.closed:
                             # Should not have to call this
                             if wormhole in notfound:
                                 notfound.remove(wormhole)

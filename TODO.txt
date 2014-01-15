@@ -1,4 +1,3 @@
-Paste page normal needs to ensure that the objects are NOT CLOSED before saying they're in the database
 WormholeSnapshot date fields being updated?
 Directions toggle div on addsite/addwormhole pages is ugly
 Index page countdown - views.py - no negatives! Subtract from next over.
