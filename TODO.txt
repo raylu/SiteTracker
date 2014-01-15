@@ -1,5 +1,4 @@
 WormholeSnapshot date fields being auto updated?
 Index page countdown - views.py - no negatives! Subtract from next over.
-Recent scanid page needs more information
 After downtime paste page does not save data - seems to be saving its original scanid
 Different times for different wormhole connection types

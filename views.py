@@ -78,6 +78,7 @@ def index(request, note=None):
     sites = Site.objects.filter(closed=False)
     wormholes = Wormhole.objects.filter(closed=False)
     
+    # timers for couting down the rest of a wormhole's lifespan
     maxTimers = {}
     for wormhole in wormholes:
         maxTimers[wormhole.id] = util.maxTimeLeft(wormhole)

@@ -19,6 +19,15 @@ class Site(models.Model):
         return self.name in ['Common Perimeter Deposit', 'Average Frontier Deposit', 'Exceptional Core Deposit', 'Unexceptional Frontier Reservoir', 'Ordinary Permiter Deposit', 'Core Garrison', 'Core Stronghold', 'Oruze Osobnyk', 'Quarantine Area', 'Ordinary Perimeter Deposit', 'Rarified Core Deposit', 'Unexceptional Frontier Deposit']
     def get_snapshots(self):
         return SiteSnapshot.objects.filter(site=self.id)
+    def id_changes(self):
+        ret = ''
+        snaps = self.get_snapshots()
+        for count, snap in enumerate(snaps):
+            if count == 0:
+                ret = snap.scanid
+                continue
+            ret += ' > ' + snap.scanid
+        return ret
 
 class SiteSnapshot(models.Model):
     """ A snapshot of a Site object, used for recording changes in data """
@@ -52,6 +61,15 @@ class Wormhole(models.Model):
         return '{0} {1} > {2} ({3})'.format(self.scanid, self.start, self.destination, self.status)
     def get_snapshots(self):
         return WormholeSnapshot.objects.filter(wormhole=self.id)
+    def id_changes(self):
+        ret = ''
+        snaps = self.get_snapshots()
+        for count, snap in enumerate(snaps):
+            if count == 0:
+                ret = snap.scanid
+                continue
+            ret += ' > ' + snap.scanid
+        return ret
 
 class WormholeSnapshot(models.Model):
     """ A snapshot of a Wormhole object, used for recording changes in data """
