@@ -332,6 +332,7 @@ def do_edit_site(p, site, display_name):
             changedName = True
             site.name = p['name']
     if p.has_key('scanid') and p['scanid']:
+        p['scanid'] = p['scanid'].upper()
         if p['scanid'] != site.scanid:
             changedScanid = True
             site.scanid = p['scanid'].upper()
@@ -381,6 +382,7 @@ def do_edit_wormhole(p, wormhole, dispay_name):
     changedClosed = False
     changedNotes = False
     if p.has_key('scanid') and p['scanid']:
+        p['scanid'] = p['scanid'].upper()
         if p['scanid'] != wormhole.scanid:
             changedScanid = True
             wormhole.scanid = p['scanid'].upper()
