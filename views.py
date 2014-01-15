@@ -346,7 +346,6 @@ def paste(request):
                         site.closed = True
                         site.save()
                     else:
-                        site.notes += ' Scanid: {0} >> {1}'.format(site.scanid, v)
                         site.scanid = v
                 else:
                     wormhole = util.get_wormhole(k)
@@ -355,7 +354,6 @@ def paste(request):
                         wormhole.closed = True
                         wormhole.save()
                     else:
-                        wormhole.notes += 'Scanid: {0} >> {1}'.format(wormhole.scanid, v)
                         wormhole.scanid = v
                         wormhole.save()
             set_dirty()
@@ -474,9 +472,17 @@ def system(request, systemid):
             clazz = util.get_wormhole_class(systemid)
         except:
             pass
+    kills_npc = kills_ship = kills_pod = 0
+    kills = evemap.kills_by_system()[0]
+    for k in kills.iteritems():
+        if str(k[0]) == systemid:
+            kills_npc = k[1]['faction']
+            kills_ship = k[1]['ship']
+            kills_pod = k[1]['pod']
     return render(request, 'sitemngr/system.html', {'displayname': util.get_display_name(eveigb, request), 'system': systemid, 'openwormholes': openwormholes, 'closedwormholes': closedwormholes,
                             'class': clazz, 'security': security, 'kspace': is_kspace, 'opensites': opensites, 'unopenedsites': unopenedsites,
-                            'is_in_chain': is_in_chain, 'closest_chain': closest_chain, 'closest_jumps': closest_jumps})
+                            'is_in_chain': is_in_chain, 'closest_chain': closest_chain, 'closest_jumps': closest_jumps,
+                            'kills_npc': kills_npc, 'kills_ship': kills_ship, 'kills_pod': kills_pod})
 
 def get_tradehub_jumps(request, system):
     """ Shows the number of jumps from each tradehub system """
