@@ -1,6 +1,8 @@
-Set up tests
-Wormhole remaining time should be calculated in original/first snapshot that is not status="Closed"
-WormholeSnapshot date fields being auto updated?
-Index page countdown - views.py - no negatives! Subtract from next over.
-After downtime paste page does not save data - seems to be saving its original scanid
-Different times for different wormhole connection types
+! After downtime paste page does not save data - seems to be saving its original scanid
+Add "Mark as Up to Date" button on index page and tie it auto into paste.
+	2 fields on index page: last edited and last up to date
+Change index page's wormhole countdown to a count up
+Index page canceling an in-line edit displays the scanid column wrong. Still correct in database.
+Index page's last updated feature is not working with WormholeSnapshots - incorrectly calculating last updated
+Research and set up tests because I keep breaking things with updates
+Different times for different wormhole connection types - where to pull this data from?

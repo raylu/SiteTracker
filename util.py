@@ -53,11 +53,14 @@ def get_last_update():
     date = None
     try:
         date = sorted(dates)[-1]
+        print date
     except IndexError:
         # if nothing was added to the list, i.e. new database
+        print 'Last update parse IndexError'
         return None
     except TypeError:
         # one of more of the fields was filled, and one or more was None
+        print 'Last update parse TypeError'
         return None
     # get the object whose date was selected
     try:
@@ -432,6 +435,7 @@ timemap = {
     '< 50% time': '12:00:00',
     'Unknown': '99:99:00',
     'EoL': '4:00:00',
+    'Closed': '00:00:00'
 }
 
 def maxTimeLeft(wormhole):
