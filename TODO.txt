@@ -1,8 +1,5 @@
-! After downtime paste page does not save data - seems to be saving its original scanid
-Add "Mark as Up to Date" button on index page and tie it auto into paste.
-	2 fields on index page: last edited and last up to date
-Change index page's wormhole countdown to a count up
+! After downtime paste page does not save data - is saving its original scanid
+Auto-mark the database as up to date when a paste into the home system returns all in the first column
 Index page canceling an in-line edit displays the scanid column wrong. Still correct in database.
 Index page's last updated feature is not working with WormholeSnapshots - incorrectly calculating last updated
 Research and set up tests because I keep breaking things with updates
-Different times for different wormhole connection types - where to pull this data from?

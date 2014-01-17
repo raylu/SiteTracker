@@ -17,35 +17,29 @@ Index
         $('#tt3').tooltip();
         $('#tt4').tooltip();
         $('#tt5').tooltip();
-        $('#tt6').tooltip();
         setTimeout(function() {
             $('#alert_notices').fadeOut(5000);
             $('#alert_flag').fadeOut(5000);
         }, 30000);
         var counter = setInterval(timer, 1000);
         function timer() {
-            var elements = $('td.countdowntimer');
+            var elements = $('td.countup');
             elements.each(function() {
                 var current = $(this).text();
+                if (current.indexOf(':') === -1)
+                    return;
                 var next = current.split(':');
-                if (next[0] == 0 && next[1] == 0 && next[2] == 0) {
-                    // do nothing
+                if (next[1] == 59) {
+                    next[0] ++;
+                    next[1] = 0;
+                    next[2] = 0;
+                } else if (next[2] == 59) {
+                    next[1] ++;
+                    next[2] = 0;
+                } else {
+                    next[2] ++;
                 }
-                else {
-                    if (next[1] == 0) {
-                        next[0] --;
-                        next[1] = 59;
-                        next[2] = 59;
-                    }
-                    else if (next[2] == 0) {
-                        next[1] --;
-                        next[2] = 59;
-                    }
-                    else {
-                        next[2] --;
-                    }
-                    $(this).text(next[0] + ':' + next[1] + ':' + next[2]);
-                }
+                $(this).text(next[0] + ':' + next[1] + ':' + next[2]);
             });
         }
     });
@@ -223,12 +217,6 @@ Index
 
 {% block content %}
 
-<!--
-{% for n in notices %}{{ n }}{% endfor %}
-
-{{ notices }}
--->
-
 <center>
 
 {% if notices %}
@@ -339,7 +327,12 @@ Index
 
 <h5><a href="/sitemngr/system/{{ homesystem }}" id="tt1" data-toggle="tooltip" title="Direct link to the system overview page for the homesystem in settings, {{ homesystem }}">Home System Page</a></h5>
 
-<h5>It is currently Eve time {% now 'H:i:s, N j' %}. Last update: {{ last_update_diff }} ago, by {{ last_update_user }}</h5>
+<p><strong>
+    It is currently Eve time {% now 'H:i:s, N j' %}.<br>
+    Last edit: {{ last_update_diff }} ago, by {{ last_update_user }}<br>
+    Last marked as up to date: {{ last_up_to_date_diff }} ago, by {{ last_up_to_date_user }}<br>
+    <a class="label label-info" href="/sitemngr/markuptodate/">Click me to mark up to date</a>
+</strong></p>
 
 <h1 id="tt5" data-toggle="tooltip" title="Wormholes start in one system and lead to another - the method of transportantion for those living in wormhole-space.">Index of {% if status and status == 'open' %}{% else %}closed {% endif %}wormholes</h1>
 <table class="hovertable">
@@ -350,7 +343,7 @@ Index
             <th>Leads to</th>
             <th>Entered</th>
             <th>Status</th>
-            <th id="tt6" data-toggle="tooltip" title="This is the ellapsed time - entered time, with respect to the status">Max Time</th>
+            <th>Ellapsed time</th>
             <th>Edit</th>
         </tr>
     </thead>
@@ -366,7 +359,7 @@ Index
                 <td id="wend{{ w.id }}">{% if w.destination == 'Unknown' or w.destination == '' or w.destination == 'Unopened' or w.destination == 'Closed' %}{{ w.destination }}{% else %}<a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>{% endif %}</td>
                 <td>{{ w.date|date:'m/d @ H:i' }}</td>
                 <td id="wstatus{{ w.id }}">{{ w.status }}</td>
-                <td class="countdowntimer">{% for k,v in maxTimers.items %}{% if k == w.id %}{{ v }}{% endif %}{% endfor %}</td>
+                <td class="countup">{% for k,v in ellapsedTimers.items %}{% if k == w.id %}{{ v }}{% endif %}{% endfor %}</td>
                 <td id="wlink{{ w.id }}"><a class="label label-info" href="/sitemngr/editwormhole/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('wormhole', {{ w.id }});">In line</a></td>
             </tr>
         {% endfor %}

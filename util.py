@@ -5,7 +5,7 @@ from datetime import datetime
 import pytz
 
 # sitemngr
-from models import (Site, SiteSnapshot, Wormhole, WormholeSnapshot, PasteUpdated, Settings, System)
+from models import (Site, SiteSnapshot, Wormhole, WormholeSnapshot, PasteUpdated, Settings, System, DatabaseUpToDate)
 import settings as appSettings
 
 def get_time_difference_formatted(old, recent):
@@ -16,37 +16,24 @@ def get_time_difference_formatted(old, recent):
     h, m = divmod(m, 60)
     return '%s days, %s hours, %s minutes, and %s seconds' % (days, h, m, s)
 
-def get_last_update_time():
-    """ Returns the time of the most recent database change """
-    if not get_last_update():
-        return '-never'
-    return get_last_update().date
-
-def get_last_update_user():
-    """ Returns the user to make the most recent database change """
-    last = get_last_update()
-    if not last:
-        return '-no one-'
-    return last.creator if isinstance(last, (Site, Wormhole)) else last.user
-
 def get_last_update():
-    """ Returns the object that has the most recent date """
+    """ Returns a dict of info for the last time a user made an edit """
     # add the last of each type of data to the list
     site = Site.objects.last()
-    s_change = SiteSnapshot.objects.last()
+    sitesnap = SiteSnapshot.objects.last()
     wormhole = Wormhole.objects.last()
-    w_change = WormholeSnapshot.objects.last()
+    wormholesnap = WormholeSnapshot.objects.last()
     paste = PasteUpdated.objects.last()
     dates = []
     # only add dates belonging to actual objects (prevents trying to get the data of a None object)
     if site:
         dates.append(site.date)
-    if s_change:
-        dates.append(s_change.date)
+    if sitesnap:
+        dates.append(sitesnap.date)
     if wormhole:
         dates.append(wormhole.date)
-    if w_change:
-        dates.append(w_change.date)
+    if wormholesnap:
+        dates.append(wormholesnap.date)
     if paste:
         dates.append(paste.date)
     # get the most recent date
@@ -57,40 +44,27 @@ def get_last_update():
     except IndexError:
         # if nothing was added to the list, i.e. new database
         print 'Last update parse IndexError'
-        return None
+        return {'time': None, 'user': None}
     except TypeError:
         # one of more of the fields was filled, and one or more was None
         print 'Last update parse TypeError'
-        return None
-    # get the object whose date was selected
-    try:
-        if len(Site.objects.filter(date=date)) > 0:
-            return Site.objects.filter(date=date)[0]
-        else:
-            return Site.objects.get(date=date)
-    except Site.DoesNotExist:
-        try:
-            if len(Wormhole.objects.filter(date=date)) > 0:
-                return Wormhole.objects.filter(date=date)[0]
-            else:
-                return Wormhole.objects.get(date=date)
-        except Wormhole.DoesNotExist:
-            try:
-                if len(SiteSnapshot.objects.filter(date=date)) > 0:
-                    return SiteSnapshot.objects.filter(date=date)[0]
-                else:
-                    return SiteSnapshot.objects.get(date=date)
-            except SiteSnapshot.DoesNotExist:
-                try:
-                    if len(WormholeSnapshot.objects.filter(date=date)) > 0:
-                        return WormholeSnapshot.objects.filter(date=date)[0]
-                    else:
-                        return WormholeSnapshot.objects.get(date=date)
-                except WormholeSnapshot.DoesNotExist:
-                    if len(PasteUpdated.objects.filter(date=date)) > 0:
-                        return PasteUpdated.objects.filter(date=date)[0]
-                    else:
-                        return PasteUpdated.objects.get(date=date)
+        return {'time': None, 'user': None}
+    # return the appropriate not None information
+    if site and site.date == date:
+        return {'time': date, 'user': site.creator}
+    if sitesnap and sitesnap.date == date:
+        return {'time': date, 'user': sitesnap.user}
+    if wormhole and wormhole.date == date:
+        return {'time': date, 'user': wormhole.creator}
+    if wormholesnap and wormholesnap.date == date:
+        return {'time': date, 'user': wormholesnap.user}
+
+def get_last_up_to_date():
+    """ Return a dict of info for the last time the database was marked as up to date """
+    if DatabaseUpToDate.objects.count() == 0:
+        return {'time': '-never', 'user': '-no one-'}
+    last = DatabaseUpToDate.objects.last()
+    return {'time': last.date, 'user': last.user}
 
 def p_get_all_data(line):
     """ Parses all information from a line from the discovery scanner """

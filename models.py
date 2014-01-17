@@ -108,4 +108,12 @@ class PasteUpdated(models.Model):
     user = models.CharField(max_length=100)
     date = models.DateTimeField()
     def __repr__(self):
-        return '<PasteUpdated-%s>' % self.user
+        return '<PasteUpdated-%s-%s>' % (self.user, self.date)
+
+class DatabaseUpToDate(models.Model):
+    """ Represents the database entires for the home system being up to date """
+    user = models.CharField(max_length=100)
+    date = models.DateTimeField()
+    by = models.CharField(max_length=300)
+    def __repr__(self):
+        return '<DatabaseUpToDate-%s-%s>' % (self.user, self.date)

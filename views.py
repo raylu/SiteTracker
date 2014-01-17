@@ -12,7 +12,8 @@ from django.http import HttpResponse
 # sitemngr
 from models import (Site, SiteSnapshot,
                     Wormhole, WormholeSnapshot,
-                    PasteUpdated, Settings, System)
+                    PasteUpdated, Settings,
+                    System, DatabaseUpToDate)
 import settings as appSettings
 import util
 
@@ -88,13 +89,13 @@ def index(request, note=None):
         tidy()
     now = datetime.utcnow()
     # get the last updated time and player
-    last_update_diff = None
-    try:
-        last_update_diff = util.get_time_difference_formatted(util.get_last_update_time().replace(tzinfo=None), now)
-    except TypeError:
-        last_update_diff = '-never-'
-    last_update_user = util.get_last_update_user()
-    return render(request, 'sitemngr/index.html', {'maxTimers': maxTimers, 'displayname': util.get_display_name(eveigb, request), 'homepage': True, 'homesystem': appSettings.HOME_SYSTEM, 'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': util.get_settings(util.get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': util.get_settings(util.get_display_name(eveigb, request)).userBackgroundImage, 'flag': note, 'last_update_diff': last_update_diff, 'last_update_user': last_update_user})
+    lasteditdict = util.get_last_update()
+    last_update_diff, last_update_user = util.get_time_difference_formatted(lasteditdict['time'].replace(tzinfo=None), now), lasteditdict['user']
+    uptodatedict = util.get_last_up_to_date()
+    last_up_to_date_diff, last_up_to_date_user = util.get_time_difference_formatted(uptodatedict['time'].replace(tzinfo=None), now), uptodatedict['user']
+    return render(request, 'sitemngr/index.html', {'maxTimers': maxTimers, 'displayname': util.get_display_name(eveigb, request), 'homepage': True, 'homesystem': appSettings.HOME_SYSTEM, \
+        'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': util.get_settings(util.get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': util.get_settings(util.get_display_name(eveigb, request)).userBackgroundImage, \
+        'flag': note, 'last_update_diff': last_update_diff, 'last_update_user': last_update_user, 'last_up_to_date_diff': last_up_to_date_diff, 'last_up_to_date_user': last_up_to_date_user})
 
 def view_all(request):
     """ Index page, but with the closed objects instead of the open """
@@ -952,3 +953,11 @@ def no_access(request):
     eveigb = IGBHeaderParser(request)
     wrongAlliance = util.can_view_wrong_alliance(eveigb)
     return render(request, 'sitemngr/noaccess.html', {'displayname': util.get_display_name(eveigb, request), 'wrongAlliance': wrongAlliance})
+
+def mark_up_to_date(request):
+    """ User manually marked the database as up to date """
+    eveigb = IGBHeaderParser(request)
+    if not util.can_view(eveigb, request):
+        return no_access(request)
+    DatabaseUpToDate(user=util.get_display_name(eveigb, request), date=datetime.utcnow(), by='Manual').save()
+    return redirect('/sitemngr/')
