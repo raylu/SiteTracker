@@ -398,6 +398,9 @@ def paste(request):
                             present.append(wormhole)
                     if not found:
                         findnew.append(newP)
+                # check if the database is up to date
+                if len(findnew) == 0 and len(notfound) == 0:
+                    DatabaseUpToDate(user=util.get_display_name(eveigb, request), date=datetime.utcnow(), by='sitemngr.views.paste').save()
                 return render(request, 'sitemngr/pastescan.html', {'displayname': util.get_display_name(eveigb, request), 'raw': post['pastedata'],
                                'present': present, 'notfound': notfound, 'findnew': findnew, 'timenow': now, 'system': system, 'newTab': util.get_settings(util.get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': util.get_settings(util.get_display_name(eveigb, request)).userBackgroundImage})
     # Base request - show the base pastescan page

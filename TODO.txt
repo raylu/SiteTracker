@@ -1,5 +1,4 @@
 ! After downtime paste page does not save data - is saving its original scanid
-Auto-mark the database as up to date when a paste into the home system returns all in the first column
 Index page canceling an in-line edit displays the scanid column wrong. Still correct in database.
 Index page's last updated feature is not working with WormholeSnapshots - incorrectly calculating last updated
 Research and set up tests because I keep breaking things with updates
