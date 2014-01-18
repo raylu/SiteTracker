@@ -58,6 +58,8 @@ def get_last_update():
         return {'time': date, 'user': wormhole.creator}
     if wormholesnap and wormholesnap.date == date:
         return {'time': date, 'user': wormholesnap.user}
+    if paste and paste.date == date:
+        return {'time': date, 'user': paste.user}
     return {'time': '-never-', 'user': '-no one-'}
 
 def get_last_up_to_date():
@@ -66,6 +68,17 @@ def get_last_up_to_date():
         return {'time': '-never', 'user': '-no one-'}
     last = DatabaseUpToDate.objects.last()
     return {'time': last.date, 'user': last.user}
+
+def ellapsed_timers():
+    ret = {}
+    now = datetime.now(pytz.utc)
+    for wormhole in Wormhole.objects.filter(opened=True, closed=False):
+        diff = (now - wormhole.date)
+        m, s = divmod(diff.seconds, 60)
+        h, m = divmod(m, 60)
+        left = '%s:%s:%s' % (h, m, s)
+        ret[wormhole.id] = left
+    return ret
 
 def p_get_all_data(line):
     """ Parses all information from a line from the discovery scanner """
@@ -403,17 +416,6 @@ def do_edit_wormhole(p, wormhole, dispay_name):
         snap.save()
         return snap
     return False
-
-def ellapsed_timers():
-    ret = {}
-    now = datetime.now(pytz.utc)
-    for wormhole in Wormhole.objects.filter(opened=True, closed=False):
-        diff = (now - wormhole.date)
-        m, s = divmod(diff.seconds, 60)
-        h, m = divmod(m, 60)
-        left = '%s:%s:%s' % (h, m, s)
-        ret[wormhole.id] = left
-    return ret
 
 class PasteData:
     """ Dynamically constructed class sent to /sitemngr/addsite and  /sitemngr/addwormhole from /sitemngr/paste  """

@@ -91,12 +91,12 @@ def index(request, note=None):
     try:
         last_update_diff, last_update_user = util.get_time_difference_formatted(lasteditdict['time'].replace(tzinfo=None), now), lasteditdict['user']
     except TypeError:
-        last_update_diff, last_update_user = '-never-', '-no one-'
+        last_update_diff, last_update_user = 'error', 'error'
     uptodatedict = util.get_last_up_to_date()
     try:
         last_up_to_date_diff, last_up_to_date_user = util.get_time_difference_formatted(uptodatedict['time'].replace(tzinfo=None), now), uptodatedict['user']
     except TypeError:
-        last_up_to_date_diff, last_up_to_date_user = '-never-', '-no one -'
+        last_up_to_date_diff, last_up_to_date_user = 'error', 'error'
     return render(request, 'sitemngr/index.html', {'displayname': util.get_display_name(eveigb, request), 'homepage': True, 'homesystem': appSettings.HOME_SYSTEM, \
         'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': util.get_settings(util.get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': util.get_settings(util.get_display_name(eveigb, request)).userBackgroundImage, \
         'flag': note, 'last_update_diff': last_update_diff, 'last_update_user': last_update_user, 'last_up_to_date_diff': last_up_to_date_diff, 'last_up_to_date_user': last_up_to_date_user, 'ellapsed_timers': ellapsed_timers})
