@@ -79,10 +79,8 @@ def index(request, note=None):
     sites = Site.objects.filter(closed=False)
     wormholes = Wormhole.objects.filter(closed=False)
     
-    # timers for couting down the rest of a wormhole's lifespan
-    maxTimers = {}
-    for wormhole in wormholes:
-        maxTimers[wormhole.id] = util.maxTimeLeft(wormhole)
+    # ellapsed timers
+    ellapsed_timers = util.ellapsed_timers()
 
     # check if the wormhole objects and graph are out of sync
     if is_dirty():
@@ -93,9 +91,9 @@ def index(request, note=None):
     last_update_diff, last_update_user = util.get_time_difference_formatted(lasteditdict['time'].replace(tzinfo=None), now), lasteditdict['user']
     uptodatedict = util.get_last_up_to_date()
     last_up_to_date_diff, last_up_to_date_user = util.get_time_difference_formatted(uptodatedict['time'].replace(tzinfo=None), now), uptodatedict['user']
-    return render(request, 'sitemngr/index.html', {'maxTimers': maxTimers, 'displayname': util.get_display_name(eveigb, request), 'homepage': True, 'homesystem': appSettings.HOME_SYSTEM, \
+    return render(request, 'sitemngr/index.html', {'displayname': util.get_display_name(eveigb, request), 'homepage': True, 'homesystem': appSettings.HOME_SYSTEM, \
         'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': util.get_settings(util.get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': util.get_settings(util.get_display_name(eveigb, request)).userBackgroundImage, \
-        'flag': note, 'last_update_diff': last_update_diff, 'last_update_user': last_update_user, 'last_up_to_date_diff': last_up_to_date_diff, 'last_up_to_date_user': last_up_to_date_user})
+        'flag': note, 'last_update_diff': last_update_diff, 'last_update_user': last_update_user, 'last_up_to_date_diff': last_up_to_date_diff, 'last_up_to_date_user': last_up_to_date_user, 'ellapsed_timers': ellapsed_timers})
 
 def view_all(request):
     """ Index page, but with the closed objects instead of the open """

@@ -359,7 +359,7 @@ Index
                 <td id="wend{{ w.id }}">{% if w.destination == 'Unknown' or w.destination == '' or w.destination == 'Unopened' or w.destination == 'Closed' %}{{ w.destination }}{% else %}<a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>{% endif %}</td>
                 <td>{{ w.date|date:'m/d @ H:i' }}</td>
                 <td id="wstatus{{ w.id }}">{{ w.status }}</td>
-                <td class="countup">{% for k,v in ellapsedTimers.items %}{% if k == w.id %}{{ v }}{% endif %}{% endfor %}</td>
+                <td class="countup">{% for k,v in ellapsed_timers.items %}{% if k == w.id %}{{ v }}{% endif %}{% endfor %}</td>
                 <td id="wlink{{ w.id }}"><a class="label label-info" href="/sitemngr/editwormhole/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('wormhole', {{ w.id }});">In line</a></td>
             </tr>
         {% endfor %}

@@ -403,33 +403,16 @@ def do_edit_wormhole(p, wormhole, dispay_name):
         return snap
     return False
 
-timemap = {
-    'Fresh': '24:00:00',
-    'Undecayed': '20:00:00',
-    '< 50% time': '12:00:00',
-    'Unknown': '99:99:00',
-    'EoL': '4:00:00',
-    'Closed': '00:00:00'
-}
-
-def maxTimeLeft(wormhole):
+def ellapsed_timers():
+    ret = {}
     now = datetime.now(pytz.utc)
-    max_time = None
-    snapshots = wormhole.get_snapshots()
-    if len(snapshots) > 0:
-        if not snapshots[0].status in timemap:
-            return '16:00:00'
-        else:
-            max_time = timemap[snapshots[0].status]
-    else:
-        if not wormhole.status in timemap:
-            return '16:00:00'
-        max_time = timemap[wormhole.status]
-    diff = (now - wormhole.date)
-    m, s = divmod(diff.seconds, 60)
-    h, m = divmod(m, 60)
-    left = str((int(max_time.split(':')[0]) - h)) + ':' + str(abs(60 - m)) + ':' + str(abs(60 - s))
-    return str(left)
+    for wormhole in Wormhole.objects.filter(opened=True, closed=False):
+        diff = (now - wormhole.date)
+        m, s = divmod(diff.seconds, 60)
+        h, m = divmod(m, 60)
+        left = '%s:%s:%s' % (h, m, s)
+        ret[wormhole.id] = left
+    return ret
 
 class PasteData:
     """ Dynamically constructed class sent to /sitemngr/addsite and  /sitemngr/addwormhole from /sitemngr/paste  """
