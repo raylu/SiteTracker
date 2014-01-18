@@ -58,6 +58,7 @@ def get_last_update():
         return {'time': date, 'user': wormhole.creator}
     if wormholesnap and wormholesnap.date == date:
         return {'time': date, 'user': wormholesnap.user}
+    return {'time': '-never-', 'user': '-no one-'}
 
 def get_last_up_to_date():
     """ Return a dict of info for the last time the database was marked as up to date """
