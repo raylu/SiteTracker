@@ -14,7 +14,7 @@ from models import (Site, SiteSnapshot,
                     Wormhole, WormholeSnapshot,
                     PasteUpdated, Settings,
                     System, DatabaseUpToDate)
-import settings as appSettings
+import appSettings
 import util
 
 # eveigb

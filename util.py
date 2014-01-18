@@ -6,7 +6,7 @@ import pytz
 
 # sitemngr
 from models import (Site, SiteSnapshot, Wormhole, WormholeSnapshot, PasteUpdated, Settings, System, DatabaseUpToDate)
-import settings as appSettings
+import appSettings
 
 def get_time_difference_formatted(old, recent):
     """ Formats the difference between two datetime objects """

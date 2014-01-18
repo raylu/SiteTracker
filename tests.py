@@ -6,7 +6,7 @@ from django.test import TestCase
 
 # sitemngr
 from sitemngr.models import Site, SiteSnapshot, Wormhole, WormholeSnapshot
-import settings as appSettings
+import appSettings
 import util
 
 now = lambda: datetime.utcnow()
