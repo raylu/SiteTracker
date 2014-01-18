@@ -353,6 +353,7 @@ def paste(request):
                         site.save()
                     else:
                         site.scanid = v
+                        site.save()
                 else:
                     wormhole = util.get_wormhole(k)
                     util.snapshot(wormhole).save()
