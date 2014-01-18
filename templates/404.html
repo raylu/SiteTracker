@@ -1,0 +1,15 @@
+{% extends 'sitemngr/base.html' %}
+
+{% block subtitle %}
+404 Page Not Found
+{% endblock %}
+
+{% block content %}
+
+<h3>
+    You've generated a 404 error. That means that the URL you are trying to access does not exist.<br>
+    You're trying to reach {{ request_path }}. Use the top nav bar to nagivate back, or click 
+    <a href="/sitemngr/">here</a> to go back to the index page.
+</h3>
+
+{% endblock %}
