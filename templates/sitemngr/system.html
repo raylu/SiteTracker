@@ -9,7 +9,7 @@ System Info
     $(document).ready(function()
     {
         {% if kspace %}
-            $('#jumps').load('/sitemngr/get_tradehub_jumps/{{ system }}/');
+            $('#jumps').load('/get_tradehub_jumps/{{ system }}/');
         {% endif %}
     });
 </script>
@@ -63,21 +63,21 @@ System Info
             {% else %}
             <tr class="closed">
             {% endif %}
-                <td><a href="{% url 'viewwormhole' w.id ">{{ w.scanid }}</a></td>
+                <td><a href="{% url 'viewwormhole' w.id %}">{{ w.scanid }}</a></td>
                 <td>{{ w.date|date:'H:i, M d, y' }}</td>
                 <td>{{ w.time }}</td>
                 <td>
                     {% if system == w.start %}
                        <i>{{ w.start }}</i>
                     {% else %}
-                        <a href="{% url 'system' w.start ">{{ w.start }}</a>
+                        <a href="{% url 'system' w.start %}">{{ w.start }}</a>
                     {% endif %}
                 </td>
                 <td>
                     {% if system == w.destination %}
                         <i>{{ w.destination }}</i>
                     {% else %}
-                        <a href="{% url 'system' w.destination ">{{ w.destination }}</a>
+                        <a href="{% url 'system' w.destination %}">{{ w.destination }}</a>
                     {% endif %}
                 </td>
             </tr>
@@ -105,7 +105,7 @@ System Info
             {% else %}
             <tr class="closed">
             {% endif %}
-                <td><a href="{% url 'viewsite' s.id ">{{ s.scanid }}</a></td>
+                <td><a href="{% url 'viewsite' s.id %}">{{ s.scanid }}</a></td>
                 <td>{{ s.date|date:'H:i, M d, y' }}</td>
                 <td>{{ s.name }}</td>
             </tr>
@@ -133,7 +133,7 @@ System Info
             {% else %}
             <tr class="closed">
             {% endif %}
-                <td><a href="{% url 'viewsite' s.id ">{{ s.scanid }}</a></td>
+                <td><a href="{% url 'viewsite' s.id %}">{{ s.scanid }}</a></td>
                 <td>{{ s.date|date:'H:i, M d, y' }}</td>
                 <td>{{ s.name }}</td>
             </tr>
@@ -156,10 +156,10 @@ System Info
     </tr>
     {% for w in closedwormholes %}
         <tr>
-            <td><a href="{% url 'editwormhole' w.id ">{{ w.scanid }}</a></td>
+            <td><a href="{% url 'editwormhole' w.id %}">{{ w.scanid }}</a></td>
             <td>{{ w.date|date:'H:i, M d, y' }}</td>
             <td>{{ w.time }}</td>
-            <td><a href="{% url 'system' w.destination ">{{ w.destination }}</a></td>
+            <td><a href="{% url 'system' w.destination %}">{{ w.destination }}</a></td>
         </tr>
     {% endfor %}
     </table>
