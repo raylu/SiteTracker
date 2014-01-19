@@ -8,6 +8,10 @@ import pytz
 from models import (Site, SiteSnapshot, Wormhole, WormholeSnapshot, PasteUpdated, Settings, System, DatabaseUpToDate)
 import appSettings
 
+# ldap
+from django_auth_ldap.backend import LDAPBackend
+ldap_backend = LDAPBackend()
+
 def get_time_difference_formatted(old, recent):
     """ Formats the difference between two datetime objects """
     diff = recent - old
@@ -240,16 +244,21 @@ def get_display_name(eveigb, request):
         return eveigb.charname
     return 'someone'
 
-def can_view(igb, request=None):
+def can_view(igb, request=None, user=None):
     """
         Returns True if the user can view that page by testing
             if they are using the EVE IGB (Trusted mode) and in the appropriate alliance
     """
     if get_display_name(igb, request) in appSettings.BLOCKED_USERS:
         return False
+    if user is not None and user.is_active and user.account_status == 'Internal':
+        return True
     if request is not None:
         if request.user is not None:
             if request.user.is_active:
+                user = ldap_backend.populate_user(request.user.username)
+                if not user.account_status == 'Internal':
+                    return False
                 return True
     return igb is not None and igb.is_igb and igb.trusted and igb.alliancename == appSettings.ALLIANCE_NAME
 
