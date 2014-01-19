@@ -15,16 +15,16 @@ Login
     </div>
 {% endif %}
 
-<div class="row">
-    <div class="span6">
-        <h2>Login</h2>
-        <form method="POST" action="/sitemngr/login/">
-        {% csrf_token %}
-            <label>Username: </label><input type="text" name="username"><br>
-            <label>Password: </label><input type="password" name="password"><br>
-            <input type="submit" value="Login" class="btn btn-primary" data-loading-text="Checking..." onclick="$(this).button('loading');">
-        </form>
-    </div>
+<!-- <div class="row">
+    <div class="span6"> -->
+<h2>Login</h2>
+<form method="POST" action="/sitemngr/login/">
+{% csrf_token %}
+    <label>Username: </label><input type="text" name="username"><br>
+    <label>Password: </label><input type="password" name="password"><br>
+    <input type="submit" value="Login" class="btn btn-primary" data-loading-text="Checking..." onclick="$(this).button('loading');">
+</form>
+    <!-- </div>
     <div class="span6">
         <h2>Create account</h2>
         <form method="POST" action="/sitemngr/create_account/">
@@ -35,6 +35,7 @@ Login
         </form>
     </div>
 </div>
+-->
 
 
 </center>
