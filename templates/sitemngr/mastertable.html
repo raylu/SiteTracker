@@ -30,7 +30,7 @@ Table View
     {% for w in wormholes %}
     <tr>
         <td>WH</td>
-        <td><a href="{% url 'viewwormhole' w.pk %}">{{ w.scanid }}</a></td>
+        <td><a href="{% url 'view_wormhole' w.pk %}">{{ w.scanid }}</a></td>
         <td>{{ w.date|date:'H:i, M d, y' }}</td>
         <td>{{ w.start }} -> {{ w.destination }}</td>
         <td>{{ w.opened }}</td>

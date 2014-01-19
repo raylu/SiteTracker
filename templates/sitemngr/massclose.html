@@ -24,7 +24,7 @@ Mass Close
         </tr>
         {% for w in wormholes %}
         <tr>
-            <td><a href="{% url 'viewwormhole' w.pk %}">{{ w.scanid }}</a></td>
+            <td><a href="{% url 'view_wormhole' w.pk %}">{{ w.scanid }}</a></td>
             <td>{{ w.date|date:'H:i, M d, y' }}</td>
             <td><a href="{% url 'system' w.start %}">{{ w.start }}</a></td>
             <td><a href="{% url 'system' w.destination %}">{{ w.destination }}</a></td>

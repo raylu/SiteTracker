@@ -63,7 +63,7 @@ System Info
             {% else %}
             <tr class="closed">
             {% endif %}
-                <td><a href="{% url 'viewwormhole' w.id %}">{{ w.scanid }}</a></td>
+                <td><a href="{% url 'view_wormhole' w.id %}">{{ w.scanid }}</a></td>
                 <td>{{ w.date|date:'H:i, M d, y' }}</td>
                 <td>{{ w.time }}</td>
                 <td>
