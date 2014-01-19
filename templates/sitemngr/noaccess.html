@@ -10,23 +10,22 @@ Restricted
 
 <h1>No Access</h1>
 
-<h4>Sorry, but you do not have the ability to view this page. Please read over the <a href="/sitemngr/help/">help page</a> for ways to gain access.</h4>
+<h4>Sorry, but you do not have the ability to view this page. Please read over the <a href="{% url 'view_help' %}">help page</a> for ways to gain access.</h4>
 
 {% if wrongAlliance %}
     <p>
         You are using the site in-game and have it Trusted, but you are not<br>
         in the alliance in the app's settings.<br>
-        <a href="/sitemngr/whitelist/request/">Click here to request whitelisting</a>.
     </p>
 {% endif %}
 
 {% if messages %}
-	<h4>Errors:</h4>
-	<p>
+	<h5>Errors:</h5>
+	<p><strong>
 	{% for m in messages %}
 		{{ m }}<br>
 	{% endfor %}
-	</p>
+	</strong></p>
 {% endif %}
 
 </center>

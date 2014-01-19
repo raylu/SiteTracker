@@ -24,10 +24,10 @@ Mass Close
         </tr>
         {% for w in wormholes %}
         <tr>
-            <td><a href="/sitemngr/viewwormhole/{{ w.pk }}">{{ w.scanid }}</a></td>
+            <td><a href="{% url 'viewwormhole' w.pk %}">{{ w.scanid }}</a></td>
             <td>{{ w.date|date:'H:i, M d, y' }}</td>
-            <td><a href="/sitemngr/system/{{ w.start }}">{{ w.start }}</a></td>
-            <td><a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a></td>
+            <td><a href="{% url 'system' w.start %}">{{ w.start }}</a></td>
+            <td><a href="{% url 'system' w.destination %}">{{ w.destination }}</a></td>
             <td>{{ w.status }}</td>
             <td>{% if w.opened %}<span style="color: green;">True</span>{% else %}<span style="color: red;">False</span>{% endif %}</td>
             <td><input type="checkbox" name="{{ w.id }}"></td>

@@ -3,8 +3,8 @@
     Recent Ship kills in {{ home_system }}: {% if kills_ship %}<b>Yes: {{ kills_ship }}</b>{% else %}No{% endif %}<br>
     Recent Pod kills in {{ home_system }}: {% if kills_pod %}<b>Yes: {{ kills_pod }}</b>{% else %}No{% endif %}<br>
     Is the C2 open: {% if c2_open %}<b>Yes</b>{% else %}False{% endif %}<br>
-    High Sec systems in the database: {% if hs %}<b>{% for h in hs %}<a href="/sitemngr/system/{{ h }}">{{ h }}</a>, {% endfor %}</b>{% else %}None{% endif %}<br>
-    Closest chain system to Jita: {% if jita_closest %}<b><a href="/sitemngr/system/{{ jita_closest }}">{{ jita_closest }}</a> @ {{ jita_jumps }} jumps</b>{% else %}Null{% endif %}<br>
+    High Sec systems in the database: {% if hs %}<b>{% for h in hs %}<a href="{% url 'system' h %}">{{ h }}</a>, {% endfor %}</b>{% else %}None{% endif %}<br>
+    Closest chain system to Jita: {% if jita_closest %}<b><a href="{% url 'system' jita_closest %}">{{ jita_closest }}</a> @ {{ jita_jumps }} jumps</b>{% else %}Null{% endif %}<br>
     {% if eveigb.is_igb and eveigb.trusted %}
         {% if is_in_chain_system %}
             You are in <b>{{ current_system }}</b>, which is a system directly in the chain

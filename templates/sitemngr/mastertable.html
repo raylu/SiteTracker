@@ -20,7 +20,7 @@ Table View
     {% for s in sites %}
     <tr>
         <td>Site</td>
-        <td><a href="/sitemngr/viewsite/{{ s.pk }}">{{ s.scanid }}</a></td>
+        <td><a href="{% url 'viewsite' s.pk %}">{{ s.scanid }}</a></td>
         <td>{{ s.date|date:'H:i, M d, y' }}</td>
         <td>{{ s.type }}</td>
         <td>{{ s.opened }}</td>
@@ -30,7 +30,7 @@ Table View
     {% for w in wormholes %}
     <tr>
         <td>WH</td>
-        <td><a href="/sitemngr/viewwormhole/{{ w.pk }}">{{ w.scanid }}</a></td>
+        <td><a href="{% url 'viewwormhole' w.pk %}">{{ w.scanid }}</a></td>
         <td>{{ w.date|date:'H:i, M d, y' }}</td>
         <td>{{ w.start }} -> {{ w.destination }}</td>
         <td>{{ w.opened }}</td>

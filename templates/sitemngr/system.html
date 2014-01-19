@@ -39,13 +39,6 @@ System Info
 
 <h5><a href="http://wormhol.es/{{ system }}">Wormhol.es page</a></h5>
 
-<h5><a onclick="$('#db_control').toggle(250);">Database access</a></h5>
-<div id="db_control" hidden>
-    <a href="/sitemngr/addsite/?system={{ system }}">Create new site in this system</a><br>
-    <a href="/sitemngr/addwormhole/?start={{ system }}">Start new wormhole in this system</a><br>
-    <a href="/sitemngr/addwormhole/?end={{ system }}">End new wormhole in this system</a><br>
-</div>
-
 {% if kspace %}
 <div style="width: 100%; margin-bottom: 20px;" id="jumps">
     <span style="color: gray; text-align: left;">Loading jumps to major tradehubs ...</span>
@@ -70,21 +63,21 @@ System Info
             {% else %}
             <tr class="closed">
             {% endif %}
-                <td><a href="/sitemngr/viewwormhole/{{ w.id }}">{{ w.scanid }}</a></td>
+                <td><a href="{% url 'viewwormhole' w.id ">{{ w.scanid }}</a></td>
                 <td>{{ w.date|date:'H:i, M d, y' }}</td>
                 <td>{{ w.time }}</td>
                 <td>
                     {% if system == w.start %}
                        <i>{{ w.start }}</i>
                     {% else %}
-                        <a href="/sitemngr/system/{{ w.start }}">{{ w.start }}</a>
+                        <a href="{% url 'system' w.start ">{{ w.start }}</a>
                     {% endif %}
                 </td>
                 <td>
                     {% if system == w.destination %}
                         <i>{{ w.destination }}</i>
                     {% else %}
-                        <a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>
+                        <a href="{% url 'system' w.destination ">{{ w.destination }}</a>
                     {% endif %}
                 </td>
             </tr>
@@ -112,7 +105,7 @@ System Info
             {% else %}
             <tr class="closed">
             {% endif %}
-                <td><a href="/sitemngr/viewsite/{{ s.id }}">{{ s.scanid }}</a></td>
+                <td><a href="{% url 'viewsite' s.id ">{{ s.scanid }}</a></td>
                 <td>{{ s.date|date:'H:i, M d, y' }}</td>
                 <td>{{ s.name }}</td>
             </tr>
@@ -140,7 +133,7 @@ System Info
             {% else %}
             <tr class="closed">
             {% endif %}
-                <td><a href="/sitemngr/viewsite/{{ s.id }}">{{ s.scanid }}</a></td>
+                <td><a href="{% url 'viewsite' s.id ">{{ s.scanid }}</a></td>
                 <td>{{ s.date|date:'H:i, M d, y' }}</td>
                 <td>{{ s.name }}</td>
             </tr>
@@ -163,10 +156,10 @@ System Info
     </tr>
     {% for w in closedwormholes %}
         <tr>
-            <td><a href="/sitemngr/editwormhole/{{ w.id }}/">{{ w.scanid }}</a></td>
+            <td><a href="{% url 'editwormhole' w.id ">{{ w.scanid }}</a></td>
             <td>{{ w.date|date:'H:i, M d, y' }}</td>
             <td>{{ w.time }}</td>
-            <td><a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a></td>
+            <td><a href="{% url 'system' w.destination ">{{ w.destination }}</a></td>
         </tr>
     {% endfor %}
     </table>

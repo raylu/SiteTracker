@@ -50,33 +50,33 @@
             <span class="icon-bar">2</span>
             <span class="icon-bar">3</span>
             </button>
-            <a class="brand" href="/sitemngr/help/" style="border-left: 1px solid silver; border-right: 1px solid silver;">SiteMngr - Eve Tracking App</a>
+            <a class="brand" href="{% url 'view_help' %}" style="border-left: 1px solid silver; border-right: 1px solid silver;">SiteMngr - Eve Tracking App</a>
             <div class="nav-collapse collapse">
                 <ul class="nav">
-                    <li {% if homepage %}class="active"{% endif %}><a href="/sitemngr/">Home</a></li>
+                    <li {% if homepage %}class="active"{% endif %}><a href="{% url 'index' %}">Home</a></li>
                     <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Navigation <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li class="nav-header">Basic Functions</li>
-                        <li><a href="/sitemngr/">Index</a></li>
-                        <li><a href="/sitemngr/addsite/">Add site</a></li>
-                        <li><a href="/sitemngr/addwormhole/">Add wormhole</a></li>
-                        <li><a href="/sitemngr/paste">Paste scan data</a></li>
-                        <li><a href="/sitemngr/output">Output current data</a></li>
-                        <li><a href="/sitemngr/system">Browse by system</a></li>
-                        <li><a href="/sitemngr/massclose">Quickly close multiple wormholes</a></li>
+                        <li><a href="{% url 'index' %}">Index</a></li>
+                        <li><a href="{% url 'add_site' %}">Add site</a></li>
+                        <li><a href="{% url 'add_wormhole' %}">Add wormhole</a></li>
+                        <li><a href="{% url 'paste' %}">Paste scan data</a></li>
+                        <li><a href="{% url 'output' %}">Output current data</a></li>
+                        <li><a href="{% url 'system_landing' %}">Browse by system</a></li>
+                        <li><a href="{% url 'mass_close' %}">Quickly close multiple wormholes</a></li>
                         {% if eveigb.is_igb and eveigb.trusted %}
-                            <li><a href="/sitemngr/system/{{ eveigb.solarsystemname }}">My current system</a></li>
+                            <li><a href="{% url 'system' eveigb.solarsystem %}">My current system</a></li>
                         {% endif %}
                         <li class="divider"></li>
                         <li class="nav-header">Extra Features</li>
-                        <li><a href="/sitemngr/checkkills">Check kills in connected systems</a></li>
-                        <li><a href="/sitemngr/recentscanedits">Recent scanid changes</a></li>
-                        <li><a href="/sitemngr/mastertable">Master list</a></li>
-                        <li><a href="/sitemngr/stats">Stats</a></li>
-                        <li><a href="/sitemngr/igbtest">IGB test</a></li>
-                        <li><a href="/sitemngr/help">Help/Guide</a></li>
-                        <li><a href="/sitemngr/changelog">Changelog</a></li>
+                        <li><a href="{% url 'check_kills' %}">Check kills in connected systems</a></li>
+                        <li><a href="{% url 'recent_scan_edits' %}">Recent scanid changes</a></li>
+                        <li><a href="{% url 'mastertable' %}">Master list</a></li>
+                        <li><a href="{% url 'stats' %}">Stats</a></li>
+                        <li><a href="{% url 'igb_test' %}">IGB test</a></li>
+                        <li><a href="{% url 'view_help' %}">Help/Guide</a></li>
+                        <li><a href="{% url 'changelog' %}">Changelog</a></li>
                         <li class="divider"></li>
                         <li class="nav-header">External Links</li>
                         <li><a href="http://auth.talkinlocal.org/">Back to TIL</a></li>
@@ -87,16 +87,16 @@
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li class="nav-header">Account Control</li>
-                        <li><a href="/sitemngr/login/">Login / Create account</a></li>
+                        <li><a href="{% url 'login_page' %}">Login / Create account</a></li>
                         {% if not eveigb.is_igb %}
-                            <li><a href="/sitemngr/logout/">Logout</a></li>
+                            <li><a href="{% url 'logout_page' %}">Logout</a></li>
                         {% endif %}
-                        <li><a href="/sitemngr/settings/">User Settings</a></li>
+                        <li><a href="{% url 'settings' %}">User Settings</a></li>
                     </ul>
                 </ul>
                 <ul class="nav pull-right">
                     {% if eveigb.is_igb and not eveigb.trusted %}
-                        <li><a onclick="CCPEVE.requestTrust('/sitemngr/*');">Click to trust</a></li>
+                        <li><a onclick="CCPEVE.requestTrust('/*');">Click to trust</a></li>
                     {% else %}
                         <li><a>Welcome, {{ displayname }}</a></li>
                     {% endif %}

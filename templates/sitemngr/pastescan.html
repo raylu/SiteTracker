@@ -50,7 +50,7 @@ Paste
                 {% for p in present %}
                 <tr>
                     <td>{{ p.scanid }}</td>
-                    <td><a href="/sitemngr/lookup/{{ p.scanid }}" {% if newTab %}target="_blank"{% endif %}>Link</a></td>
+                    <td><a href="/lookup/{{ p.scanid }}" {% if newTab %}target="_blank"{% endif %}>Link</a></td>
                 </tr>
                 {% endfor %}
             </table>
@@ -70,7 +70,7 @@ Paste
                 <tr>
                     <td>{{ n.scanid }}
                     </td>
-                    <td><a href="/sitemngr/lookup/{{ n.scanid }}/?system={{ system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
+                    <td><a href="/lookup/{{ n.scanid }}/?system={{ system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -92,9 +92,9 @@ Paste
                     <td>{{ f.scanid }}</td>
                     <td>
                         {% if f.isWormhole %}
-                            <a href="/sitemngr/addwormhole/?scanid={{ f.scanid }}&timenow={{ timenow }}&start={{ f.system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
+                            <a href="/addwormhole/?scanid={{ f.scanid }}&timenow={{ timenow }}&start={{ f.system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
                         {% else %}
-                            <a href="/sitemngr/addsite/?scanid={{ f.scanid }}&timenow={{ timenow }}&type={{ f.type }}&name={{ f.name }}&system={{ f.system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
+                            <a href="/addsite/?scanid={{ f.scanid }}&timenow={{ timenow }}&type={{ f.type }}&name={{ f.name }}&system={{ f.system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
                         {% endif %}
                     </td>
                 </tr>

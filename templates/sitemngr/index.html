@@ -84,10 +84,10 @@ Index
             var start = $('#wstart' + n).html().split('"')[5];
             var end = $('#wend' + n).html().split('"')[5];
             var status = $('#wstatus' + n).html().split('"')[5];
-            $('#wlink' + n).html('<a class="label label-info" href="/sitemngr/editwormhole/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'wormhole\', ' + n + ')">In line</a>');
-            $('#wid' + n).html('<a href="/sitemngr/viewwormhole/' + n + '">' + scanid + '</a>');
-            $('#wstart' + n).html('<a href="/sitemngr/system/' + start +'">' + start + '</a>');
-            $('#wend' + n).html('<a href="/sitemngr/system/' + end +'">' + end + '</a>');
+            $('#wlink' + n).html('<a class="label label-info" href="/editwormhole/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'wormhole\', ' + n + ')">In line</a>');
+            $('#wid' + n).html('<a href="/viewwormhole/' + n + '">' + scanid + '</a>');
+            $('#wstart' + n).html('<a href="/system/' + start +'">' + start + '</a>');
+            $('#wend' + n).html('<a href="/system/' + end +'">' + end + '</a>');
             $('#wstatus' + n).html(status);
         }
         else if (type === 'site') {
@@ -95,11 +95,11 @@ Index
             var name = $('#sname' + n).html().split('"')[5];
             var type = $('#stype' + n).html().split('"')[5];
             var where = $('#swhere' + n).html().split('"')[5];
-            $('#slink' + n).html('<a class="label label-info" href="/sitemngr/editsite/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'site\', ' + n + ')">In line</a>');
-            $('#sid' + n).html('<a href="/sitemngr/viewsite/' + n + '">' + scanid + '</a>');
+            $('#slink' + n).html('<a class="label label-info" href="/editsite/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'site\', ' + n + ')">In line</a>');
+            $('#sid' + n).html('<a href="/viewsite/' + n + '">' + scanid + '</a>');
             $('#sname' + n).html(name);
             $('#stype' + n).html(type);
-            $('#swhere' + n).html('<a href="/sitemngr/system/' + where + '">' + where + '</a>');
+            $('#swhere' + n).html('<a href="/system/' + where + '">' + where + '</a>');
         }
     }
     function save(type, n) {
@@ -122,10 +122,10 @@ Index
                   status: status
               },
               success: function(data) {
-                $('#wlink' + n).html('<a class="label label-info" href="/sitemngr/editwormhole/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'wormhole\',' + n + ')">In line</a>');
-                $('#wid' + n).html('<a href="/sitemngr/viewwormhole/' + n + '">' + scanid + '</a>');
-                $('#wstart' + n).html('<a href="/sitemngr/system/' + start +'">' + start + '</a>');
-                $('#wend' + n).html('<a href="/sitemngr/system/' + end +'">' + end + '</a>');
+                $('#wlink' + n).html('<a class="label label-info" href="/editwormhole/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'wormhole\',' + n + ')">In line</a>');
+                $('#wid' + n).html('<a href="/viewwormhole/' + n + '">' + scanid + '</a>');
+                $('#wstart' + n).html('<a href="/system/' + start +'">' + start + '</a>');
+                $('#wend' + n).html('<a href="/system/' + end +'">' + end + '</a>');
                 $('#wstatus' + n).html(status);
                 $('#js_alerts_out').text('Saved');
                 $('#js_alerts').fadeOut(3000);
@@ -159,11 +159,11 @@ Index
                     where: where
                 },
                 success: function(data) {
-                    $('#slink' + n).html('<a class="label label-info" href="/sitemngr/editsite/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'site\',' + n + ')">In line</a>');
-                    $('#sid' + n).html('<a href="/sitemngr/viewsite/' + n + '">' + scanid + '</a>');
+                    $('#slink' + n).html('<a class="label label-info" href="/editsite/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'site\',' + n + ')">In line</a>');
+                    $('#sid' + n).html('<a href="/viewsite/' + n + '">' + scanid + '</a>');
                     $('#sname' + n).html(name);
                     $('#stype' + n).html(type);
-                    $('#swhere' + n).html('<a href="/sitemngr/system/' + where + '">' + where + '</a>');
+                    $('#swhere' + n).html('<a href="/system/' + where + '">' + where + '</a>');
                     $('#js_alerts_out').text('Saved');
                     $('#js_alerts').fadeOut(3000);
                 },
@@ -325,13 +325,13 @@ Index
     </form>
 </div>
 
-<h5><a href="/sitemngr/system/{{ homesystem }}" id="tt1" data-toggle="tooltip" title="Direct link to the system overview page for the homesystem in settings, {{ homesystem }}">Home System Page</a></h5>
+<h5><a href="{% url 'system' homesystem %}" id="tt1" data-toggle="tooltip" title="Direct link to the system overview page for the homesystem in settings, {{ homesystem }}">Home System Page</a></h5>
 
 <p><strong>
     It is currently Eve time {% now 'H:i:s, N j' %}.<br>
     Last edit: {{ last_update_diff }} ago, by {{ last_update_user }}<br>
     Last marked as up to date: {{ last_up_to_date_diff }} ago, by {{ last_up_to_date_user }}<br>
-    <a class="label label-info" href="/sitemngr/markuptodate/">Click me to mark up to date</a>
+    <a class="label label-info" href="{% url 'mark_up_to_date' %}">Click me to mark up to date</a>
 </strong></p>
 
 <h1 id="tt5" data-toggle="tooltip" title="Wormholes start in one system and lead to another - the method of transportantion for those living in wormhole-space.">Index of {% if status and status == 'open' %}{% else %}closed {% endif %}wormholes</h1>
@@ -354,13 +354,13 @@ Index
             {% else %}
                 <tr class="closed">
             {% endif %}
-                <td id="wid{{ w.id }}"><a href="/sitemngr/viewwormhole/{{ w.id }}">{{ w.scanid }}</a></td>
-                <td id="wstart{{ w.id }}"><a href="/sitemngr/system/{{ w.start }}">{{ w.start }}</a></td>
-                <td id="wend{{ w.id }}">{% if w.destination == 'Unknown' or w.destination == '' or w.destination == 'Unopened' or w.destination == 'Closed' %}{{ w.destination }}{% else %}<a href="/sitemngr/system/{{ w.destination }}">{{ w.destination }}</a>{% endif %}</td>
+                <td id="wid{{ w.id }}"><a href="{% url 'view_wormhole' w.id %}">{{ w.scanid }}</a></td>
+                <td id="wstart{{ w.id }}"><a href="{% url 'system' w.start %}">{{ w.start }}</a></td>
+                <td id="wend{{ w.id }}">{% if w.destination == 'Unknown' or w.destination == '' or w.destination == 'Unopened' or w.destination == 'Closed' %}{{ w.destination }}{% else %}<a href="{% url 'system' w.destination %}">{{ w.destination }}</a>{% endif %}</td>
                 <td>{{ w.date|date:'m/d @ H:i' }}</td>
                 <td id="wstatus{{ w.id }}">{{ w.status }}</td>
                 <td class="countup">{% for k,v in ellapsed_timers.items %}{% if k == w.id %}{{ v }}{% endif %}{% endfor %}</td>
-                <td id="wlink{{ w.id }}"><a class="label label-info" href="/sitemngr/editwormhole/{{ w.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('wormhole', {{ w.id }});">In line</a></td>
+                <td id="wlink{{ w.id }}"><a class="label label-info" href="{% url 'edit_wormhole' w.id %}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('wormhole', {{ w.id }});">In line</a></td>
             </tr>
         {% endfor %}
         <tr>
@@ -401,13 +401,13 @@ Index
             {% else %}
                 <tr class="closed">
             {% endif %}
-                <td id="sid{{ s.id }}"><a href="/sitemngr/viewsite/{{ s.id }}">{{ s.scanid }}</a></td>
+                <td id="sid{{ s.id }}"><a href="{% url 'view_site' s.id %}">{{ s.scanid }}</a></td>
                 <td id="sname{{ s.id }}">{{ s.name }}</td>
                 <td id="stype{{ s.id }}">{{ s.type }}</td>
-                <td id="swhere{{ s.id }}"><a href="/sitemngr/system/{{ s.where }}">{{ s.where }}</a></td>
+                <td id="swhere{{ s.id }}"><a href="{% url 'system' s.where %}">{{ s.where }}</a></td>
                 <td>{% if s.opened %}<span class="g">{{ s.opened }}</span>{% else %}<span class="r">{{ s.opened }}</span>{% endif %}</td>
                 <td>{{ s.date|date:'m/d @ H:i' }}</td>
-                <td id="slink{{ s.id }}"><a class="label label-info" href="/sitemngr/editsite/{{ s.id }}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('site', {{ s.id }});">In line</a></td>
+                <td id="slink{{ s.id }}"><a class="label label-info" href="{% url 'edit_site' s.id %}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('site', {{ s.id }});">In line</a></td>
             </tr>
         {% endfor %}
         <tr>
@@ -428,13 +428,13 @@ Index
 <br><br><br>
 <p style="font-size: 200%;">
     {% if status and status == 'open' %}
-        <a href="/sitemngr/viewall/" id="tt2" data-toggle="tooltip" title="View this index page in the same format, but only show closed sites and wormholes intead of the open entries">View closed</a>
+        <a href="{% url 'view_all' %}" id="tt2" data-toggle="tooltip" title="View this index page in the same format, but only show closed sites and wormholes intead of the open entries">View closed</a>
     {% else %}
-        <a href="/sitemngr/">Back</a>
+        <a href="{% url 'index' %}">Back</a>
     {% endif %}
     <br>
 </p>
-<a href="/sitemngr/refreshgraph/" id="tt3" data-toggle="tooltip" title="Use this to force the wormhole chain graph to update. This shouldn't ever be needed, but just in case someone makes edits directly on the database, use this page.">Manually refresh graph</a>
+<a href="{% url 'refresh_graph' %}" id="tt3" data-toggle="tooltip" title="Use this to force the wormhole chain graph to update. This shouldn't ever be needed, but just in case someone makes edits directly on the database, use this page.">Manually refresh graph</a>
 
 </center>
 
