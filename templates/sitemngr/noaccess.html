@@ -20,6 +20,15 @@ Restricted
     </p>
 {% endif %}
 
+{% if messages %}
+	<h4>Errors:</h4>
+	<p>
+	{% for m in messages %}
+		{{ m }}<br>
+	{% endfor %}
+	</p>
+{% endif %}
+
 </center>
 
 {% endblock %}

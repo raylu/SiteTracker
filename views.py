@@ -774,7 +774,7 @@ def login_page(request, note=None):
                     messages.add_message(request, messages.INFO, 'That account is disabled')
                     return redirect('/sitemngr/')
             else:
-                messages.add_message(request, messages.INFO, 'An error occurred when logging in - check your username and password')
+                messages.add_message(request, messages.INFO, 'User not found')
                 return redirect('/sitemngr/')
         else:
             messages.add_message(request, messages.INFO, 'You must enter both a username and a password')
