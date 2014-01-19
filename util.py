@@ -234,7 +234,7 @@ def get_display_name(eveigb, request):
     """ Returns the correct name of a user from their browser """
     if request is not None:
         if request.user is not None:
-            if request.user.is_active and request.user.is_authenticated:
+            if request.user.is_active and request.user.is_authenticated():
                 return request.user.username
     if eveigb and eveigb.trusted:
         return eveigb.charname

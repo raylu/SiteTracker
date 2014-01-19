@@ -776,7 +776,7 @@ def login_page(request, note=None):
         else:
             messages.add_message(request, messages.INFO, 'You must enter both a username and a password')
             return redirect('/sitemngr/')
-    return render(request, 'sitemngr/login.html', {'note': note, 'displayname': util.get_display_name(IGBHeaderParser(request), request)})
+    return render(request, 'sitemngr/login.html', {'note': note, 'displayname': util.get_display_name(None, request)})
 
 def logout_page(request):
     """ If the user is logged into an account, they are logged off """
