@@ -23,10 +23,6 @@ eve = evelink.eve.EVE()
 eveapi = evelink.api.API()
 evemap = evelink.map.Map(api=eveapi)
 
-# ldap
-from django_auth_ldap.backend import LDAPBackend
-ldap_backend = LDAPBackend()
-
 # scripts
 useGraphing = True
 try:
@@ -766,7 +762,7 @@ def login_page(request, note=None):
     if request.method == 'POST':
         p = request.POST
         if p['username'] and p['password']:
-            user = ldapBackend.authenticate(username=p['username'], password=p['password'])
+            user = authenticate(username=p['username'], password=p['password'])
             if user is not None:
                 if user.is_active:
                     login(request, user)
