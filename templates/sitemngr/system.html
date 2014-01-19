@@ -156,7 +156,7 @@ System Info
     </tr>
     {% for w in closedwormholes %}
         <tr>
-            <td><a href="{% url 'editwormhole' w.id %}">{{ w.scanid }}</a></td>
+            <td><a href="{% url 'edit_wormhole' w.id %}">{{ w.scanid }}</a></td>
             <td>{{ w.date|date:'H:i, M d, y' }}</td>
             <td>{{ w.time }}</td>
             <td><a href="{% url 'system' w.destination %}">{{ w.destination }}</a></td>
