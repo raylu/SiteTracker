@@ -8,7 +8,7 @@ Index
 {% block javascript %}
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#overlay').load('/sitemngr/overlay/');
+        $('#overlay').load("{% url 'overlay' %}");
         $('.message').bind('click', function() {
            $(this).hide(250);
         });
@@ -296,7 +296,7 @@ Index
 </div>
 <div id="index_paste" style="border: 1px solid gray; display: none;">
     <h4>This is the same thing as the paste page, without having to load that separate page before pasting.</h4>
-    <form action="/sitemngr/paste/" method="POST">
+    <form action="{% url 'paste' %}" method="POST">
     {% csrf_token %}
         <table style="border: none;">
             <tr style="border: none;">
