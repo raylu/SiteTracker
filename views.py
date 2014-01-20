@@ -28,6 +28,7 @@ useGraphing = True
 try:
     import graphcolor
 except ImportError:
+    print 'SiteMngr will not use the graphing feature due to the lack of required libraries'
     useGraphing = False
 
 dirty = True

@@ -1,3 +1,5 @@
+Graphing feature on live isn't working
+After downtime paste page thinks all unnamed signatures are wormholes
 Index page wormhole ellapsed time is acting oddly - timezones?
 ModelForms
 Research and set up tests because I keep breaking things with updates
