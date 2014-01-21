@@ -767,7 +767,8 @@ def login_page(request, note=None):
     if request.method == 'POST':
         p = request.POST
         if p['username'] and p['password']:
-            user = ldap_backend.authenticate(username=p['username'], password=p['password'])
+            ldap_backend.populate_user(p['usernmae'])
+            user = authenticate(username=p['username'], password=p['password'])
             if user is not None:
                 if user.is_active:
                     login(request, user)
