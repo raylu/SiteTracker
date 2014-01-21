@@ -15,6 +15,10 @@ class Site(models.Model):
         return '<Site-%s-%s-%s>' % (self.id, self.scanid, self.where)
     def printOut(self):
         return '{0} [{1}] {2} - {3}'.format(self.scanid, self.type[0], self.name, 'Open' if self.opened else 'Closed')
+    def is_site_object(self):
+        return True
+    def is_wormhole_object(self):
+        return False
     def isAnom(self):
         return self.name in ['Common Perimeter Deposit', 'Average Frontier Deposit', 'Exceptional Core Deposit', 'Unexceptional Frontier Reservoir', 'Ordinary Permiter Deposit', 'Core Garrison', 'Core Stronghold', 'Oruze Osobnyk', 'Quarantine Area', 'Ordinary Perimeter Deposit', 'Rarified Core Deposit', 'Unexceptional Frontier Deposit']
     def get_snapshots(self):
@@ -59,6 +63,10 @@ class Wormhole(models.Model):
         return '<Wormhole-%s-%s-%s-%s-%s>' % (self.id, self.scanid, self.start, self.destination, self.status)
     def printOut(self):
         return '{0} {1} > {2} ({3})'.format(self.scanid, self.start, self.destination, self.status)
+    def is_site_object(self):
+        return False
+    def is_wormhole_object(self):
+        return True
     def get_snapshots(self):
         return WormholeSnapshot.objects.filter(wormhole=self.id)
     def id_changes(self):

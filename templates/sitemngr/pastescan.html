@@ -50,7 +50,11 @@ Paste
                 {% for p in present %}
                 <tr>
                     <td>{{ p.scanid }}</td>
-                    <td><a href="{% url 'lookup' p.scanid %}" {% if newTab %}target="_blank"{% endif %}>Link</a></td>
+                    {% if p.is_site_object %}
+                        <td><a href="{% url 'view_site' p.id %}" {% if newTab %}target="_blank"{% endif %}>Link</a></td>
+                    {% else %}
+                        <td><a href="{% url 'view_wormhole' p.id %}" {% if newTab %}target="_blank"{% endif %}>Link</a></td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </table>
