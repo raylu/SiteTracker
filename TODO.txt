@@ -1,4 +1,4 @@
-Graphing feature on live isn't working
+Lookup page is not using proper redirects - it's returning a view method
 After downtime paste page thinks all unnamed signatures are wormholes
 Index page wormhole ellapsed time is acting oddly - timezones?
 ModelForms
