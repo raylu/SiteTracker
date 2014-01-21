@@ -701,7 +701,7 @@ def overlay(request):
     least = 5000
     # if the user is in-game, then get their current position
     home_system = appSettings.HOME_SYSTEM
-    current_system = eveigb.solarsystemname
+    current_system = None # eveigb.solarsystemname
     is_in_kspace = current_system and not re.match(r'^J\d{6}$', current_system)
     is_in_chain_system = False
     chain_systems = [w.destination for w in Wormhole.objects.filter(opened=True, closed=False)]
