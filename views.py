@@ -457,10 +457,11 @@ def system(request, systemid):
     # if the system is in wormhole space, it has a class
     if re.match(r'J\d{6}', systemid):
         util.get_wormhole_class(systemid)
+        is_kspace = False
     # otherwise, it has a security level
     else:
         try:
-            security = 2
+            security = round(float(System.objects.get(name=systemid).security_level), 1)
             is_kspace = True
         except System.DoesNotExist:
                 pass
