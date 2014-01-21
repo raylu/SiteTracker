@@ -78,10 +78,12 @@ def ellapsed_timers():
     now = datetime.now(pytz.utc)
     for wormhole in Wormhole.objects.filter(opened=True, closed=False):
         diff = (now - wormhole.date)
+        days = diff.days
         m, s = divmod(diff.seconds, 60)
         h, m = divmod(m, 60)
-        left = '%s:%s:%s' % (h, m, s)
-        ret[wormhole.id] = left
+        h += days * 24 if not days > 1 else 0
+        passed = '%s:%s:%s' % (h, m, s)
+        ret[wormhole.id] = passed
     return ret
 
 def p_get_all_data(line):
