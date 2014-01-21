@@ -110,7 +110,7 @@ def view_all(request):
         return no_access(request)
     sites = Site.objects.filter(closed=True)
     wormholes = Wormhole.objects.filter(closed=True)
-    return render(request, 'sitemngr/index.html', {'displayname': util.get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes, 'status': 'closed'})
+    return render(request, 'sitemngr/index.html', {'displayname': util.get_display_name(eveigb, request), 'homesystem': appSettings.HOME_SYSTEM, 'sites': sites, 'wormholes': wormholes, 'status': 'closed'})
 
 def add(request):
     """
