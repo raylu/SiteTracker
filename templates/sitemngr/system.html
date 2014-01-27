@@ -105,7 +105,7 @@ System Info
             {% else %}
             <tr class="closed">
             {% endif %}
-                <td><a href="{% url 'viewsite' s.id %}">{{ s.scanid }}</a></td>
+                <td><a href="{% url 'view_site' s.id %}">{{ s.scanid }}</a></td>
                 <td>{{ s.date|date:'H:i, M d, y' }}</td>
                 <td>{{ s.name }}</td>
             </tr>
@@ -133,7 +133,7 @@ System Info
             {% else %}
             <tr class="closed">
             {% endif %}
-                <td><a href="{% url 'viewsite' s.id %}">{{ s.scanid }}</a></td>
+                <td><a href="{% url 'view_site' s.id %}">{{ s.scanid }}</a></td>
                 <td>{{ s.date|date:'H:i, M d, y' }}</td>
                 <td>{{ s.name }}</td>
             </tr>
