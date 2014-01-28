@@ -15,8 +15,8 @@ class ObjectsTest(TestCase):
 	def test_first_test(self):
 		site = Site(creator='SERVER', scanid='AAA', date=now(), name='the name', type='the type', \
 			where=appSettings.HOME_SYSTEM, opened=True, closed=False, notes='')
-		snap1 = util.snapshot(site)
+		snap1 = util.snapshot(site, 'server')
 		self.assertEqual(snap1.scanid, site.scanid)
 		site.scanid = 'BBB'
-		snap2 = util.snapshot(site)
+		snap2 = util.snapshot(site, 'server')
 		self.assertEqual(snap2.scanid, site.scanid)

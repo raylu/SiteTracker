@@ -68,7 +68,7 @@ def cleanup(offset_days=14):
     f.write('Site Snapshots: %s\n' % SiteSnapshot.objects.count())
     f.write('Wormholes: %s\n' % Wormhole.objects.count())
     f.write('Wormhole Snapshots: %s\n' % WormholeSnapshot.objects.count())
-    f.write('Pastes: %s\n\n' % PasteUpdated.objects.all())
+    f.write('Pastes: %s\n\n' % PasteUpdated.objects.count())
 
     print 'Deleting old site snapshots'
     c = deletelist(sitesnapshots)
