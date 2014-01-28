@@ -57,11 +57,11 @@ def get_last_update():
     if site and site.date == date:
         return {'time': date, 'user': site.creator}
     if sitesnap and sitesnap.date == date:
-        return {'time': date, 'user': sitesnap.user}
+        return {'time': date, 'user': sitesnap.snappedBy}
     if wormhole and wormhole.date == date:
         return {'time': date, 'user': wormhole.creator}
     if wormholesnap and wormholesnap.date == date:
-        return {'time': date, 'user': wormholesnap.user}
+        return {'time': date, 'user': wormholesnap.snappedBy}
     if paste and paste.date == date:
         return {'time': date, 'user': paste.user}
     return {'time': '-never-', 'user': '-no one-'}
