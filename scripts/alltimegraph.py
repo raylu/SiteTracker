@@ -2,7 +2,6 @@ import pygal
 import os
 from os import listdir
 from os.path import join, isfile
-import re
 
 dir = join(os.getcwd(), 'stats\\')
 print 'Starting dir:', dir

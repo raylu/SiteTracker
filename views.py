@@ -60,6 +60,7 @@ def index(request, note=None):
     eveigb = None # IGBHeaderParser(request)
     if not util.can_view(eveigb, request):
         return no_access(request)
+    display_name = util.get_display_name(eveigb, request)
     notices = ['Be sure to check out the video tutorial series, posted on the forums!']
     if request.method == 'POST':
         p = request.POST
@@ -68,7 +69,7 @@ def index(request, note=None):
             start = p['start']
             destination = p['destination']
             status = p['status']
-            Wormhole(creator=util.get_display_name(eveigb, request), date=datetime.utcnow(), scanid=scanid.upper(), start=start, destination=destination,
+            Wormhole(creator=display_name, date=datetime.utcnow(), scanid=scanid.upper(), start=start, destination=destination,
                             status=status, opened=False if destination.lower() in ['unopened', 'closed'] else True, closed=False, notes='').save()
             notices.append('New wormhole added')
         elif p['data_type'] == 'site':
@@ -76,7 +77,7 @@ def index(request, note=None):
             name = p['name']
             type = p['type']
             where = p['where']
-            Site(name=name, scanid=scanid.upper(), type=type, where=where, creator=util.get_display_name(eveigb, request), date=datetime.utcnow(), opened=False, closed=False, notes='').save()
+            Site(name=name, scanid=scanid.upper(), type=type, where=where, creator=display_name, date=datetime.utcnow(), opened=False, closed=False, notes='').save()
             notices.append('New site added')
     sites = Site.objects.filter(closed=False)
     wormholes = Wormhole.objects.filter(closed=False)
@@ -99,8 +100,8 @@ def index(request, note=None):
         last_up_to_date_diff, last_up_to_date_user = util.get_time_difference_formatted(uptodatedict['time'].replace(tzinfo=None), now), uptodatedict['user']
     except TypeError:
         last_up_to_date_diff, last_up_to_date_user = 'error', 'error'
-    return render(request, 'sitemngr/index.html', {'displayname': util.get_display_name(eveigb, request), 'homepage': True, 'homesystem': appSettings.HOME_SYSTEM, \
-        'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': util.get_settings(util.get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': util.get_settings(util.get_display_name(eveigb, request)).userBackgroundImage, \
+    return render(request, 'sitemngr/index.html', {'displayname': display_name, 'homepage': True, 'homesystem': appSettings.HOME_SYSTEM, \
+        'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': util.get_settings(display_name).editsInNewTabs, 'backgroundimage': util.get_settings(display_name).userBackgroundImage, \
         'flag': note, 'last_update_diff': last_update_diff, 'last_update_user': last_update_user, 'last_up_to_date_diff': last_up_to_date_diff, 'last_up_to_date_user': last_up_to_date_user, 'ellapsed_timers': ellapsed_timers})
 
 def view_all(request):
@@ -145,18 +146,20 @@ def edit_site(request, siteid):
     eveigb = None # IGBHeaderParser(request)
     if not util.can_view(eveigb, request):
         return no_access(request)
+    display_name = util.get_display_name(eveigb, request)
     site = get_object_or_404(Site, pk=siteid)
     if request.method == 'POST':
         p = request.POST
         if util.do_edit_site(p, site, util.get_display_name(eveigb, request)):
             return redirect('/')
-    return render(request, 'sitemngr/editsite.html', {'displayname': util.get_display_name(eveigb, request), 'isForm': True, 'site': site, 'finish_msg': 'Store changes back into the database:'})
+    return render(request, 'sitemngr/editsite.html', {'displayname': display_name, 'isForm': True, 'site': site, 'finish_msg': 'Store changes back into the database:'})
 
 def add_site(request):
     """ Add a site to the databse """
     eveigb = None # IGBHeaderParser(request)
     if not util.can_view(eveigb, request):
         return no_access(request)
+    display_name = util.get_display_name(eveigb, request)
     g_scanid = None
     g_system = None
     g_type = None
@@ -178,11 +181,11 @@ def add_site(request):
             return redirect('/')
         except Site.DoesNotExist:
             pass
-        site = Site(name=s_name, scanid=s_scanid, type=s_type, where=s_where, creator=util.get_display_name(eveigb, request), date=now, opened=s_opened, closed=s_closed, notes=s_notes)
+        site = Site(name=s_name, scanid=s_scanid, type=s_type, where=s_where, creator=display_name, date=now, opened=s_opened, closed=s_closed, notes=s_notes)
         site.save()
         # return the user to the appropriate page, depending on their user settings
-        if util.get_settings(util.get_display_name(eveigb, request)).storeMultiple:
-            return render(request, 'sitemngr/addsite.html', {'displayname': util.get_display_name(eveigb, request), 'isForm': True,
+        if util.get_settings(display_name).storeMultiple:
+            return render(request, 'sitemngr/addsite.html', {'displayname': display_name, 'isForm': True,
                  'message': 'Successfully stored the data into the database.', 'finish_msg': 'Store new site into the database:', 'timenow': now.strftime('%m/%d @ %H:%M')})
         else:
             return redirect('/')
@@ -193,7 +196,7 @@ def add_site(request):
         g_system = g['system'] if 'system' in g else None
         g_type = g['type'] if 'type' in g else None
         g_name = g['name'] if 'name' in g else None
-    return render(request, 'sitemngr/addsite.html', {'request': request, 'displayname': util.get_display_name(eveigb, request),
+    return render(request, 'sitemngr/addsite.html', {'request': request, 'displayname': display_name,
              'isForm': True, 'finish_msg': 'Store new site into the database:', 'g_scanid': g_scanid, 'g_system': g_system, 'g_type': g_type, 'g_name': g_name, 'timenow': now})
 
 # ==============================
@@ -214,13 +217,14 @@ def edit_wormhole(request, wormholeid):
     eveigb = None # IGBHeaderParser(request)
     if not util.can_view(eveigb, request):
         return no_access(request)
+    display_name = util.get_display_name(eveigb, request)
     wormhole = get_object_or_404(Wormhole, pk=wormholeid)
     if request.method == 'POST':
         p = request.POST
-        if util.do_edit_wormhole(p, wormhole, util.get_display_name(eveigb, request)):
+        if util.do_edit_wormhole(p, wormhole, display_name):
             set_dirty()
             return redirect('/')
-    return render(request, 'sitemngr/editwormhole.html', {'displayname': util.get_display_name(eveigb, request), 'isForm': True,
+    return render(request, 'sitemngr/editwormhole.html', {'displayname': display_name, 'isForm': True,
           'wormhole': wormhole, 'finish_msg': 'Store changes back into the database'})
 
 def add_wormhole(request):
@@ -228,6 +232,7 @@ def add_wormhole(request):
     eveigb = None # IGBHeaderParser(request)
     if not util.can_view(eveigb, request):
         return no_access(request)
+    display_name = util.get_display_name(eveigb, request)
     g_scanid = ''
     g_start = ''
     g_end = ''
@@ -249,14 +254,14 @@ def add_wormhole(request):
             return redirect('/')
         except Wormhole.DoesNotExist:
             pass
-        wormhole = Wormhole(creator=util.get_display_name(eveigb, request), date=now, scanid=s_scanid, start=s_start, destination=s_destination,
+        wormhole = Wormhole(creator=display_name, date=now, scanid=s_scanid, start=s_start, destination=s_destination,
                             status=s_status, opened=s_opened, closed=s_closed, notes=s_notes)
         wormhole.save()
         # make the new view of the index page update the graph
         set_dirty()
         # return the user to the appropriate page, depending on their user settings
-        if util.get_settings(util.get_display_name(eveigb, request)).storeMultiple:
-            return render(request, 'sitemngr/addwormhole.html', {'request': request, 'displayname': util.get_display_name(eveigb, request),
+        if util.get_settings(display_name).storeMultiple:
+            return render(request, 'sitemngr/addwormhole.html', {'request': request, 'displayname': display_name,
                     'isForm': True, 'message': 'Successfully stored the data into the database.', 'finish_msg': 'Store new site into database:', 'timenow': now.strftime('%m/%d @ %H:%M')})
         else:
             return redirect('/')
@@ -267,7 +272,7 @@ def add_wormhole(request):
         g_start = g['start'] if 'start' in g else None
         g_end = g['end'] if 'end' in g else None
         g_name = g['name'] if 'name' in g else None
-    return render(request, 'sitemngr/addwormhole.html', {'request': request, 'displayname': util.get_display_name(eveigb, request),
+    return render(request, 'sitemngr/addwormhole.html', {'request': request, 'displayname': display_name,
                  'isForm': True, 'finish_msg': 'Store new wormhole into the database:', 'g_scanid': g_scanid, 'g_start': g_start, 'g_end': g_end, 'g_name': g_name, 'timenow': now.strftime('%m/%d @ %H:%M')})
 
 # ==============================
@@ -282,6 +287,7 @@ def paste(request):
     eveigb = None # IGBHeaderParser(request)
     if not util.can_view(eveigb, request):
         return no_access(request)
+    display_name = util.get_display_name(eveigb, request)
     now = datetime.utcnow()
     if request.method == 'POST':
         post = request.POST
@@ -334,10 +340,10 @@ def paste(request):
             for w in new_wormholes:
                 newids.append(util.SpaceObject(w, 'Wormhole', ''))
             return render(request, 'sitemngr/pastescandowntime.html', {'system': system, 'pastedata': paste_data, 'sites': sites, 'wormholes': wormholes, 'newids': newids,
-                           'displayname': util.get_display_name(eveigb, request), 'newTab': util.get_settings(util.get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': util.get_settings(util.get_display_name(eveigb, request)).userBackgroundImage})
+                           'displayname': display_name, 'newTab': util.get_settings(display_name).editsInNewTabs, 'backgroundimage': util.get_settings(display_name).userBackgroundImage})
         elif post.has_key('afterdowntime') and post['afterdowntime']:
             # After downtime paste page after submitting database changes
-            PasteUpdated(user=util.get_display_name(eveigb, request), date=datetime.utcnow()).save()
+            PasteUpdated(user=display_name, date=datetime.utcnow()).save()
             for k, v in post.iteritems():
                 if ' ' in k:
                     k = k.split(' ')[0]
@@ -349,7 +355,7 @@ def paste(request):
                     continue
                 if util.is_site(k):
                     site = util.get_site(k)
-                    util.snapshot(site).save()
+                    util.snapshot(site, display_name).save()
                     if v == '-CLOSE-':
                         site.closed = True
                         site.save()
@@ -358,7 +364,7 @@ def paste(request):
                         site.save()
                 else:
                     wormhole = util.get_wormhole(k)
-                    util.snapshot(wormhole).save()
+                    util.snapshot(wormhole, display_name).save()
                     if v == '-CLOSE-':
                         wormhole.closed = True
                         wormhole.save()
@@ -370,7 +376,7 @@ def paste(request):
         else:
             # Parse data to return to normal paste page
             if 'pastedata' in post and post['pastedata'] and 'system' in post and post['system']:
-                PasteUpdated(user=util.get_display_name(eveigb, request), date=datetime.utcnow()).save()
+                PasteUpdated(user=display_name, date=datetime.utcnow()).save()
                 present = []
                 findnew = []
                 notfound = []
@@ -407,11 +413,11 @@ def paste(request):
                         findnew.append(newP)
                 # check if the database is up to date
                 if len(findnew) == 0 and len(notfound) == 0:
-                    DatabaseUpToDate(user=util.get_display_name(eveigb, request), date=datetime.utcnow(), by='sitemngr.views.paste').save()
-                return render(request, 'sitemngr/pastescan.html', {'displayname': util.get_display_name(eveigb, request), 'raw': post['pastedata'],
-                               'present': present, 'notfound': notfound, 'findnew': findnew, 'timenow': now, 'system': system, 'newTab': util.get_settings(util.get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': util.get_settings(util.get_display_name(eveigb, request)).userBackgroundImage})
+                    DatabaseUpToDate(user=display_name, date=datetime.utcnow(), by='sitemngr.views.paste').save()
+                return render(request, 'sitemngr/pastescan.html', {'displayname': display_name, 'raw': post['pastedata'],
+                               'present': present, 'notfound': notfound, 'findnew': findnew, 'timenow': now, 'system': system, 'newTab': util.get_settings(display_name).editsInNewTabs, 'backgroundimage': util.get_settings(display_name).userBackgroundImage})
     # Base request - show the base pastescan page
-    return render(request, 'sitemngr/pastescan.html', {'displayname': util.get_display_name(eveigb, request), 'timenow': now, 'newTab': util.get_settings(util.get_display_name(eveigb, request)).editsInNewTabs, 'backgroundimage': util.get_settings(util.get_display_name(eveigb, request)).userBackgroundImage})
+    return render(request, 'sitemngr/pastescan.html', {'displayname': display_name, 'timenow': now, 'newTab': util.get_settings(display_name).editsInNewTabs, 'backgroundimage': util.get_settings(display_name).userBackgroundImage})
 
 
 # ==============================
@@ -819,11 +825,12 @@ def settings(request):
     eveigb = None # IGBHeaderParser(request)
     if not util.can_view(eveigb, request):
         return no_access(request)
+    display_name = util.get_display_name(eveigb, request)
     message = None
     try:
-        settings = Settings.objects.get(user=util.get_display_name(eveigb, request))
+        settings = Settings.objects.get(user=display_name)
     except Settings.DoesNotExist:
-        settings = Settings(user=util.get_display_name(eveigb, request), editsInNewTabs=True, storeMultiple=True)
+        settings = Settings(user=display_name, editsInNewTabs=True, storeMultiple=True)
         settings.save()
     if request.method == 'POST':
         p = request.POST
@@ -844,7 +851,7 @@ def settings(request):
     edit = settings.editsInNewTabs
     store = settings.storeMultiple
     image = settings.userBackgroundImage
-    return render(request, 'sitemngr/settings.html', {'displayname': util.get_display_name(eveigb, request), 'edit': edit, 'store': store, 'image': image, 'message': message})
+    return render(request, 'sitemngr/settings.html', {'displayname': display_name, 'edit': edit, 'store': store, 'image': image, 'message': message})
 
 def get_search_results(request, keyword, flags):
     """ Returns a list of links for use by the search feature on the index page """
@@ -909,6 +916,7 @@ def mass_close(request):
     eveigb = None # IGBHeaderParser(request)
     if not util.can_view(eveigb, request):
         return no_access(request)
+    display_name = util.get_display_name(eveigb, request)
     data = ''
     if request.method == 'POST':
         p = request.POST
@@ -916,12 +924,12 @@ def mass_close(request):
             if k == 'csrfmiddlewaretoken':
                 continue
             wormhole = Wormhole.objects.get(id=k)
-            util.snapshot(wormhole).save()
+            util.snapshot(wormhole, display_name).save()
             wormhole.closed = True
             wormhole.save()
         set_dirty()
     wormholes = Wormhole.objects.filter(closed=False)
-    return render(request, 'sitemngr/massclose.html', {'displayname': util.get_display_name(eveigb, request), 'wormholes': wormholes, 'data': data})
+    return render(request, 'sitemngr/massclose.html', {'displayname': display_name, 'wormholes': wormholes, 'data': data})
 
 @csrf_exempt
 def inline_edit_site(request):

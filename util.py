@@ -300,25 +300,25 @@ def get_settings(username):
         settings.save()
     return settings
 
-def snapshot(model):
+def snapshot(model, display_name):
     """
         Create and return SiteSnapshot/WormholeSnapshot
         Note: The returned snapshot is NOT SAVED!
     """
     if isinstance(model, Site):
         snap = SiteSnapshot(site=model, date=datetime.utcnow(), user=model.creator, scanid=model.scanid, name=model.name,
-            type=model.type, where=model.where, opened=model.opened, closed=model.closed, notes=model.notes)
+            type=model.type, where=model.where, opened=model.opened, closed=model.closed, notes=model.notes, snappedBy=display_name)
         return snap
     elif isinstance(model, Wormhole):
         snap = WormholeSnapshot(wormhole=model, date=datetime.utcnow(), user=model.creator, scanid=model.scanid,
             start=model.start, destination=model.destination, status=model.status,
-            opened=model.opened, closed=model.closed, notes=model.notes)
+            opened=model.opened, closed=model.closed, notes=model.notes, snappedBy=display_name)
         return snap
     return None
 
 def do_edit_site(p, site, display_name):
     """ Edits a site """
-    snap = snapshot(site)
+    snap = snapshot(site, display_name)
     changedName = False
     changedScanid = False
     changedType = False
@@ -371,9 +371,9 @@ def do_edit_site(p, site, display_name):
         return snap
     return False
 
-def do_edit_wormhole(p, wormhole, dispay_name):
+def do_edit_wormhole(p, wormhole, display_name):
     """ Edits a wormhole """
-    snap = snapshot(wormhole)
+    snap = snapshot(wormhole, display_name)
     changedScanid = False
     changedStart = False
     changedDestination = False

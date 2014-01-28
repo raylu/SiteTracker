@@ -17,21 +17,21 @@ def run():
 def cleanup(offset_days=14):
     print 'Selecting old data'
     sites = []
-    sitechanges = []
+    sitesnapshots = []
     wormholes = []
-    wormholechanges = []
+    wormholesnapshots = []
     for site in Site.objects.filter(closed=True):
         if (now - site.date).days > offset_days:
             sites.append(site)
-            for change in SiteChange.objects.filter(site=site):
-                if not change in sitechanges:
-                    sitechanges.append(change)
+            for snap in SiteSnapshot.objects.filter(site=site):
+                if not snap in sitesnapshots:
+                    sitesnapshots.append(snap)
     for wormhole in Wormhole.objects.filter(closed=True):
         if (now - wormhole.date).days > offset_days:
             wormholes.append(wormhole)
-            for change in WormholeChange.objects.filter(wormhole=wormhole):
-                if not change in wormholechanges:
-                    wormholechanges.append(change)
+            for snap in WormholeSnapshot.objects.filter(wormhole=wormhole):
+                if not snap in wormholesnapshots:
+                    wormholesnapshots.append(snap)
 
     print 'Generating user stats'
     con = {}
@@ -45,12 +45,12 @@ def cleanup(offset_days=14):
             con[w.creator] += 1
         else:
             con[w.creator] = 1
-    for s in SiteChange.objects.all():
+    for s in SiteSnapshot.objects.all():
         if s.user in con:
             con[s.user] += 1
         else:
             con[s.user] = 1
-    for w in WormholeChange.objects.all():
+    for w in WormholeSnapshot.objects.all():
         if w.user in con:
             con[w.user] += 1
         else:
@@ -64,24 +64,24 @@ def cleanup(offset_days=14):
     f = open('stats_' + now.strftime('%m.%d.%Y-%H.%M.%S'), 'w')
     for a,b in con:
         f.write('%s %s\n' % (b, a))
-    f.write('\nSites: %s\n' % len(Site.objects.all()))
-    f.write('SiteChanges: %s\n' % len(SiteChange.objects.all()))
-    f.write('Wormholes: %s\n' % len(Wormhole.objects.all()))
-    f.write('WormholeChanges: %s\n' % len(WormholeChange.objects.all()))
-    f.write('Pastes: %s\n\n' % len(PasteUpdated.objects.all()))
+    f.write('\nSites: %s\n' % Site.objects.count())
+    f.write('Site Snapshots: %s\n' % SiteSnapshot.objects.count())
+    f.write('Wormholes: %s\n' % Wormhole.objects.count())
+    f.write('Wormhole Snapshots: %s\n' % WormholeSnapshot.objects.count())
+    f.write('Pastes: %s\n\n' % PasteUpdated.objects.all())
 
-    print 'Deleting old site changes'
-    c = deletelist(sitechanges)
-    f.write('Deleted %s SiteChanges\n' % c)
+    print 'Deleting old site snapshots'
+    c = deletelist(sitesnapshots)
+    f.write('Deleted %s Site Snapshots\n' % c)
     print 'Deleting old sites'
     c = deletelist(sites)
     f.write('Deleted %s Sites\n' % c)
-    print 'Deleting old wormhole changes'
-    c = deletelist(wormholechanges)
-    f.write('Deleted %s WormholeChanges\n' % c)
+    print 'Deleting old wormhole snapshots'
+    c = deletelist(wormholesnapshots)
+    f.write('Deleted %s Wormhole Snapshots\n' % c)
     print 'Deleting old wormholes'
     c = deletelist(wormholes)
-    f.write('Deleted %s Wormholes' % c)
+    f.write('Deleted %s wormholes' % c)
     
     f.close()
     

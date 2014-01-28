@@ -1,5 +1,3 @@
-Lookup page still not working, and still being used for paste results?
-Graph feature graphing NS systems as HS
 After downtime paste page thinks all unnamed signatures are wormholes
 ModelForms
 Research and set up tests because I keep breaking things with updates
