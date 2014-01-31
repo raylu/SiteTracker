@@ -191,7 +191,7 @@ def get_wormhole_class(system):
 class Result:
     """ Object for use by the get_search_results method """
     def __init__(self, link, text):
-        self.link = 'http://tracker.talkinlocal.org/sitemngr/' + link
+        self.link = 'http://tracker.talkinlocal.org/' + link
         self.text = text
     def __repr__(self):
         return '<Result %s-%s>' % (self.link, self.text)

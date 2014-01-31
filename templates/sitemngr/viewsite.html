@@ -24,6 +24,7 @@ View Site
 {% if snapshots %}
     <table class="table-striped">
         <tr>
+            <th>Saved By</th>
             <th>User</th>
             <th>Date</th>
             <th>Scanid</th>
@@ -36,6 +37,7 @@ View Site
         </tr>
         {% for snap in snapshots %}
             <tr>
+                <td>{{ snap.snappedBy }}</td>
                 <td>{{ snap.user }}</td>
                 <td>{{ snap.date|date:'H:i, M d, y' }}</td>
                 <td>{{ snap.scanid }}</td>
