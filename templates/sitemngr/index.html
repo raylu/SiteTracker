@@ -6,6 +6,7 @@ Index
 {% endblock %}
 
 {% block javascript %}
+<script type="text/javascript" src="{% static 'tablesorter/jquery.tablesorter.min.js' %}"></script>
 <script type="text/javascript">
     $(document).ready(function() {
         $('#overlay').load("{% url 'overlay' %}");
@@ -17,6 +18,8 @@ Index
         $('#tt3').tooltip();
         $('#tt4').tooltip();
         $('#tt5').tooltip();
+        $('#sitestable').tablesorter();
+        $('#wormholetable').tablesorter();
         setTimeout(function() {
             $('#alert_notices').fadeOut(5000);
             $('#alert_flag').fadeOut(5000);
@@ -197,7 +200,8 @@ Index
 </script>
 {% endblock %}
 
-{% block extraHead %}
+{% block extraCSS %}
+<link rel="stylesheet" type="text/css" href="{% static 'tablesorter/style.css' %}">
 <style>
     input[type="text"] {
         text-align: center;
@@ -334,7 +338,7 @@ Index
 </strong></p>
 
 <h1 id="tt5" data-toggle="tooltip" title="Wormholes start in one system and lead to another - the method of transportantion for those living in wormhole-space.">Index of {% if status and status == 'open' %}{% else %}closed {% endif %}wormholes</h1>
-<table class="hovertable">
+<table id="wormholetable" class="hovertable">
     <thead>
         <tr>
             <th>ID</th>
@@ -379,7 +383,7 @@ Index
 </table>
 <br>
 <h1 id="tt4" data-toggle="tooltip" title="A 'site' is a Cosmic Anomaly or a Cosmic Signature. Both are grouped under this name.">Index of {% if status and status == 'open' %}{% else %}closed {% endif %}sites</h1>
-<table class="hovertable">
+<table id="sitetable" class="hovertable">
     <thead>
         <tr>
             <th> ID</th>

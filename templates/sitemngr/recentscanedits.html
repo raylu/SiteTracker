@@ -1,4 +1,19 @@
 {% extends 'sitemngr/base.html' %}
+{% load staticfiles %}
+
+{% block extraCSS %}
+<link rel="stylesheet" type="text/css" href="{% static 'tablesorter/style.css' %}">
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript" src="{% static 'tablesorter/jquery.tablesorter.min.js' %}"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#sitestable').tablesorter();
+        $('#wormholetable').tablesorter();
+    });
+</script>
+{% endblock %}
 
 {% block subtitle %}
 Recent Edits
@@ -14,7 +29,8 @@ Recent Edits
     <div class="span6">
         <h3>Site</h3>
         {% if sites %}
-            <table class="table-striped">
+            <table id="sitestable" class="table-striped">
+                <thead>
                 <tr>
                     <th>Scanid</th>
                     <th>Name</th>
@@ -22,6 +38,8 @@ Recent Edits
                     <th>Notes</th>
                     <th>Changes</th>
                 </tr>
+                </thead>
+                <tbody>
             {% for s in sites %}
                 <tr>
                     <td><a href="{% url 'view_site' s.id %}">{{ s.scanid }}</a></td>
@@ -31,6 +49,7 @@ Recent Edits
                     <td>{{ s.id_changes }}</td>
                 </tr>
             {% endfor %}
+            </tbody>
             </table>
         {% else %}
             <p>None</p>
@@ -39,7 +58,8 @@ Recent Edits
     <div class="span6">
         <h3>Wormhole</h3>
         {% if wormholes %}
-        <table class="table-striped">
+        <table id="wormholetable" class="table-striped">
+            <thead>
                 <tr>
                     <th>Scanid</th>
                     <th>Start</th>
@@ -47,6 +67,8 @@ Recent Edits
                     <th>Notes</th>
                     <th>Changes</th>
                 </tr>
+            </thead>
+            <tbody>
             {% for w in wormholes %}
                 <tr>
                     <td><a href="{% url 'view_wormhole' w.id %}">{{ w.scanid }}</a></td>
@@ -56,6 +78,7 @@ Recent Edits
                     <td>{{ w.id_changes }}</td>
                 </tr>
             {% endfor %}
+            </tbody>
             </table>
         {% else %}
             <p>None</p>
