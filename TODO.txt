@@ -1,5 +1,3 @@
+CSS for index and recent edit pages' table sorting
 Old objects with the same scanid cause the paste page to incorrectly mark them
 After downtime paste page thinks all unnamed signatures are wormholes
-ModelForms
-Research and set up tests because I keep breaking things with updates
-Index page JS tables for sorting, like the admin panel?
