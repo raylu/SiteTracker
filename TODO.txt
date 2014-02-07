@@ -1,3 +1,4 @@
+Load system kills from JS
 CSS for index and recent edit pages' table sorting
 Old objects with the same scanid cause the paste page to incorrectly mark them
 After downtime paste page thinks all unnamed signatures are wormholes

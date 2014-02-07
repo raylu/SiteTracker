@@ -403,7 +403,7 @@ def paste(request):
                             present.append(site)
                     elif util.is_wormhole(newP.scanid):
                         wormhole = util.get_wormhole(newP.scanid)
-                        if wormhole.start == system and not wormhole.closed:
+                        if (wormhole.start == system or wormhole.destination == system) and not wormhole.closed:
                             # Should not have to call this
                             if wormhole in notfound:
                                 notfound.remove(wormhole)
