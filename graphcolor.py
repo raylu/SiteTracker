@@ -44,7 +44,7 @@ def get_color(system_name):
         system = System.objects.get(name=system_name)
     except System.DoesNotExist:
         return 'gray'
-    status = system.security_level
+    status = float(system.security_level)
     if status > 0.45:
         return cmap['HS']
     elif status > 0.1:
