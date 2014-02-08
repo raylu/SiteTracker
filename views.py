@@ -100,9 +100,10 @@ def index(request, note=None):
         last_up_to_date_diff, last_up_to_date_user = util.get_time_difference_formatted(uptodatedict['time'].replace(tzinfo=None), now), uptodatedict['user']
     except TypeError:
         last_up_to_date_diff, last_up_to_date_user = 'error', 'error'
-    return render(request, 'sitemngr/index.html', {'displayname': display_name, 'homepage': True, 'homesystem': appSettings.HOME_SYSTEM, \
-        'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': util.get_settings(display_name).editsInNewTabs, 'backgroundimage': util.get_settings(display_name).userBackgroundImage, \
-        'flag': note, 'last_update_diff': last_update_diff, 'last_update_user': last_update_user, 'last_up_to_date_diff': last_up_to_date_diff, 'last_up_to_date_user': last_up_to_date_user, 'ellapsed_timers': ellapsed_timers})
+    return render(request, 'sitemngr/index.html', {'displayname': display_name, 'homepage': True, 'homesystem': appSettings.HOME_SYSTEM, 
+        'sites': sites, 'wormholes': wormholes, 'status': 'open', 'notices': notices, 'newTab': util.get_settings(display_name).editsInNewTabs, 'backgroundimage': util.get_settings(display_name).userBackgroundImage, 
+        'flag': note, 'last_update_diff': last_update_diff, 'last_update_user': last_update_user, 'last_up_to_date_diff': last_up_to_date_diff, 'last_up_to_date_user': last_up_to_date_user, 
+        'ellapsed_timers': ellapsed_timers, 'tracker_title': appSettings.TITLE})
 
 def view_all(request):
     """ Index page, but with the closed objects instead of the open """
