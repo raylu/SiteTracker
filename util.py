@@ -27,7 +27,7 @@ def get_last_update():
     sitesnap = SiteSnapshot.objects.last()
     wormhole = Wormhole.objects.last()
     wormholesnap = WormholeSnapshot.objects.last()
-    paste = PasteUpdated.objects.last()
+    # paste = PasteUpdated.objects.last()
     dates = []
     # only add dates belonging to actual objects (prevents trying to get the data of a None object)
     if site:
@@ -38,8 +38,8 @@ def get_last_update():
         dates.append(wormhole.date)
     if wormholesnap:
         dates.append(wormholesnap.date)
-    if paste:
-        dates.append(paste.date)
+    # if paste:
+        # dates.append(paste.date)
     # get the most recent date
     date = None
     try:
@@ -62,8 +62,8 @@ def get_last_update():
         return {'time': date, 'user': wormhole.creator}
     if wormholesnap and wormholesnap.date == date:
         return {'time': date, 'user': wormholesnap.snappedBy}
-    if paste and paste.date == date:
-        return {'time': date, 'user': paste.user}
+    # if paste and paste.date == date:
+        # return {'time': date, 'user': paste.user}
     return {'time': '-never-', 'user': '-no one-'}
 
 def get_last_up_to_date():
