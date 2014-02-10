@@ -1,5 +1,6 @@
 from datetime import datetime
 import re
+from collections import Counter
 
 # Django
 from django.shortcuts import render, get_object_or_404, redirect
@@ -630,32 +631,17 @@ def stats(request):
     numWormholes = Wormhole.objects.count()
     numEdits = SiteSnapshot.objects.count() + WormholeSnapshot.objects.count()
     numPastes = PasteUpdated.objects.count()
-    con = {}
+    con = Counter()
     for site_change in Site.objects.all():
-        if site_change.creator in con:
-            con[site_change.creator] += 1
-        else:
-            con[site_change.creator] = 1
+        con[site_change.creator] += 1
     for wormhole_change in Wormhole.objects.all():
-        if wormhole_change.creator in con:
-            con[wormhole_change.creator] += 1
-        else:
-            con[wormhole_change.creator] = 1
+        con[wormhole_change.creator] += 1
     for snap in SiteSnapshot.objects.all():
-        if snap.user in con:
-            con[snap.user] += 1
-        else:
-            con[snap.user] = 1
+        con[snap.user] += 1
     for snap in WormholeSnapshot.objects.all():
-        if snap.user in con:
-            con[snap.user] += 1
-        else:
-            con[snap.user] = 1
+        con[snap.user] += 1
     for paste in PasteUpdated.objects.all():
-        if paste.user in con:
-            con[paste.user] += 1
-        else:
-            con[paste.user] = 1
+        con[paste.user] += 1
     numContributors = len(con)
     conList = []
     con = sorted(con.items(), key=lambda kv: kv[1])
