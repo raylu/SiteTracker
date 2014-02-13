@@ -11,6 +11,7 @@ System Info
         {% if kspace %}
             $('#jumps').load('/get_tradehub_jumps/{{ system }}/');
         {% endif %}
+        $('#kills').load('/system_kills/{{ system }}/');
     });
 </script>
 {% endblock %}
@@ -31,10 +32,8 @@ System Info
     <h3>Closest chain system to this is {{ closest_chain }}, {{ closest_jumps }} jumps</h3>
 {% endif %}
 
-<p>
-    Recent NPC kills: {{ kills_npc }}<br>
-    Recent Ship kills: {{ kills_ship }}<br>
-    Recent Pod kills: {{ kills_pod }}<br>
+<p id="kills">
+    <span style="color: gray; text-align: left;">Loading recent kills in this system ...</span>
 </p>
 
 <h5><a href="http://wormhol.es/{{ system }}">Wormhol.es page</a></h5>

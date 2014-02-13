@@ -22,7 +22,7 @@ Table View
         <td>Site</td>
         <td><a href="{% url 'view_site' s.pk %}">{{ s.scanid }}</a></td>
         <td>{{ s.date|date:'H:i, M d, y' }}</td>
-        <td>{{ s.type }}</td>
+        <td>{{ s.name }} ({{ s.type }})</td>
         <td>{{ s.opened }}</td>
         <td>{{ s.closed }}</td>
     </tr>

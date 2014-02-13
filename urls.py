@@ -34,4 +34,5 @@ urlpatterns = patterns('',
    url(r'^deletewormhole/(\d+)/', 'sitemngr.views.delete_wormhole', name='delete_wormhole'),
    url(r'^inlineeditsite/', 'sitemngr.views.inline_edit_site', name='inline_edit_site'),
    url(r'^inlineeditwormhole/', 'sitemngr.views.inline_edit_wormhole', name='inline_edit_wormhole'),
+   url(r'^system_kills/(.+)/', 'sitemngr.views.system_kills', name='system_kills'),
 )

@@ -493,17 +493,9 @@ def system(request, systemid):
             clazz = util.get_wormhole_class(systemid)
         except:
             pass
-    kills_npc = kills_ship = kills_pod = 0
-    kills = evemap.kills_by_system()[0]
-    for k in kills.iteritems():
-        if str(k[0]) == systemid:
-            kills_npc = k[1]['faction']
-            kills_ship = k[1]['ship']
-            kills_pod = k[1]['pod']
     return render(request, 'sitemngr/system.html', {'displayname': util.get_display_name(eveigb, request), 'system': systemid, 'openwormholes': openwormholes, 'closedwormholes': closedwormholes,
                             'class': clazz, 'security': security, 'kspace': is_kspace, 'opensites': opensites, 'unopenedsites': unopenedsites,
-                            'is_in_chain': is_in_chain, 'closest_chain': closest_chain, 'closest_jumps': closest_jumps,
-                            'kills_npc': kills_npc, 'kills_ship': kills_ship, 'kills_pod': kills_pod})
+                            'is_in_chain': is_in_chain, 'closest_chain': closest_chain, 'closest_jumps': closest_jumps})
 
 def get_tradehub_jumps(request, system):
     """ Shows the number of jumps from each tradehub system """
@@ -968,3 +960,14 @@ def mark_up_to_date(request):
         return no_access(request)
     DatabaseUpToDate(user=util.get_display_name(eveigb, request), date=datetime.utcnow(), by='Manual').save()
     return redirect('/')
+
+def system_kills(request, systemid):
+    """ Load kills for a system from the EVE API """
+    kills_npc = kills_ship = kills_pod = 0
+    kills = evemap.kills_by_system()[0]
+    for k in kills.iteritems():
+        if str(k[0]) == systemid:
+            kills_npc = k[1]['faction']
+            kills_ship = k[1]['ship']
+            kills_pod = k[1]['pod']
+    return render(request, 'sitemngr/systemkills.html', {'npc': kills_npc, 'ship': kills_ship, 'pod': kills_pod})
