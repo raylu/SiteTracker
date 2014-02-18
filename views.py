@@ -705,31 +705,33 @@ def overlay(request):
                 if jumps < closest_jumps:
                     closest_in = system
                     closest_jumps = jumps
-    # look for an open c2 connection, and all highsec systems in the chain
+    # look for an open c2 connection and all highsec systems in the chain
     for wormhole in Wormhole.objects.filter(opened=True, closed=False):
-        if not wormhole.destination.lower() in ['', ' ', 'closed', 'unopened', 'unknown']:
-            if re.match(r'^J\d{6}$', wormhole.destination):
+        for system in [wormhole.destination, wormhole.start]:
+            if system in ['', ' ', 'closed', 'unopened', 'unknown']:
+                continue
+            if re.match(r'^J\d{6}$', system):
                 if wormhole.start == home_system:
-                    if not wormhole.destination.lower() in ['', ' ', 'closed', 'unopened', 'unknown']:
-                        if re.match(r'^J\d{6}$', wormhole.destination):
-                            if util.get_wormhole_class(wormhole.destination) == '2':
+                    if not system.lower() in ['', ' ', 'closed', 'unopened', 'unknown']:
+                        if re.match(r'^J\d{6}$', system):
+                            if util.get_wormhole_class(system) == '2':
                                 # we know that we have a connection to a C2
                                 c2_open = True
                 continue
-            if not util.is_system(wormhole.destination):
+            if not util.is_system(system):
                 continue
             # determine if this system is the closest to Jita
-            jumps = util.get_jumps_between('Jita', wormhole.destination)
+            jumps = util.get_jumps_between('Jita', system)
             if int(jumps) < least:
                 least = int(jumps)
-                jita_closest = wormhole.destination
+                jita_closest = system
                 jita_jumps = jumps
             # ensure that the system is actually in Eve, and not a user typo
             try:
-                obj = System.objects.get(name=wormhole.destination)
+                obj = System.objects.get(name=system)
                 status = obj.security_level
                 if status > 0.45:
-                    hs.append(wormhole.destination)
+                    hs.append(system)
             except System.DoesNotExist:
                 continue
     # kills in the home system
