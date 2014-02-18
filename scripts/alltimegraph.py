@@ -22,15 +22,16 @@ for start in files:
         if not 'Deleted' in line and not ':' in line:
             data = line.split(' ', 1)
             if len(data) == 1:
-                data = [data[0], 'Celeo Servasse']
+                data = [data[0], 'celeo_servasse']
+            data[1] = data[1].lower().replace(' ', '_')
             if data[1] == '':
-                data[1] = 'Celeo Servasse'
+                data[1] = 'celeo_servasse'
             if data[1] == ' ':
-                data[1] = 'Celeo Servasse'
-            if data[1] == 'Celeo':
-                data[1] = 'Celeo Servasse'
-            if data[1] == 'DirTee Ore' or data[1] == 'Lord VoldemOre':
-                data[1] = 'Elroy Skimms'
+                data[1] = 'celeo_servasse'
+            if data[1] == 'root':
+                data[1] = 'celeo_servasse'
+            if data[1] == 'dirtee_ore' or data[1] == 'lord_voldemore':
+                data[1] = 'elroy_skimms'
             if data[1] in edits:
                 edits[data[1]] += int(data[0])
             else:
@@ -41,7 +42,7 @@ chart = pygal.Bar()
 chart.title = 'Number of edits per user'
 
 for a, b in edits.iteritems():
-    if b > 30:
+    if b > 50:
         chart.add(a, [b])
 
 chart.render_to_file('chart.svg')
