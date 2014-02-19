@@ -257,6 +257,8 @@ def can_view(igb, request=None):
         if request.user is not None:
             if request.user.is_active:
                 user = ldap_backend.populate_user(request.user.username)
+                if user is None:
+                    return False
                 if not user.account_status == 'Internal':
                     return False
                 return True
