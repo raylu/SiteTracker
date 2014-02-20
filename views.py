@@ -223,8 +223,10 @@ def edit_wormhole(request, wormholeid):
     wormhole = get_object_or_404(Wormhole, pk=wormholeid)
     if request.method == 'POST':
         p = request.POST
+        update_graph = True if not 'noupdate' in p else False
         if util.do_edit_wormhole(p, wormhole, display_name):
-            set_dirty()
+            if update_graph:
+                set_dirty()
             return redirect('/')
     return render(request, 'sitemngr/editwormhole.html', {'displayname': display_name, 'isForm': True,
           'wormhole': wormhole, 'finish_msg': 'Store changes back into the database'})

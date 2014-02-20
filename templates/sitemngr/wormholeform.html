@@ -58,6 +58,10 @@
     </tr>
     {% if isForm %}
     <tr>
+        <td><label>Do not update the graph:</label></td>
+        <td><input type="checkbox" name="noupdate"></td>
+    </tr>
+    <tr>
         <td><label>{% if finish_msg %}{{ finish_msg }}{% endif %}</label></td>
         <td><input type="submit" id="submit_button" value="Store" class="btn btn-primary" data-loading-text="Storing..." onclick="$(this).button('loading');"></td>
     </tr>
