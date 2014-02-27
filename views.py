@@ -445,6 +445,7 @@ def system_landing(request):
             systems.append(wormhole.destination)
     return render(request, 'sitemngr/systemlanding.html', {'displayname': util.get_display_name(eveigb, request), 'systems': systems, 'timenow': now})
 
+@csrf_exempt
 def system(request, systemid):
     """
         Show all wormholes into and out of this system.
@@ -453,6 +454,16 @@ def system(request, systemid):
     eveigb = None # IGBHeaderParser(request)
     if not util.can_view(eveigb, request):
         return no_access(request)
+    systemObject = None
+    try:
+        systemObject = System.objects.get(name=systemid)
+    except System.DoesNotExist:
+            pass
+    if request.method == 'POST':
+        p = request.POST
+        if 'systemnote' in p and systemObject:
+            systemObject.note = p['systemnote']
+            systemObject.save()
     opensites = Site.objects.filter(where=systemid, closed=False, opened=True)
     unopenedsites = Site.objects.filter(where=systemid, closed=False, opened=False)
     openwormholes = []
@@ -470,11 +481,8 @@ def system(request, systemid):
         is_kspace = False
     # otherwise, it has a security level
     else:
-        try:
-            security = round(float(System.objects.get(name=systemid).security_level), 1)
-            is_kspace = True
-        except System.DoesNotExist:
-                pass
+        security = round(float(systemObject.security_level), 1)
+        is_kspace = True
     is_in_chain = util.is_system_in_chain(systemid)
     closest_chain = None
     closest_jumps = 5000
@@ -497,7 +505,7 @@ def system(request, systemid):
             pass
     return render(request, 'sitemngr/system.html', {'displayname': util.get_display_name(eveigb, request), 'system': systemid, 'openwormholes': openwormholes, 'closedwormholes': closedwormholes,
                             'class': clazz, 'security': security, 'kspace': is_kspace, 'opensites': opensites, 'unopenedsites': unopenedsites,
-                            'is_in_chain': is_in_chain, 'closest_chain': closest_chain, 'closest_jumps': closest_jumps})
+                            'is_in_chain': is_in_chain, 'closest_chain': closest_chain, 'closest_jumps': closest_jumps, 'systemObject': systemObject})
 
 def get_tradehub_jumps(request, system):
     """ Shows the number of jumps from each tradehub system """

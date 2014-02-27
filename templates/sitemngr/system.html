@@ -46,6 +46,14 @@ System Info
 
 <hr>
 
+<h3><a href="" onclick="$('#notesform').toggle(200);">Alliance Notes</a></h3>
+<form action="" method="POST" id="notesform">
+    <textarea name="systemnote" id="systemnote" style="width: 45%;" rows="10">{{ systemObject.note }}</textarea><br>
+    <input type="submit" value="Save">
+</form>
+
+<hr>
+
 <h3>Currently open Wormholes</h3>
 {% if openwormholes %}
     <table>

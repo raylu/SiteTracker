@@ -110,6 +110,7 @@ class System(models.Model):
     name = models.CharField(max_length=100)
     mapid = models.IntegerField()
     security_level = models.CharField(max_length=20)
+    note = models.TextField(blank=True, null=True)
     def __repr__(self):
         return '<System-%s-%s>' % (self.name, self.security_level)
 
