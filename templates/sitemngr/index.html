@@ -207,14 +207,51 @@ Index
         text-align: center;
         width: 75%;
     }
+    
     #w_new_scanid {
         text-transform: uppercase;
     }
+
     #s_new_scanid {
         text-transform: uppercase;
     }
+
     .uppercase {
         text-transform: uppercase;
+    }
+
+    .link {
+      fill: none;
+      stroke: black;
+      stroke-width: 2px;
+    }
+
+    #c1_2 {
+        fill: green;
+    }
+
+    .link.c1_2 {
+        stroke: blue;
+    }
+
+    .link.half {
+        stroke-dasharray: 0,8 1;
+    }
+
+    .link.nearly {
+        stroke-dasharray: 0,2 1;
+    }
+
+    circle {
+      fill: #ccc;
+      stroke: #333;
+      stroke-width: 1.5px;
+    }
+
+    text {
+      font: 16px sans-serif;
+      pointer-events: none;
+      text-shadow: 0 0 10px red;
     }
 </style>
 {% endblock %}
@@ -290,13 +327,88 @@ Index
 <div id="overlay" style="width: 100%; border: 1px solid black; display: none;">
     <span style="color: gray; text-align: left;">Loading ...</span>
 </div>
-<div id="graph" style="border: 1px solid gray; display: none;">
-    <img id="img_graph" src="{% static 'pictures/graph.png' %}" alt="Current graph not found"></img><br>
-    <p>
-        <b>System outline colors</b>: HS = gold, LS = purple, NS = brown, C1 = blue, C2 = green, C3 = yellow, C4 = orange, C5 = red, C6 = black, not found = gray<br>
-        <b>Line styles</b>: Fresh = bold, < 50% mass & < 50% time = dashed, EoL & VoC = dotted, Unknown = standard<br>
-        <i>Note</i>: Dotted red lines mean that the wormhole has been "Fresh" or "Unknown" for more than 16 hours
-    </p>
+<div id="graph" style="border: 1px solid gray;">
+<p>Note: this is a work in progress.</p>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script>
+var links = [
+{% for wormhole in wormholes %}
+  {source: "{{ wormhole.start }}", target: "{{ wormhole.destination }}", type:"resolved"},
+{% endfor %}
+];
+
+var nodes = {};
+
+links.forEach(function(link) {
+  link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
+  link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
+});
+
+var width = 960,
+    height = 500;
+
+var force = d3.layout.force()
+    .nodes(d3.values(nodes))
+    .links(links)
+    .size([width, height])
+    .linkDistance(60)
+    .charge(-300)
+    .on("tick", tick)
+    .start();
+
+var svg = d3.select("#graph").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+svg.append("defs").selectAll("marker")
+    .data(["resolved", "half", "nearly"])
+  .enter().append("marker")
+    .attr("id", function(d) { return d; })
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 15)
+    .attr("refY", -1.5)
+    .attr("markerWidth", 6)
+    .attr("markerHeight", 6)
+    .attr("orient", "auto")
+  .append("path")
+    .attr("d", "M0,-5L10,0L0,5");
+
+var path = svg.append("g").selectAll("path")
+    .data(force.links())
+  .enter().append("path")
+    .attr("class", function(d) { return "link " + d.type; })
+    .attr("marker-end", function(d) { return "url(#" + d.type + ")"; });
+
+var circle = svg.append("g").selectAll("circle")
+    .data(force.nodes())
+  .enter().append("circle")
+    .attr("r", 6)
+    .call(force.drag);
+
+var text = svg.append("g").selectAll("text")
+    .data(force.nodes())
+  .enter().append("text")
+    .attr("x", 8)
+    .attr("y", "1em")
+    .text(function(d) { return d.name; });
+
+function tick() {
+  path.attr("d", linkArc);
+  circle.attr("transform", transform);
+  text.attr("transform", transform);
+}
+
+function linkArc(d) {
+  var dx = d.target.x - d.source.x,
+      dy = d.target.y - d.source.y,
+      dr = Math.sqrt(dx * dx + dy * dy);
+  return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
+}
+
+function transform(d) {
+  return "translate(" + d.x + "," + d.y + ")";
+}
+</script>
 </div>
 <div id="index_paste" style="border: 1px solid gray; display: none;">
     <h4>This is the same thing as the paste page, without having to load that separate page before pasting.</h4>
