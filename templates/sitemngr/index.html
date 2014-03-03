@@ -1,5 +1,6 @@
 {% extends 'sitemngr/base.html' %}
 {% load staticfiles %}
+{% load sitemngr_tags %}
 
 {% block subtitle %}
 Index
@@ -222,24 +223,20 @@ Index
 
     .link {
       fill: none;
-      stroke: black;
-      stroke-width: 2px;
+      stroke: #666;
+      stroke-width: 1.5px;
     }
 
-    #c1_2 {
-        fill: green;
+    #licensing {
+      fill: green;
     }
 
-    .link.c1_2 {
-        stroke: blue;
+    .link.licensing {
+      stroke: green;
     }
 
-    .link.half {
-        stroke-dasharray: 0,8 1;
-    }
-
-    .link.nearly {
-        stroke-dasharray: 0,2 1;
+    .link.resolved {
+      stroke-dasharray: 0,2 1;
     }
 
     circle {
@@ -249,9 +246,9 @@ Index
     }
 
     text {
-      font: 16px sans-serif;
+      font: 14px sans-serif;
       pointer-events: none;
-      text-shadow: 0 0 10px red;
+      /* text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff; */
     }
 </style>
 {% endblock %}
@@ -328,20 +325,19 @@ Index
     <span style="color: gray; text-align: left;">Loading ...</span>
 </div>
 <div id="graph" style="border: 1px solid gray;">
-<p>Note: this is a work in progress.</p>
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <script>
 var links = [
 {% for wormhole in wormholes %}
-  {source: "{{ wormhole.start }}", target: "{{ wormhole.destination }}", type:"resolved"},
+    {source: "{{ wormhole.start|graphname }}", target: "{{ wormhole.destination|graphname }}", type:"resolved"},
 {% endfor %}
 ];
 
 var nodes = {};
 
 links.forEach(function(link) {
-  link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
-  link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
+    link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
+    link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
 });
 
 var width = 960,
@@ -393,9 +389,9 @@ var text = svg.append("g").selectAll("text")
     .text(function(d) { return d.name; });
 
 function tick() {
-  path.attr("d", linkArc);
-  circle.attr("transform", transform);
-  text.attr("transform", transform);
+    path.attr("d", linkArc);
+    circle.attr("transform", transform);
+    text.attr("transform", transform);
 }
 
 function linkArc(d) {

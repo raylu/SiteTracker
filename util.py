@@ -5,12 +5,12 @@ from datetime import datetime
 import pytz
 
 # sitemngr
-from models import (Site, SiteSnapshot, Wormhole, WormholeSnapshot, PasteUpdated, Settings, System, DatabaseUpToDate)
+from models import *
 import appSettings
 
 # ldap
-# from django_auth_ldap.backend import LDAPBackend
-# ldap_backend = LDAPBackend()
+from django_auth_ldap.backend import LDAPBackend
+ldap_backend = LDAPBackend()
 
 def get_time_difference_formatted(old, recent):
     """ Formats the difference between two datetime objects """
@@ -180,12 +180,28 @@ def is_system(system):
 
 def get_wormhole_class(system):
     """ Returns the class (1-6) of a wormhole by its system name """
+    try:
+        s = System.objects.get(name=system)
+        if s.clazz:
+            return s.clazz
+    except System.DoesNotExist:
+        pass
     url = 'http://www.ellatha.com/eve/WormholeSystemview.asp?key={}'.format(system.replace('J', ''))
-    contents = urllib2.urlopen(url).read().split('\n')
-    for line in contents:
-        if line.startswith('<td bgcolor="#F5F5F5">'):
-            if re.match(r'^\d$', line.split('>')[1][0]):
-                return line.split('>')[1][0]
+    try:
+        contents = urllib2.urlopen(url).read().split('\n')
+        for line in contents:
+            if line.startswith('<td bgcolor="#F5F5F5">'):
+                if re.match(r'^\d$', line.split('>')[1][0]):
+                    clazz = line.split('>')[1][0]
+                    try:
+                        s = System.objects.get(name=system)
+                        s.clazz = clazz
+                        s.save()
+                    except System.DoesNotExist:
+                        pass
+                    return clazz
+    except:
+        pass
     return 0
 
 class Result:
@@ -256,11 +272,11 @@ def can_view(igb, request=None):
     if request is not None:
         if request.user is not None:
             if request.user.is_active:
-                # user = ldap_backend.populate_user(request.user.username)
-                # if user is None:
-                    # return False
-                # if not user.account_status == 'Internal':
-                    # return False
+                user = ldap_backend.populate_user(request.user.username)
+                if user is None:
+                    return False
+                if not user.account_status == 'Internal':
+                    return False
                 return True
     return igb is not None and igb.is_igb and igb.trusted and igb.alliancename == appSettings.ALLIANCE_NAME
 
