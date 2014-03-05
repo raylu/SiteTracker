@@ -79,6 +79,14 @@ class Wormhole(models.Model):
                 continue
             ret += ' > ' + snap.scanid
         return ret
+    def get_type_js(self):
+        if self.status in ['Undecayed', 'Fresh']:
+            return 'good'
+        elif self.status in ['< 50% mass']:
+            return 'half'
+        elif self.status == 'Unknown':
+            return 'unknown'
+        return 'gone'
 
 class WormholeSnapshot(models.Model):
     """ A snapshot of a Wormhole object, used for recording changes in data """

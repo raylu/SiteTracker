@@ -223,32 +223,41 @@ Index
 
     .link {
       fill: none;
-      stroke: #666;
-      stroke-width: 1.5px;
+      stroke: black;
+      stroke-width: 1.75px;
     }
 
-    #licensing {
-      fill: green;
+    .link.good {
+        /* no styling needed */
     }
 
-    .link.licensing {
-      stroke: green;
+    .link.half {
+        stroke-dasharray: 0,8 1;
     }
 
-    .link.resolved {
-      stroke-dasharray: 0,2 1;
+    .link.gone {
+        stroke-dasharray: 0,2 1;
+    }
+
+    .link.unknown {
+        stroke-dasharray: 0,2 1;
+        stroke: gray;
     }
 
     circle {
       fill: #ccc;
-      stroke: #333;
+      stroke: black;
       stroke-width: 1.5px;
     }
 
+    #red {
+        fill: red;
+        stroke: black;
+    }
+
     text {
-      font: 14px sans-serif;
+      font: 20px sans-serif;
       pointer-events: none;
-      /* text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff; */
     }
 </style>
 {% endblock %}
@@ -329,7 +338,7 @@ Index
 <script>
 var links = [
 {% for wormhole in wormholes %}
-    {source: "{{ wormhole.start|graphname }}", target: "{{ wormhole.destination|graphname }}", type:"resolved"},
+    {source: "{{ wormhole.start|graphname }}", target: "{{ wormhole.destination|graphname }}", type:"{{ wormhole.get_type_js }}"},
 {% endfor %}
 ];
 
@@ -340,15 +349,15 @@ links.forEach(function(link) {
     link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
 });
 
-var width = 960,
-    height = 500;
+var width = 1000,
+    height = 600;
 
 var force = d3.layout.force()
     .nodes(d3.values(nodes))
     .links(links)
     .size([width, height])
-    .linkDistance(60)
-    .charge(-300)
+    .linkDistance(140)
+    .charge(-500)
     .on("tick", tick)
     .start();
 
@@ -357,7 +366,7 @@ var svg = d3.select("#graph").append("svg")
     .attr("height", height);
 
 svg.append("defs").selectAll("marker")
-    .data(["resolved", "half", "nearly"])
+    .data(["good", "half", "gone", "unknown"])
   .enter().append("marker")
     .attr("id", function(d) { return d; })
     .attr("viewBox", "0 -5 10 10")
@@ -378,6 +387,7 @@ var path = svg.append("g").selectAll("path")
 var circle = svg.append("g").selectAll("circle")
     .data(force.nodes())
   .enter().append("circle")
+    .attr("id", function(d) { return "red"; })
     .attr("r", 6)
     .call(force.drag);
 
