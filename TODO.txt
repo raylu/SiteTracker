@@ -1,5 +1,4 @@
-Longer log in session
-Store wormhole classes
+Overview HS calculation is not working
 Store kspace jumps to trade hubs
 Add the actual route when calculating distances between systems to the results (already grabbing a copy of the page)
 CSS for index and recent edit pages' table sorting

@@ -25,8 +25,8 @@ eveapi = evelink.api.API()
 evemap = evelink.map.Map(api=eveapi)
 
 # ldap
-from django_auth_ldap.backend import LDAPBackend
-ldap_backend = LDAPBackend()
+# from django_auth_ldap.backend import LDAPBackend
+# ldap_backend = LDAPBackend()
 
 # scripts
 useGraphing = True
@@ -62,7 +62,7 @@ def index(request, note=None):
     if not util.can_view(eveigb, request):
         return no_access(request)
     display_name = util.get_display_name(eveigb, request)
-    notices = ['Be sure to check out the video tutorial series, posted on the forums!']
+    notices = []
     if request.method == 'POST':
         p = request.POST
         if p['data_type'] == 'wormhole':
@@ -223,10 +223,8 @@ def edit_wormhole(request, wormholeid):
     wormhole = get_object_or_404(Wormhole, pk=wormholeid)
     if request.method == 'POST':
         p = request.POST
-        update_graph = True if not 'noupdate' in p else False
         if util.do_edit_wormhole(p, wormhole, display_name):
-            if update_graph:
-                set_dirty()
+            set_dirty()
             return redirect('/')
     return render(request, 'sitemngr/editwormhole.html', {'displayname': display_name, 'isForm': True,
           'wormhole': wormhole, 'finish_msg': 'Store changes back into the database'})
@@ -739,9 +737,10 @@ def overlay(request):
             # ensure that the system is actually in Eve, and not a user typo
             try:
                 obj = System.objects.get(name=system)
-                status = obj.security_level
-                if status > 0.45:
-                    hs.append(system)
+                if obj:
+                    status = obj.security_level
+                    if status and status > 0.45:
+                        hs.append(system)
             except System.DoesNotExist:
                 continue
     # kills in the home system
@@ -765,7 +764,7 @@ def login_page(request, note=None):
     if request.method == 'POST':
         p = request.POST
         if p['username'] and p['password']:
-            ldap_backend.populate_user(p['username'])
+            # ldap_backend.populate_user(p['username'])
             user = authenticate(username=p['username'], password=p['password'])
             if user is not None:
                 if user.is_active:
