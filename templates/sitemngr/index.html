@@ -333,87 +333,90 @@ Index
 <div id="overlay" style="width: 100%; border: 1px solid black; display: none;">
     <span style="color: gray; text-align: left;">Loading ...</span>
 </div>
-<div id="graph" style="border: 1px solid gray;">
+<div id="graph" style="border: 1px solid gray; display: none;">
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <script>
-var links = [
-{% for wormhole in wormholes %}
-    {source: "{{ wormhole.start|graphname }}", target: "{{ wormhole.destination|graphname }}", type:"{{ wormhole.get_type_js }}"},
-{% endfor %}
-];
 
-var nodes = {};
+$(document).ready(function() {
+    var links = [
+    {% for wormhole in wormholes %}
+        {source: "{{ wormhole.start|graphname }}", target: "{{ wormhole.destination|graphname }}", type:"{{ wormhole.get_type_js }}"},
+    {% endfor %}
+    ];
 
-links.forEach(function(link) {
-    link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
-    link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
+    var nodes = {};
+
+    links.forEach(function(link) {
+        link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
+        link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
+    });
+
+    var width = 1000,
+        height = 600;
+
+    var force = d3.layout.force()
+        .nodes(d3.values(nodes))
+        .links(links)
+        .size([width, height])
+        .linkDistance(140)
+        .charge(-500)
+        .on("tick", tick)
+        .start();
+
+    var svg = d3.select("#graph").append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+    svg.append("defs").selectAll("marker")
+        .data(["good", "half", "gone", "unknown"])
+      .enter().append("marker")
+        .attr("id", function(d) { return d; })
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", 15)
+        .attr("refY", -1.5)
+        .attr("markerWidth", 6)
+        .attr("markerHeight", 6)
+        .attr("orient", "auto")
+      .append("path")
+        .attr("d", "M0,-5L10,0L0,5");
+
+    var path = svg.append("g").selectAll("path")
+        .data(force.links())
+      .enter().append("path")
+        .attr("class", function(d) { return "link " + d.type; })
+        .attr("marker-end", function(d) { return "url(#" + d.type + ")"; });
+
+    var circle = svg.append("g").selectAll("circle")
+        .data(force.nodes())
+      .enter().append("circle")
+        .attr("id", function(d) { return "red"; })
+        .attr("r", 6)
+        .call(force.drag);
+
+    var text = svg.append("g").selectAll("text")
+        .data(force.nodes())
+      .enter().append("text")
+        .attr("x", 8)
+        .attr("y", "1em")
+        .text(function(d) { return d.name; });
+
+    function tick() {
+        path.attr("d", linkArc);
+        circle.attr("transform", transform);
+        text.attr("transform", transform);
+    }
+
+    function linkArc(d) {
+      var dx = d.target.x - d.source.x,
+          dy = d.target.y - d.source.y,
+          dr = Math.sqrt(dx * dx + dy * dy);
+      return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
+    }
+
+    function transform(d) {
+      return "translate(" + d.x + "," + d.y + ")";
+    }
 });
-
-var width = 1000,
-    height = 600;
-
-var force = d3.layout.force()
-    .nodes(d3.values(nodes))
-    .links(links)
-    .size([width, height])
-    .linkDistance(140)
-    .charge(-500)
-    .on("tick", tick)
-    .start();
-
-var svg = d3.select("#graph").append("svg")
-    .attr("width", width)
-    .attr("height", height);
-
-svg.append("defs").selectAll("marker")
-    .data(["good", "half", "gone", "unknown"])
-  .enter().append("marker")
-    .attr("id", function(d) { return d; })
-    .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 15)
-    .attr("refY", -1.5)
-    .attr("markerWidth", 6)
-    .attr("markerHeight", 6)
-    .attr("orient", "auto")
-  .append("path")
-    .attr("d", "M0,-5L10,0L0,5");
-
-var path = svg.append("g").selectAll("path")
-    .data(force.links())
-  .enter().append("path")
-    .attr("class", function(d) { return "link " + d.type; })
-    .attr("marker-end", function(d) { return "url(#" + d.type + ")"; });
-
-var circle = svg.append("g").selectAll("circle")
-    .data(force.nodes())
-  .enter().append("circle")
-    .attr("id", function(d) { return "red"; })
-    .attr("r", 6)
-    .call(force.drag);
-
-var text = svg.append("g").selectAll("text")
-    .data(force.nodes())
-  .enter().append("text")
-    .attr("x", 8)
-    .attr("y", "1em")
-    .text(function(d) { return d.name; });
-
-function tick() {
-    path.attr("d", linkArc);
-    circle.attr("transform", transform);
-    text.attr("transform", transform);
-}
-
-function linkArc(d) {
-  var dx = d.target.x - d.source.x,
-      dy = d.target.y - d.source.y,
-      dr = Math.sqrt(dx * dx + dy * dy);
-  return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
-}
-
-function transform(d) {
-  return "translate(" + d.x + "," + d.y + ")";
-}
 </script>
 </div>
 <div id="index_paste" style="border: 1px solid gray; display: none;">
@@ -492,7 +495,7 @@ function transform(d) {
                 <td><input onkeyup="checkNew('wormhole');" style="margin: 0 0 0 0; padding: 0 0 0 0;" type="text" id="w_new_start" name="start" value="" placeholder="start"></td>
                 <td><input onkeyup="checkNew('wormhole');" style="margin: 0 0 0 0; padding: 0 0 0 0;" type="text" id="w_new_end" name="destination" value="" placeholder="end"></td>
                 <td></td>
-                <td><select style="margin: 0 0 0 0; padding: 0 0 0 0; width: 100%;" id="w_new_status" name="status"><option>Undecayed</option><option>Fresh</option><option>&#60 50% mass</option><option>&#60 50% time</option><option>VoC</option><option>EoL</option><option>Unknown</option><option>Closed</option></select></td>
+                <td><select style="margin: 0 0 0 0; padding: 0 0 0 0; width: 100%;" id="w_new_status" name="status"><option>Undecayed</option><option>Fresh</option><option>&#60 50% mass</option><option>&#60 50% time</option><option>VoC</option><option>EoL</option><option>VoC and EoL</option><option>Unknown</option><option>Closed</option></select></td>
                 <td></td>
                 <td><input style="margin: 0 0 0 0; padding: 0 0 0 0;" id="w_new_submit" type="submit" class="btn btn-mini btn-primary" value="Add New" disabled></td>
             </form>
