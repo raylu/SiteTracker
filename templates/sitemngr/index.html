@@ -46,6 +46,26 @@ Index
                 $(this).text(next[0] + ':' + next[1] + ':' + next[2]);
             });
         }
+        $(document).keydown(function(event) {
+            switch (event.keyCode)
+            {
+                case 73:
+                    $('#b_nav_tables').click();
+                    break;
+                case 71:
+                    $('#b_nav_graph').click();
+                    break;
+                case 79:
+                    $('#b_nav_overview').click();
+                    break;
+                case 83:
+                    $('#b_nav_search').click();
+                    break;
+                case 80:
+                    $('#b_nav_paste').click();
+                    break;
+            }
+        });
     });
     function get_tags() {
         var keyword = $('#omnibox').val();
@@ -296,11 +316,11 @@ Index
 <h2>{{ tracker_title }}</h2>
 
 <div class="btn-group" id="button_nav">
-    <button class="btn active" onclick="toggleSection('tables');" data-toggle="button">Toggle tables</button>
-    <button class="btn" onclick="toggleSection('graph');" data-toggle="button">Toggle graph</button>
-    <button class="btn" onclick="toggleSection('overlay');" data-toggle="button">Show Overview</button>
-    <button class="btn" onclick="toggleSection('search');" data-toggle="button">Search</button>
-    <button class="btn" onclick="toggleSection('index_paste');" data-toggle="button">Paste</button>
+    <button id="b_nav_tables" class="btn active" onclick="toggleSection('tables');" data-toggle="button">Toggle tables</button>
+    <button id="b_nav_graph" class="btn" onclick="toggleSection('graph');" data-toggle="button">Toggle graph</button>
+    <button id="b_nav_overview" class="btn" onclick="toggleSection('overlay');" data-toggle="button">Show Overview</button>
+    <button id="b_nav_search" class="btn" onclick="toggleSection('search');" data-toggle="button">Search</button>
+    <button id="b_nav_paste" class="btn" onclick="toggleSection('index_paste');" data-toggle="button">Paste</button>
 </div>
 
 <div id="search" style="border: 1px solid gray; display: none;">
