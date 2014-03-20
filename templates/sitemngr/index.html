@@ -295,12 +295,12 @@ Index
 
 <h2>{{ tracker_title }}</h2>
 
-<div class="btn-group">
-    <button class="btn" onclick="toggleSection('tables');">Toggle tables</button>
-    <button class="btn" onclick="toggleSection('graph');">Toggle graph</button>
-    <button class="btn" onclick="toggleSection('overlay');">Show Overview</button>
-    <button class="btn" onclick="toggleSection('search');">Search</button>
-    <button class="btn" onclick="toggleSection('index_paste');">Paste</button>
+<div class="btn-group" id="button_nav">
+    <button class="btn active" onclick="toggleSection('tables');" data-toggle="button">Toggle tables</button>
+    <button class="btn" onclick="toggleSection('graph');" data-toggle="button">Toggle graph</button>
+    <button class="btn" onclick="toggleSection('overlay');" data-toggle="button">Show Overview</button>
+    <button class="btn" onclick="toggleSection('search');" data-toggle="button">Search</button>
+    <button class="btn" onclick="toggleSection('index_paste');" data-toggle="button">Paste</button>
 </div>
 
 <div id="search" style="border: 1px solid gray; display: none;">
