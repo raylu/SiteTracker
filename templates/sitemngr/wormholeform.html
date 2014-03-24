@@ -57,6 +57,10 @@
         <td><label>Notes</label></td>
         <td><textarea name="notes"{% if isForm %}{% else %} readonly{% endif %}>{% if wormhole %}{{ wormhole.notes }}{% endif %}</textarea></td>
     </tr>
+    <tr>
+        <td><label>Other side's scanid</label></td>
+        <td><input type="text" id="t_otherscanid" name="scanid" placeholder="AAA, BBB, LOL ..." value="{% if wormhole %}{{ wormhole.otherscanid }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}></td>
+    </tr>
     {% if isForm %}
     <tr>
         <td><label>{% if finish_msg %}{{ finish_msg }}{% endif %}</label></td>

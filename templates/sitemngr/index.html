@@ -86,10 +86,12 @@ Index
             var start = $('#wstart' + n).text();
             var end = $('#wend' + n).text();
             var status = $('#wstatus' + n).text();
+            var otherscanid = $('#wotherscanid' + n).text();
             $('#wid' + n).html('<input type="text" class="uppercase" id="wid' + n + '_edit" value="' + scanid + '">');
             $('#wstart' + n).html('<input type="text" id="wstart' + n + '_edit" value="' + start + '">');
             $('#wend' + n).html('<input type="text" id="wend' + n + '_edit" value="' + end + '">');
             $('#wstatus' + n).html('<input type="text" id="wstatus' + n + '_edit" value="' + status + '">');
+            $('#wotherscanid' + n).html('<input type="text" id="wotherscanid' + n + '_edit" value="' + otherscanid + '">');
             $('#wlink' + n).html('<a class="label label-important" onclick="cancel(\'wormhole\', ' + n + ')">Cancel</a> <td><a class="label label-success" onclick="save(\'wormhole\', ' + n + ')">Save</a></td>');
         }
         else if (type === 'site') {
@@ -110,11 +112,13 @@ Index
             var start = $('#wstart' + n).html().split('"')[5];
             var end = $('#wend' + n).html().split('"')[5];
             var status = $('#wstatus' + n).html().split('"')[5];
+            var otherscanid = $('#wotherscanid' + n).html().split('"')[5];
             $('#wlink' + n).html('<a class="label label-info" href="/editwormhole/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'wormhole\', ' + n + ')">In line</a>');
             $('#wid' + n).html('<a href="/viewwormhole/' + n + '">' + scanid + '</a>');
             $('#wstart' + n).html('<a href="/system/' + start +'">' + start + '</a>');
             $('#wend' + n).html('<a href="/system/' + end +'">' + end + '</a>');
             $('#wstatus' + n).html(status);
+            $('#wotherscanid' + n).html(otherscanid);
         }
         else if (type === 'site') {
             var scanid = $('#sid' + n).html().split('"')[7];
@@ -137,6 +141,7 @@ Index
             var start = $('#wstart' + n + '_edit').val();
             var end = $('#wend' + n + '_edit').val();
             var status = $('#wstatus' + n + '_edit').val();
+            var otherscanid = $('#wotherscanid' + n + '_edit').val();
             $.ajax({
               type: "POST",
               url: String("inlineeditwormhole/" + n),
@@ -145,7 +150,8 @@ Index
                   scanid: scanid,
                   start: start,
                   destination: end,
-                  status: status
+                  status: status,
+                  otherscanid: otherscanid
               },
               success: function(data) {
                 $('#wlink' + n).html('<a class="label label-info" href="/editwormhole/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'wormhole\',' + n + ')">In line</a>');
@@ -153,6 +159,7 @@ Index
                 $('#wstart' + n).html('<a href="/system/' + start +'">' + start + '</a>');
                 $('#wend' + n).html('<a href="/system/' + end +'">' + end + '</a>');
                 $('#wstatus' + n).html(status);
+                $('#wotherscanid' + n).html(otherscanid);
                 $('#js_alerts_out').text('Saved');
                 $('#js_alerts').fadeOut(3000);
               },
@@ -230,8 +237,8 @@ Index
         text-align: center;
         width: 75%;
     }
-    
-    #w_new_scanid {
+
+    #w_new_scanid, #w_new_otherscanid {
         text-transform: uppercase;
     }
 
@@ -491,6 +498,7 @@ $(document).ready(function() {
                 <th>Leads to</th>
                 <th>Entered</th>
                 <th>Status</th>
+                <th>Other side</th>
                 <th>Ellapsed time</th>
                 <th>Edit</th>
             </tr>
@@ -507,6 +515,7 @@ $(document).ready(function() {
                     <td id="wend{{ w.id }}">{% if w.destination == 'Unknown' or w.destination == '' or w.destination == 'Unopened' or w.destination == 'Closed' %}{{ w.destination }}{% else %}<a href="{% url 'system' w.destination %}">{{ w.destination }}</a>{% endif %}</td>
                     <td>{{ w.date|date:'m/d @ H:i' }}</td>
                     <td id="wstatus{{ w.id }}">{{ w.status }}</td>
+                    <td id="wotherscanid{{ w.id }}">{% if w.otherscanid %}{{ w.otherscanid }}{% else %}?{% endif %}</td>
                     <td class="countup">{% for k,v in ellapsed_timers.items %}{% if k == w.id %}{{ v }}{% endif %}{% endfor %}</td>
                     <td id="wlink{{ w.id }}"><a class="label label-info" href="{% url 'edit_wormhole' w.id %}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('wormhole', {{ w.id }});">In line</a></td>
                 </tr>
@@ -520,6 +529,7 @@ $(document).ready(function() {
                     <td><input onkeyup="checkNew('wormhole');" style="margin: 0 0 0 0; padding: 0 0 0 0;" type="text" id="w_new_end" name="destination" value="" placeholder="end"></td>
                     <td></td>
                     <td><select style="margin: 0 0 0 0; padding: 0 0 0 0; width: 100%;" id="w_new_status" name="status"><option>Undecayed</option><option>Fresh</option><option>&#60 50% mass</option><option>&#60 50% time</option><option>VoC</option><option>EoL</option><option>VoC and EoL</option><option>Unknown</option><option>Closed</option></select></td>
+                    <td><input onkeyup="checkNew('wormhole');" style="margin: 0 0 0 0; padding: 0 0 0 0;" type="text" id="w_new_otherscanid" name="w_new_otherscanid" value="" placeholder="ID2"></td>
                     <td></td>
                     <td><input style="margin: 0 0 0 0; padding: 0 0 0 0;" id="w_new_submit" type="submit" class="btn btn-mini btn-primary" value="Add New" disabled></td>
                 </form>

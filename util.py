@@ -330,7 +330,7 @@ def snapshot(model, display_name):
     elif isinstance(model, Wormhole):
         snap = WormholeSnapshot(wormhole=model, date=datetime.utcnow(), user=model.creator, scanid=model.scanid,
             start=model.start, destination=model.destination, status=model.status,
-            opened=model.opened, closed=model.closed, notes=model.notes, snappedBy=display_name)
+            opened=model.opened, closed=model.closed, notes=model.notes, otherscanid=model.otherscanid, snappedBy=display_name)
         return snap
     return None
 
@@ -400,6 +400,7 @@ def do_edit_wormhole(p, wormhole, display_name):
     changedOpened = False
     changedClosed = False
     changedNotes = False
+    changedOtherScanid = False
     p = p.copy()
     if p.has_key('scanid') and p['scanid']:
         p['scanid'] = p['scanid'].upper()
@@ -438,7 +439,11 @@ def do_edit_wormhole(p, wormhole, display_name):
         if p['notes'] != wormhole.notes:
             changedNotes = True
             wormhole.notes = p['notes']
-    if changedScanid or changedStart or changedDestination or changedTime or changedStatus or changedOpened or changedClosed or changedNotes:
+    if p.has_key('otherscanid') and p['otherscanid']:
+        if p['otherscanid'] != wormhole.otherscanid:
+            changedOtherScanid = True
+            wormhole.otherscanid = p['otherscanid']
+    if changedScanid or changedStart or changedDestination or changedTime or changedStatus or changedOpened or changedClosed or changedNotes or changedOtherScanid:
         wormhole.save()
         snap.save()
         return snap

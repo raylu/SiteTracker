@@ -60,6 +60,7 @@ class Wormhole(models.Model):
     opened = models.BooleanField()
     closed = models.BooleanField()
     notes = models.TextField(blank=True, null=True)
+    otherscanid = models.CharField(max_length=10, blank=True, null=True)
     def __repr__(self):
         return '<Wormhole-%s-%s-%s-%s-%s>' % (self.id, self.scanid, self.start, self.destination, self.status)
     def printOut(self):
@@ -100,6 +101,7 @@ class WormholeSnapshot(models.Model):
     opened = models.BooleanField()
     closed = models.BooleanField()
     notes = models.TextField(blank=True, null=True)
+    otherscanid = models.CharField(max_length=10, blank=True, null=True)
     snappedBy = models.CharField(max_length=100)
     def __repr__(self):
         return '<WormholeSnapshot-%s-%s>' % (self.id, self.wormhole.id)

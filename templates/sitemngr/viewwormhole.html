@@ -34,6 +34,7 @@ View Wormhole
             <th>Opened</th>
             <th>Closed</th>
             <th>Notes</th>
+            <th>Other Scanid</th>
         </tr>
         {% for snap in snapshots %}
             <tr>
@@ -47,6 +48,7 @@ View Wormhole
                 <td>{{ snap.opened }}</td>
                 <td>{{ snap.closed }}</td>
                 <td>{{ snap.notes }}</td>
+                <td>{{ snap.otherscanid }}</td>
             </tr>
         {% endfor %}
     </table>
