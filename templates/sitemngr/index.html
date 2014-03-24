@@ -363,7 +363,7 @@ Index
 $(document).ready(function() {
     var links = [
     {% for wormhole in wormholes %}
-        {source: "{{ wormhole.start|graphname }}", target: "{{ wormhole.destination|graphname }}", type:"{{ wormhole.get_type_js }}"},
+        {% if wormhole.opened %}{source: "{{ wormhole.start|graphname }}", target: "{{ wormhole.destination|graphname }}", type:"{{ wormhole.get_type_js }}"},{% endif %}
     {% endfor %}
     ];
 
