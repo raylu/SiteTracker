@@ -70,7 +70,7 @@ def index(request, note=None):
             start = p['start']
             destination = p['destination']
             status = p['status']
-            otherscanid = p['otherscanid']
+            otherscanid = p['otherscanid'].upper()
             Wormhole(creator=display_name, date=datetime.utcnow(), scanid=scanid.upper(), start=start, destination=destination,
                             status=status, opened=False if destination.lower() in ['unopened', 'closed'] else True, closed=False, notes='', otherscanid=otherscanid).save()
             notices.append('New wormhole added')

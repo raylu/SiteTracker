@@ -59,7 +59,7 @@
     </tr>
     <tr>
         <td><label>Other side's scanid</label></td>
-        <td><input type="text" id="t_otherscanid" name="scanid" placeholder="AAA, BBB, LOL ..." value="{% if wormhole %}{{ wormhole.otherscanid }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}></td>
+        <td><input type="text" id="t_otherscanid" name="otherscanid" placeholder="AAA, BBB, LOL ..." value="{% if wormhole and wormhole.otherscanid %}{{ wormhole.otherscanid }}{% endif %}" {% if isForm %}{% else %}readonly{% endif %}></td>
     </tr>
     {% if isForm %}
     <tr>
