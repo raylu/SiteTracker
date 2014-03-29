@@ -442,7 +442,7 @@ def do_edit_wormhole(p, wormhole, display_name):
     if p.has_key('otherscanid') and p['otherscanid']:
         if p['otherscanid'] != wormhole.otherscanid:
             changedOtherScanid = True
-            wormhole.otherscanid = p['otherscanid']
+            wormhole.otherscanid = p['otherscanid'].upper()
     if changedScanid or changedStart or changedDestination or changedTime or changedStatus or changedOpened or changedClosed or changedNotes or changedOtherScanid:
         wormhole.save()
         snap.save()
