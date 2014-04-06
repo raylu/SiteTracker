@@ -278,17 +278,6 @@ Index
         stroke-width: 1.5px;
     }
 
-    circle {
-      fill: #ccc;
-      stroke: black;
-      stroke-width: 1.5px;
-    }
-
-    #red {
-        fill: red;
-        stroke: black;
-    }
-
     text {
       font: 20px sans-serif;
       pointer-events: none;
@@ -375,7 +364,7 @@ Index
 $(document).ready(function() {
     var links = [
     {% for wormhole in wormholes %}
-        {% if wormhole.opened %}{source: "{{ wormhole.start|graphname }}", target: "{{ wormhole.destination|graphname }}", type: "{{ wormhole.get_type_js }}", group: "{{ wormhole.destination.get_graph_group }}"},{% endif %}
+        {% if wormhole.opened %}{source: "{{ wormhole.start|graphname }}", target: "{{ wormhole.destination|graphname }}", type: "{{ wormhole.get_type_js }}", group: {{ wormhole.get_graph_group }}},{% endif %}
     {% endfor %}
     ];
 
@@ -390,6 +379,9 @@ $(document).ready(function() {
         height = 600;
 
     var color = d3.scale.category20();
+    
+    for (var i = 0; i < 21; i ++)
+        console.log(color(i));
 
     var force = d3.layout.force()
         .nodes(d3.values(nodes))
@@ -426,10 +418,9 @@ $(document).ready(function() {
     var circle = svg.append("g").selectAll("circle")
         .data(force.nodes())
       .enter().append("circle")
-        // .attr("id", function(d) { return "red"; })
         .attr("class", "node")
+        .attr("r", 8)
         .style("fill", function(d) { return color(d.group); })
-        .attr("r", 6)
         .call(force.drag);
 
     var text = svg.append("g").selectAll("text")
@@ -498,7 +489,7 @@ $(document).ready(function() {
         Up to date: {{ last_up_to_date_diff }} ago, by {{ last_up_to_date_user }}<br>
     </strong></p>
 
-    <h1 id="tt5" data-toggle="tooltip" title="Wormholes start in one system and lead to another - the method of transportantion for those living in wormhole-space.">Index of {% if status and status == 'open' %}{% else %}closed {% endif %}wormholes</h1>
+    <h1 id="tt5" data-toggle="tooltip" title="Wormholes start in one system and lead to another - the method of transportantion for those living in wormhole-space.">{% if status and status == 'open' %}{% else %}Closed {% endif %}Wormholes</h1>
     <table id="wormholetable" class="hovertable">
         <thead>
             <tr>
@@ -546,7 +537,7 @@ $(document).ready(function() {
         </tbody>
     </table>
     <br>
-    <h1 id="tt4" data-toggle="tooltip" title="A 'site' is a Cosmic Anomaly or a Cosmic Signature. Both are grouped under this name.">Index of {% if status and status == 'open' %}{% else %}closed {% endif %}sites</h1>
+    <h1 id="tt4" data-toggle="tooltip" title="A 'site' is a Cosmic Anomaly or a Cosmic Signature. Both are grouped under this name.">{% if status and status == 'open' %}{% else %}Closed {% endif %}Sites</h1>
     <table id="sitetable" class="hovertable">
         <thead>
             <tr>

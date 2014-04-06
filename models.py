@@ -1,4 +1,5 @@
 from django.db import models
+from random import randrange
 
 class Site(models.Model):
     """ Site object for sites in wormhole space """
@@ -89,7 +90,7 @@ class Wormhole(models.Model):
             return 'unknown'
         return 'gone'
     def get_graph_group(self):
-        return 5
+        return randrange(1, 20) # TODO
 
 class WormholeSnapshot(models.Model):
     """ A snapshot of a Wormhole object, used for recording changes in data """
