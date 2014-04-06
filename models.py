@@ -88,6 +88,8 @@ class Wormhole(models.Model):
         elif self.status == 'Unknown':
             return 'unknown'
         return 'gone'
+    def get_graph_group(self):
+        return 5
 
 class WormholeSnapshot(models.Model):
     """ A snapshot of a Wormhole object, used for recording changes in data """

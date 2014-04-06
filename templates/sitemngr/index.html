@@ -273,6 +273,11 @@ Index
         stroke: gray;
     }
 
+    .node {
+        stroke: #fff;
+        stroke-width: 1.5px;
+    }
+
     circle {
       fill: #ccc;
       stroke: black;
@@ -370,7 +375,7 @@ Index
 $(document).ready(function() {
     var links = [
     {% for wormhole in wormholes %}
-        {% if wormhole.opened %}{source: "{{ wormhole.start|graphname }}", target: "{{ wormhole.destination|graphname }}", type:"{{ wormhole.get_type_js }}"},{% endif %}
+        {% if wormhole.opened %}{source: "{{ wormhole.start|graphname }}", target: "{{ wormhole.destination|graphname }}", type: "{{ wormhole.get_type_js }}", group: "{{ wormhole.destination.get_graph_group }}"},{% endif %}
     {% endfor %}
     ];
 
@@ -383,6 +388,8 @@ $(document).ready(function() {
 
     var width = 1000,
         height = 600;
+
+    var color = d3.scale.category20();
 
     var force = d3.layout.force()
         .nodes(d3.values(nodes))
@@ -419,7 +426,9 @@ $(document).ready(function() {
     var circle = svg.append("g").selectAll("circle")
         .data(force.nodes())
       .enter().append("circle")
-        .attr("id", function(d) { return "red"; })
+        // .attr("id", function(d) { return "red"; })
+        .attr("class", "node")
+        .style("fill", function(d) { return color(d.group); })
         .attr("r", 6)
         .call(force.drag);
 
