@@ -1,4 +1,4 @@
-One of the examples that I looked at for D3 graphs had circles of different colors. GET THAT CODE.
+Finish different colored nodes for index page chain graph.
 Overview HS calculation is not working
 Store kspace jumps to trade hubs
 Add time check (>= 7 days) to paste page's calculations
