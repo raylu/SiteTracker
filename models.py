@@ -125,6 +125,11 @@ class System(models.Model):
     clazz = models.IntegerField(blank=True, null=True)
     security_level = models.CharField(max_length=20, blank=True, null=True)
     note = models.TextField(blank=True, null=True)
+    jumps_amarr = models.IntegerField(default=-1)
+    jumps_dodixie = models.IntegerField(default=-1)
+    jumps_hek = models.IntegerField(default=-1)
+    jumps_jita = models.IntegerField(default=-1)
+    jumps_rens = models.IntegerField(default=-1)
     def __repr__(self):
         return '<System-%s-%s>' % (self.name, self.security_level)
 

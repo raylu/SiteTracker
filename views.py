@@ -454,7 +454,6 @@ def system(request, systemid):
     if not util.can_view(eveigb, request):
         return no_access(request)
     systemObject = None
-    systemid = str(systemid)
     try:
         systemObject = System.objects.get(name=systemid)
     except System.DoesNotExist:
@@ -510,8 +509,36 @@ def system(request, systemid):
 def get_tradehub_jumps(request, system):
     """ Shows the number of jumps from each tradehub system """
     jumps = []
-    for hub in util.get_tradehub_system_names():
-        jumps.append([hub, util.get_jumps_between(system, hub)])
+    systemObject = None
+    found = False
+    try:
+        systemObject = System.objects.get(name=system)
+        if not systemObject.jumps_amarr == -1:
+            jumps.append(['Amarr', systemObject.jumps_amarr])
+            jumps.append(['Dodixie', systemObject.jumps_dodixie])
+            jumps.append(['Hek', systemObject.jumps_hek])
+            jumps.append(['Jita', systemObject.jumps_jita])
+            jumps.append(['Rens', systemObject.jumps_rens])
+            found = True
+    except System.DoesNotExist:
+        pass
+    if not found:
+        for hub in util.get_tradehub_system_names():
+            distance = util.get_jumps_between(system, hub)
+            if systemObject:
+                if hub == 'Amarr':
+                    systemObject.jumps_amarr = distance
+                elif hub == 'Dodixie':
+                    systemObject.jumps_dodixie = distance
+                elif hub == 'Hek':
+                    systemObject.jumps_hek = distance
+                elif hub == 'Jita':
+                    systemObject.jumps_jita = distance
+                elif hub == 'Rens':
+                    systemObject.jumps_rens = distance
+            jumps.append([hub, distance])
+        if systemObject:
+            systemObject.save()
     return render(request, 'sitemngr/tradehubjumps.html', dict((x.lower(), y) for x, y in jumps))
 
 # ==============================
