@@ -454,6 +454,7 @@ def system(request, systemid):
     if not util.can_view(eveigb, request):
         return no_access(request)
     systemObject = None
+    systemid = str(systemid)
     try:
         systemObject = System.objects.get(name=systemid)
     except System.DoesNotExist:

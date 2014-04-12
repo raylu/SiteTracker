@@ -34,15 +34,18 @@ System Info
 
 <h5><a href="http://wormhol.es/{{ system }}">Wormhol.es page</a></h5>
 
-<p id="kills">
-    <span style="color: gray; text-align: left;">Loading recent kills in this system ...</span>
-</p>
-
-{% if kspace %}
-<div style="width: 100%; margin-bottom: 20px;" id="jumps">
-    <span style="color: gray; text-align: left;">Loading jumps to major tradehubs ...</span>
+<div class="row">
+    <div class="span6">
+        <p id="kills"><span style="color: gray; text-align: left;">Loading recent kills in this system ...</span></p>
+    </div>
+    <div class="span6">
+        {% if kspace %}
+        <div style="width: 100%; margin-bottom: 20px;" id="jumps"><span style="color: gray; text-align: left;">Loading jumps to major tradehubs ...</span></div>
+        {% else %}
+        <p>Statics: <span style="color: red;">UNKNOWN</span></p>
+        {% endif %}
+    </div>
 </div>
-{% endif %}
 
 <hr>
 
