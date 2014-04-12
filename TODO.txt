@@ -1,3 +1,4 @@
+Edit page show history like view page
 Finish different colored nodes for index page chain graph.
 Overview HS calculation is not working
 Store kspace jumps to trade hubs
