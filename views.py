@@ -1,6 +1,5 @@
 from datetime import datetime
 import re
-import requests
 from collections import Counter
 
 # Django
@@ -491,6 +490,8 @@ def system(request, systemid):
     constellation = system_data['constellation']
     faction = system_data['faction']
     wormhole_effects = system_data['wormhole_effects']
+    pirates = system_data['pirates']
+    activityjumps = system_data['jumps']
     # determine closest chain system to this
     if is_kspace and util.is_system(systemid):
         for chain in util.get_chain_systems():
@@ -511,7 +512,8 @@ def system(request, systemid):
     return render(request, 'sitemngr/system.html', {'displayname': util.get_display_name(eveigb, request), 'system': systemid, 'openwormholes': openwormholes, 'closedwormholes': closedwormholes,
                             'class': clazz, 'security': security, 'kspace': is_kspace, 'opensites': opensites, 'unopenedsites': unopenedsites,
                             'is_in_chain': is_in_chain, 'closest_chain': closest_chain, 'closest_jumps': closest_jumps, 'systemObject': systemObject,
-                            'region': region, 'constellation': constellation, 'faction': faction, 'wormhole_effects': wormhole_effects})
+                            'region': region, 'constellation': constellation, 'faction': faction, 'wormhole_effects': wormhole_effects,
+                            'pirates': pirates, 'jumps1': activityjumps[0], 'jumps24': activityjumps[1]})
 
 def get_tradehub_jumps(request, system):
     """ Shows the number of jumps from each tradehub system """
