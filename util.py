@@ -306,6 +306,31 @@ def get_settings(username):
         settings.save()
     return settings
 
+def get_system_information(system):
+    data = {
+        'region': 'region',
+        'constellation': 'constellation',
+        'faction': 'faction',
+        'jumps': [0, 0],
+        'npckills': [0, 0],
+        'shipkills': [0, 0],
+        'podkills': [0, 0],
+        'pirates': 'pirates',
+        'wormhole_effects': ['none']
+    }
+    contents = [line for line in requests.get('http://evemaps.dotlan.net/system/' + system).text.split('\n') if line and not line == '']
+    kills = []
+    for line in contents:
+        if re.match(r'^<td align="right">\d+</td>$', line.strip()):
+            kills.append(re.search(r'\d+', line.strip()).group(0))
+        if len(kills) == 6:
+            break
+    data['shipkills'] = [kills[0], kills[1]]
+    data['npckills'] = [kills[2], kills[3]]
+    data['podkills'] = [kills[4], kills[5]]
+    # TODO more data!
+    return data
+
 def snapshot(model, display_name):
     """
         Create and return SiteSnapshot/WormholeSnapshot

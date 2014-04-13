@@ -476,7 +476,7 @@ def system(request, systemid):
     security = None
     is_kspace = None
     # if the system is in wormhole space, it has a class
-    if re.match(r'J\d{6}', systemid):
+    if re.match(r'^J\d{6}$', systemid):
         util.get_wormhole_class(systemid)
         is_kspace = False
     # otherwise, it has a security level
@@ -486,6 +486,11 @@ def system(request, systemid):
     is_in_chain = util.is_system_in_chain(systemid)
     closest_chain = None
     closest_jumps = 5000
+    system_data = util.get_system_information(systemid)
+    region = system_data['region']
+    constellation = system_data['constellation']
+    faction = system_data['faction']
+    wormhole_effects = system_data['wormhole_effects']
     # determine closest chain system to this
     if is_kspace and util.is_system(systemid):
         for chain in util.get_chain_systems():
@@ -505,7 +510,8 @@ def system(request, systemid):
             pass
     return render(request, 'sitemngr/system.html', {'displayname': util.get_display_name(eveigb, request), 'system': systemid, 'openwormholes': openwormholes, 'closedwormholes': closedwormholes,
                             'class': clazz, 'security': security, 'kspace': is_kspace, 'opensites': opensites, 'unopenedsites': unopenedsites,
-                            'is_in_chain': is_in_chain, 'closest_chain': closest_chain, 'closest_jumps': closest_jumps, 'systemObject': systemObject})
+                            'is_in_chain': is_in_chain, 'closest_chain': closest_chain, 'closest_jumps': closest_jumps, 'systemObject': systemObject,
+                            'region': region, 'constellation': constellation, 'faction': faction, 'wormhole_effects': wormhole_effects})
 
 def get_tradehub_jumps(request, system):
     """ Shows the number of jumps from each tradehub system """
@@ -971,12 +977,6 @@ def mark_up_to_date(request):
 
 def system_kills(request, systemid):
     """ Load kills for a system from dotlan """
-    contents = [line for line in requests.get('http://evemaps.dotlan.net/system/' + systemid).text.split('\n') if line and not line == '']
-    results = []
-    for line in contents:
-        if re.match(r'^<td align="right">\d+</td>$', line.strip()):
-            results.append(re.search(r'\d+', line.strip()).group(0))
-        if len(results) == 6:
-            break
-    return render(request, 'sitemngr/systemkills.html', {'npc1': results[0], 'ship1': results[1], 'pod1': results[2],
-        'npc24': results[3], 'ship24': results[4], 'pod24': results[5]})
+    system_data = util.get_system_information(systemid)
+    return render(request, 'sitemngr/systemkills.html', {'npc1': system_data['npckills'][0], 'npc24': system_data['npckills'][1], 
+        'ship1': system_data['shipkills'][0], 'ship24': system_data['shipkills'][1], 'pod1': system_data['podkills'][0], 'pod24': system_data['podkills'][1]})
