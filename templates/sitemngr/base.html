@@ -30,6 +30,18 @@
             $('#footer_tt3').tooltip();
             $('#footer_tt4').tooltip();
             $('#footer_tt5').tooltip();
+            $('body').keydown(function(event) {
+                if (event.target.tagName !== 'BODY')
+                    return;
+                switch (event.keyCode)
+                {
+                    case 72:
+                        window.location.href = "{% url 'index' %}";
+                        break;
+                }
+            });
+        });
+    </script>
         });
     </script>
     {% block javascript %}{% endblock %}
