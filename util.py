@@ -9,8 +9,8 @@ from models import *
 import appSettings
 
 # ldap
-# from django_auth_ldap.backend import LDAPBackend
-# ldap_backend = LDAPBackend()
+from django_auth_ldap.backend import LDAPBackend
+ldap_backend = LDAPBackend()
 
 def get_time_difference_formatted(old, recent):
     """ Formats the difference between two datetime objects """
@@ -212,20 +212,6 @@ class Result:
     def __repr__(self):
         return '<Result %s-%s>' % (self.link, self.text)
 
-class Flag:
-    """ Search limiter for use by the get_search_results method """
-    def __init__(self, flags):
-        self.open_only = 'o' in flags
-        self.closed_only = 'c' in flags
-        self.chain = 'f' in flags
-        self.systems = 'm' in flags
-        self.wormholes = 'w' in flags
-        self.sites = 's' in flags
-        self.universe = 'u' in flags
-        self.all = flags == '_'
-    def __repr__(self):
-        return 'Flag: Open=%s Closed=%s Chain=%s Universe=%s Systems=%s Wormholes=%s Sites=%s' % (self.open_only, self.closed_only, self.chain, self.universe, self.systems, self.wormholes, self.sites)
-
 def get_system_name(systemid):
     """ Returns the common name for the system from the Eve API's systemid representation """
     try:
@@ -272,11 +258,11 @@ def can_view(igb, request=None):
     if request is not None:
         if request.user is not None:
             if request.user.is_active:
-                # user = ldap_backend.populate_user(request.user.username)
-                # if user is None:
-                    # return False
-                # if not user.account_status == 'Internal':
-                    # return False
+                user = ldap_backend.populate_user(request.user.username)
+                if user is None:
+                    return False
+                if not user.account_status == 'Internal':
+                    return False
                 return True
     return igb is not None and igb.is_igb and igb.trusted and igb.alliancename == appSettings.ALLIANCE_NAME
 

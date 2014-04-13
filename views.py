@@ -25,8 +25,8 @@ eveapi = evelink.api.API()
 evemap = evelink.map.Map(api=eveapi)
 
 # ldap
-# from django_auth_ldap.backend import LDAPBackend
-# ldap_backend = LDAPBackend()
+from django_auth_ldap.backend import LDAPBackend
+ldap_backend = LDAPBackend()
 
 # scripts
 useGraphing = True
@@ -793,7 +793,7 @@ def login_page(request, note=None):
     if request.method == 'POST':
         p = request.POST
         if p['username'] and p['password']:
-            # ldap_backend.populate_user(p['username'])
+            ldap_backend.populate_user(p['username'])
             user = authenticate(username=p['username'], password=p['password'])
             if user is not None:
                 if user.is_active:
@@ -872,58 +872,25 @@ def settings(request):
     image = settings.userBackgroundImage
     return render(request, 'sitemngr/settings.html', {'displayname': display_name, 'edit': edit, 'store': store, 'image': image, 'message': message})
 
-def get_search_results(request, keyword, flags):
+def get_search_results(request, keyword):
     """ Returns a list of links for use by the search feature on the index page """
-    flags = util.Flag(flags)
     ret = []
-    raw = []
-    wormholes = []
-    if flags.open_only and not flags.closed_only:
-        wormholes.extend([w for w in Wormhole.objects.filter(opened=True)])
-    elif not flags.open_only and flags.closed_only:
-        wormholes.extend([w for w in Wormhole.objects.filter(opened=False)])
-    else:
-        wormholes.extend([w for w in Wormhole.objects.all()])
-    if flags.sites or flags.systems:
-        wormholes = []
-    sites = []
-    if flags.open_only and not flags.closed_only:
-        sites.extend([s for s in Site.objects.filter(opened=True)])
-    elif not flags.open_only and flags.closed_only:
-        sites.extend([s for s in Site.objects.filter(opened=False)])
-    else:
-        sites.extend([s for s in Site.objects.all()])
-    if flags.wormholes or flags.systems:
-        sites = []
-    if not flags.wormholes and not flags.sites:
-        # check system names in the chain
-        for system in util.get_chain_systems():
-            if system.startswith(keyword) and not system in raw:
-                ret.append(util.Result('system/%s' % system, system))
-                raw.append(system)
-        # check tradehub system names
-        if flags.universe and not flags.chain:
-            for system in util.get_tradehub_system_names():
-                if system.startswith(keyword) and not system in raw:
-                    ret.append(util.Result('system/%s' % system, system))
-    # check site names and locations, and scanids
-    for site in sites:
-        if site.where.startswith(keyword) or site.name.startswith(keyword) or site.scanid.startswith(keyword) or site.scanid == keyword:
-            ret.append(util.Result('viewsite/%s' % site.id, 'Site %s' % site))
-            raw.append(site)
-    # check wormhole start and destination system names, and scanids
-    for wormhole in wormholes:
-        if wormhole.start.startswith(keyword) or wormhole.destination.startswith(keyword) or wormhole.scanid.startswith(keyword) or wormhole.scanid == keyword:
-            ret.append(util.Result('viewwormhole/%s' % wormhole.id, 'Wormhole %s' % wormhole))
-            raw.append(wormhole)
-    # if we've found nothing else, then check system names from all of the universe if we can include systems
-    if flags.universe or (len(ret) == 0 and not flags.wormholes and not flags.sites and not flags.chain):
+    # check system names in the chain
+    for system in util.get_chain_systems():
+        if system.startswith(keyword):
+            ret.append(util.Result('system/%s' % system, system))
+    # check tradehub system names
+    for system in util.get_tradehub_system_names():
+        if system.startswith(keyword):
+            ret.append(util.Result('system/%s' % system, system))
+   # if we've found nothing else, then check system names from all of the universe if we can include systems
+    if not ret:
         for system in System.objects.all():
             if system.name.startswith(keyword):
                 ret.append(util.Result('system/%s' % system.name, system.name))
     if len(ret) == 0:
         ret.append(util.Result('', 'No results'))
-    return render(request, 'sitemngr/search_results.html', {'results': ret, 'flags': flags})
+    return render(request, 'sitemngr/search_results.html', {'results': ret})
 
 def refresh_graph(request):
     """ A simple redirect used for manually refreshing the wormhole chain graph """
