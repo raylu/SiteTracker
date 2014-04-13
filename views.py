@@ -1,5 +1,6 @@
 from datetime import datetime
 import re
+import requests
 from collections import Counter
 
 # Django
@@ -969,12 +970,13 @@ def mark_up_to_date(request):
     return redirect('/')
 
 def system_kills(request, systemid):
-    """ Load kills for a system from the EVE API """
-    kills_npc = kills_ship = kills_pod = 0
-    kills = evemap.kills_by_system()[0]
-    for k in kills.iteritems():
-        if str(k[0]) == systemid:
-            kills_npc = k[1]['faction']
-            kills_ship = k[1]['ship']
-            kills_pod = k[1]['pod']
-    return render(request, 'sitemngr/systemkills.html', {'npc': kills_npc, 'ship': kills_ship, 'pod': kills_pod})
+    """ Load kills for a system from dotlan """
+    contents = [line for line in requests.get('http://evemaps.dotlan.net/system/' + systemid).text.split('\n') if line and not line == '']
+    results = []
+    for line in contents:
+        if re.match(r'^<td align="right">\d+</td>$', line.strip()):
+            results.append(re.search(r'\d+', line.strip()).group(0))
+        if len(results) == 6:
+            break
+    return render(request, 'sitemngr/systemkills.html', {'npc1': results[0], 'ship1': results[1], 'pod1': results[2],
+        'npc24': results[3], 'ship24': results[4], 'pod24': results[5]})

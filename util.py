@@ -1,6 +1,6 @@
 # Python
 import re
-import urllib2
+import requests
 from datetime import datetime
 import pytz
 
@@ -159,10 +159,12 @@ def get_tradehub_system_names():
 
 def get_jumps_between(start, finish):
     """ Polls Dotlan to calculate jumps between two systems """
+    if start == finish:
+        return 0
     try:
         url = 'http://evemaps.dotlan.net/route/%s:%s' % (start, finish)
         count = 0
-        contents = urllib2.urlopen(url).read()
+        contents = requests.get(url).text
         for line in contents.split('\n'):
             if '<td align="right">' in line:
                 count += 1
@@ -188,7 +190,7 @@ def get_wormhole_class(system):
         pass
     url = 'http://www.ellatha.com/eve/WormholeSystemview.asp?key={}'.format(system.replace('J', ''))
     try:
-        contents = urllib2.urlopen(url).read().split('\n')
+        contents = requests.get(url).text.split('\n')
         for line in contents:
             if line.startswith('<td bgcolor="#F5F5F5">'):
                 if re.match(r'^\d$', line.split('>')[1][0]):
