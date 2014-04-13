@@ -881,12 +881,12 @@ def get_search_results(request, keyword):
             ret.append(util.Result('system/%s' % system, system))
     # check tradehub system names
     for system in util.get_tradehub_system_names():
-        if system.startswith(keyword):
+        if system.lower().startswith(keyword.lower()):
             ret.append(util.Result('system/%s' % system, system))
    # if we've found nothing else, then check system names from all of the universe if we can include systems
     if not ret:
         for system in System.objects.all():
-            if system.name.startswith(keyword):
+            if system.name.lower().startswith(keyword.lower()):
                 ret.append(util.Result('system/%s' % system.name, system.name))
     if len(ret) == 0:
         ret.append(util.Result('', 'No results'))
