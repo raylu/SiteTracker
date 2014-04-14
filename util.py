@@ -316,15 +316,15 @@ def get_system_information(system):
         'shipkills': [0, 0],
         'podkills': [0, 0],
         'pirates': 'pirates',
-        'wormhole_effects': ['none']
+        'wormhole_effect': 'wormhole_effect'
     }
     # website lines
-    contents = [line for line in requests.get('http://evemaps.dotlan.net/system/' + system).text.split('\n') if line and not line == '']
+    contents = [line.strip() for line in requests.get('http://evemaps.dotlan.net/system/' + system).text.split('\n') if line and not line == '']
     # recent kills
     kills = []
     for line in contents:
-        if re.match(r'^<td align="right">\d+</td>$', line.strip()):
-            kills.append(re.search(r'\d+', line.strip()).group(0))
+        if re.match(r'^<td align="right">\d+</td>$', line):
+            kills.append(re.search(r'\d+', line).group(0))
         if len(kills) == 6:
             break
     data['shipkills'] = [kills[0], kills[1]]
@@ -333,32 +333,38 @@ def get_system_information(system):
     # faction
     for line in contents:
         if '<td colspan="3">' in line:
-            data['faction'] = line.strip().split('>')[1].split('<')[0]
+            data['faction'] = line.split('>')[1].split('<')[0]
             break
     # region
     for line in contents:
         if '/region/' in line:
-            data['region'] = re.search(r'/region/\w+', line.strip()).group(0).split('/')[2].replace('_', ' ')
+            data['region'] = re.search(r'/region/\w+', line).group(0).split('/')[2].replace('_', ' ')
             break
     # constellation
     next = False
     for line in contents:
         if next:
-            data['constellation'] = re.search(r'/universe/\w+', line.strip()).group(0).split('/')[2].replace('_', ' ')
+            data['constellation'] = re.search(r'/universe/\w+', line).group(0).split('/')[2].replace('_', ' ')
             break
         if '<td><b>Constellation</b></td>' in line:
             next = True
     # pirates
     for line in contents:
         if '<td nowrap="nowrap" colspan="2">' in line:
-            data['pirates'] = line.strip().split('>')[1].split('<')[0]
+            data['pirates'] = line.split('>')[1].split('<')[0]
     # jumps
     for line in contents:
         if '<td width="5%" align="right">' in line:
             if data['jumps'][0] == -1:
-                data['jumps'][0] = line.strip().split('>')[1].split('<')[0]
+                data['jumps'][0] = line.split('>')[1].split('<')[0]
             else:
-                data['jumps'][1] = line.strip().split('>')[1].split('<')[0]
+                data['jumps'][1] = line.split('>')[1].split('<')[0]
+                break
+    # TODO wormhole_effect
+    for line in contents:
+        if '<h2>Wormhole System Effect:' in line:
+            data['wormhole_effect'] = ''.join(s + ' ' for s in line.split(' ')[3:(len(line.split(' ')) - 4)])[:-1]
+            break
     return data
 
 def snapshot(model, display_name):

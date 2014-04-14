@@ -19,8 +19,7 @@ System Info
 {% block content %}
 
 <center>
-
-<h1>System info: {{ system }}{% if class %}, Class {{ class }}{% endif %}{% if security %}, {{ security }}{% endif %}</h1>
+<h1>System info: {{ system }}{% if class %}, Class {{ class }}{% if wormhole_effect %} ({{ wormhole_effect }}){% endif %}{% endif %}{% if security %}, {{ security }}{% endif %}</h1>
 
 {% if eveigb.solarsystemname == system %}
     <h3>You are currently in this system</h3>

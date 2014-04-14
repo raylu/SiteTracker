@@ -58,7 +58,7 @@ def tidy():
 
 def index(request, note=None):
     """ Index page - lists all open sites """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     display_name = util.get_display_name(eveigb, request)
@@ -109,7 +109,7 @@ def index(request, note=None):
 
 def view_all(request):
     """ Index page, but with the closed objects instead of the open """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     sites = Site.objects.filter(closed=True)
@@ -121,7 +121,7 @@ def add(request):
         Landing page for adding to the database - only used for clarification from
             the user after using the paste page
     """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     scanid = ''
@@ -137,7 +137,7 @@ def add(request):
 
 def view_site(request, siteid):
     """ Views all the data on a particular site, including a list of snapshots """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     site = get_object_or_404(Site, pk=siteid)
@@ -146,7 +146,7 @@ def view_site(request, siteid):
 
 def edit_site(request, siteid):
     """ Edit site page for changing data """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     display_name = util.get_display_name(eveigb, request)
@@ -159,7 +159,7 @@ def edit_site(request, siteid):
 
 def add_site(request):
     """ Add a site to the databse """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     display_name = util.get_display_name(eveigb, request)
@@ -208,7 +208,7 @@ def add_site(request):
 
 def view_wormhole(request, wormholeid):
     """ Views all the data on a particular wormhole, including a list of snapshots """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     wormhole = get_object_or_404(Wormhole, pk=wormholeid)
@@ -217,7 +217,7 @@ def view_wormhole(request, wormholeid):
 
 def edit_wormhole(request, wormholeid):
     """ Edit wormhole page for changing data """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     display_name = util.get_display_name(eveigb, request)
@@ -232,7 +232,7 @@ def edit_wormhole(request, wormholeid):
 
 def add_wormhole(request):
     """ Add a wormhole to the databse """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     display_name = util.get_display_name(eveigb, request)
@@ -287,7 +287,7 @@ def paste(request):
         Allow players to paste data from their system scanner into a
         textarea and submit for automatic review.
     """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     display_name = util.get_display_name(eveigb, request)
@@ -429,7 +429,7 @@ def paste(request):
 
 def system_landing(request):
     """ Return a list of a systems with active sites """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     now = datetime.utcnow()
@@ -450,14 +450,14 @@ def system(request, systemid):
         Show all wormholes into and out of this system.
         Also show all closed wormholes in this system in the last 10 (configurable) days.
     """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     systemObject = None
     try:
         systemObject = System.objects.get(name=systemid)
     except System.DoesNotExist:
-            pass
+            return render(request, 'sitemngr/systemnotfound.html', {'system': systemid})
     if request.method == 'POST':
         p = request.POST
         if 'systemnote' in p and systemObject:
@@ -489,7 +489,7 @@ def system(request, systemid):
     region = system_data['region']
     constellation = system_data['constellation']
     faction = system_data['faction']
-    wormhole_effects = system_data['wormhole_effects']
+    wormhole_effect = system_data['wormhole_effect']
     pirates = system_data['pirates']
     activityjumps = system_data['jumps']
     # determine closest chain system to this
@@ -512,7 +512,7 @@ def system(request, systemid):
     return render(request, 'sitemngr/system.html', {'displayname': util.get_display_name(eveigb, request), 'system': systemid, 'openwormholes': openwormholes, 'closedwormholes': closedwormholes,
                             'class': clazz, 'security': security, 'kspace': is_kspace, 'opensites': opensites, 'unopenedsites': unopenedsites,
                             'is_in_chain': is_in_chain, 'closest_chain': closest_chain, 'closest_jumps': closest_jumps, 'systemObject': systemObject,
-                            'region': region, 'constellation': constellation, 'faction': faction, 'wormhole_effects': wormhole_effects,
+                            'region': region, 'constellation': constellation, 'faction': faction, 'wormhole_effect': wormhole_effect,
                             'pirates': pirates, 'jumps1': activityjumps[0], 'jumps24': activityjumps[1]})
 
 def get_tradehub_jumps(request, system):
@@ -556,7 +556,7 @@ def get_tradehub_jumps(request, system):
 
 def lookup(request, scanid):
     """ Lookup page for finding sites and wormholes by their scanid """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     system = None
@@ -582,7 +582,7 @@ def lookup(request, scanid):
 
 def mastertable(request):
     """ Master spreadsheet-link page for browsing """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     sites = Site.objects.all()
@@ -611,17 +611,17 @@ def delete_wormhole(request, wormholeid):
 
 def changelog(request):
     """ Site changelog """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     return render(request, 'sitemngr/changelog.html', {'displayname': util.get_display_name(eveigb, request)})
 
 def igb_test(request):
     """ Show all data that the in-game browser can send to a Trusted Site """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     return render(request, 'sitemngr/igbtest.html', {'displayname': util.get_display_name(eveigb, request)})
 
 def recent_scan_edits(request):
     """ Returns a readout of all recent scanid changes """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     sites = []
@@ -648,7 +648,7 @@ def recent_scan_edits(request):
 
 def output(request):
     """ Output current data for the channel MotD """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     wormholes = Wormhole.objects.filter(closed=False, start=appSettings.HOME_SYSTEM)
@@ -662,7 +662,7 @@ def output(request):
 
 def stats(request):
     """ Returns usage statistics """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     numSites = Site.objects.count()
@@ -690,7 +690,7 @@ def stats(request):
 
 def check_kills(request):
     """ Returns a readout of all ship and pod kills in and system with open objects """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     reports = []
@@ -713,12 +713,12 @@ def check_kills(request):
 
 def view_help(request):
     """ Help/instructions page """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     return render(request, 'sitemngr/help.html', {'displayname': util.get_display_name(eveigb, request), 'able': util.can_view(eveigb, request)})
 
 def overlay(request):
     """ Return a wealth of quickly-viewed information to be presented to on the idnex page """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     data = ''
@@ -830,7 +830,7 @@ def create_account(request):
         Must be done from the in-game browser
     """
     if request.method == 'POST':
-        eveigb = None # IGBHeaderParser(request)
+        eveigb = None
         if not util.can_view(eveigb):
             return no_access(request)
         try:
@@ -850,7 +850,7 @@ def create_account(request):
 
 def settings(request):
     """ Settings page for viewing and changing user settings """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     display_name = util.get_display_name(eveigb, request)
@@ -908,7 +908,7 @@ def refresh_graph(request):
 
 def mass_close(request):
     """ Close multiple wormholes at once, to be used for deleting entire chains after their connection is set to closed """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     display_name = util.get_display_name(eveigb, request)
@@ -928,7 +928,7 @@ def mass_close(request):
 
 @csrf_exempt
 def inline_edit_site(request):
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     if request.method == 'POST':
@@ -946,7 +946,7 @@ def inline_edit_site(request):
 
 @csrf_exempt
 def inline_edit_wormhole(request):
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     if request.method == 'POST':
@@ -965,13 +965,13 @@ def inline_edit_wormhole(request):
 
 def no_access(request):
     """ Shown when the viewer is restricted from viewing the page """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     wrongAlliance = util.can_view_wrong_alliance(eveigb)
     return render(request, 'sitemngr/noaccess.html', {'displayname': util.get_display_name(eveigb, request), 'wrongAlliance': wrongAlliance})
 
 def mark_up_to_date(request):
     """ User manually marked the database as up to date """
-    eveigb = None # IGBHeaderParser(request)
+    eveigb = None
     if not util.can_view(eveigb, request):
         return no_access(request)
     DatabaseUpToDate(user=util.get_display_name(eveigb, request), date=datetime.utcnow(), by='Manual').save()
