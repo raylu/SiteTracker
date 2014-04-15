@@ -316,7 +316,8 @@ def get_system_information(system):
         'shipkills': [0, 0],
         'podkills': [0, 0],
         'pirates': 'pirates',
-        'wormhole_effect': 'wormhole_effect'
+        'wormhole_effect': 'wormhole_effect',
+        'connections': 'connections'
     }
     # website lines
     contents = [line.strip() for line in requests.get('http://evemaps.dotlan.net/system/' + system).text.split('\n') if line and not line == '']
@@ -360,11 +361,21 @@ def get_system_information(system):
             else:
                 data['jumps'][1] = line.split('>')[1].split('<')[0]
                 break
-    # TODO wormhole_effect
+    # wormhole_effect
     for line in contents:
         if '<h2>Wormhole System Effect:' in line:
             data['wormhole_effect'] = ''.join(s + ' ' for s in line.split(' ')[3:(len(line.split(' ')) - 4)])[:-1]
             break
+    # wormhole statics
+    systemObject = System.objects.get(name=system)
+    s = ''
+    if ',' in systemObject.static:
+        for static in systemObject.static.split(','):
+            s += static.replace(':', ' to ') + '\n'
+        s = s[:-1]
+    else:
+        s = systemObject.static.replace(':', ' to ')
+    data['connections'] = s
     return data
 
 def snapshot(model, display_name):

@@ -130,6 +130,7 @@ class System(models.Model):
     jumps_hek = models.IntegerField(default=-1)
     jumps_jita = models.IntegerField(default=-1)
     jumps_rens = models.IntegerField(default=-1)
+    static = models.CharField(max_length=20)
     def __repr__(self):
         return '<System-%s-%s>' % (self.name, self.security_level)
 

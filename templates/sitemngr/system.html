@@ -46,7 +46,7 @@ System Info
         {% if kspace %}
         <div style="width: 100%; margin-bottom: 20px;" id="jumps"><span style="color: gray; text-align: left;">Loading jumps to major tradehubs ...</span></div>
         {% else %}
-        <p>Statics: <span style="color: red;">UNKNOWN</span></p>
+        <p><b>Statics</b>:<br>{{ connections|linebreaks }}</p>
         {% endif %}
     </div>
 </div>

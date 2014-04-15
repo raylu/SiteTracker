@@ -492,6 +492,7 @@ def system(request, systemid):
     wormhole_effect = system_data['wormhole_effect']
     pirates = system_data['pirates']
     activityjumps = system_data['jumps']
+    connections = system_data['connections']
     # determine closest chain system to this
     if is_kspace and util.is_system(systemid):
         for chain in util.get_chain_systems():
@@ -513,7 +514,7 @@ def system(request, systemid):
                             'class': clazz, 'security': security, 'kspace': is_kspace, 'opensites': opensites, 'unopenedsites': unopenedsites,
                             'is_in_chain': is_in_chain, 'closest_chain': closest_chain, 'closest_jumps': closest_jumps, 'systemObject': systemObject,
                             'region': region, 'constellation': constellation, 'faction': faction, 'wormhole_effect': wormhole_effect,
-                            'pirates': pirates, 'jumps1': activityjumps[0], 'jumps24': activityjumps[1]})
+                            'pirates': pirates, 'jumps1': activityjumps[0], 'jumps24': activityjumps[1], 'connections': connections})
 
 def get_tradehub_jumps(request, system):
     """ Shows the number of jumps from each tradehub system """
