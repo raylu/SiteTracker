@@ -966,9 +966,8 @@ def inline_edit_wormhole(request):
 
 def no_access(request):
     """ Shown when the viewer is restricted from viewing the page """
-    eveigb = None
-    wrongAlliance = util.can_view_wrong_alliance(eveigb)
-    return render(request, 'sitemngr/noaccess.html', {'displayname': util.get_display_name(eveigb, request), 'wrongAlliance': wrongAlliance})
+    return redirect('/login')
+    # return render(request, 'sitemngr/noaccess.html', {'displayname': util.get_display_name(eveigb, request), 'wrongAlliance': wrongAlliance})
 
 def mark_up_to_date(request):
     """ User manually marked the database as up to date """
