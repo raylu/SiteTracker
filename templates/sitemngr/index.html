@@ -190,7 +190,7 @@ Index
                 },
                 success: function(data) {
                     $('#slink' + n).html('<a class="label label-info" href="/editsite/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'site\',' + n + ')">In line</a>');
-                    $('#sid' + n).html('<a href="/viewsite/' + n + '">' + scanid + '</a>');
+                    $('#sid' + n).html('<a href="/viewsite/' + n + '">' + scanid.toUpperCase() + '</a>');
                     $('#sname' + n).html(name);
                     $('#stype' + n).html(type);
                     $('#swhere' + n).html('<a href="/system/' + where + '">' + where + '</a>');
