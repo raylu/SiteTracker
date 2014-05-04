@@ -10,7 +10,7 @@ Index
 <script type="text/javascript" src="{% static 'tablesorter/jquery.tablesorter.min.js' %}"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#overlay').load("{% url 'overlay' %}");
+        $('#overlay').load("{% url 'sm_overlay' %}");
         $('.message').bind('click', function() {
            $(this).hide(250);
         });
@@ -152,7 +152,7 @@ Index
               },
               success: function(data) {
                 $('#wlink' + n).html('<a class="label label-info" href="/editwormhole/' + n + '">Edit</a> <a class="label label-warning" onclick="edit(\'wormhole\',' + n + ')">In line</a>');
-                $('#wid' + n).html('<a href="/viewwormhole/' + n + '">' + scanid + '</a>');
+                $('#wid' + n).html('<a href="/viewwormhole/' + n + '">' + scanid.toUpperCase() + '</a>');
                 $('#wstart' + n).html('<a href="/system/' + start +'">' + start + '</a>');
                 $('#wend' + n).html('<a href="/system/' + end +'">' + end + '</a>');
                 $('#wstatus' + n).html(status);
@@ -426,7 +426,7 @@ $(document).ready(function() {
 </div>
 <div id="index_paste" style="border: 1px solid gray; display: none;">
     <h4>This is the same thing as the paste page, without having to load that separate page before pasting.</h4>
-    <form action="{% url 'paste' %}" method="POST">
+    <form action="{% url 'sm_paste' %}" method="POST">
     {% csrf_token %}
         <table style="border: none;">
             <tr style="border: none;">
@@ -456,7 +456,7 @@ $(document).ready(function() {
 </div>
 
 <div id="tables">
-    <h5><a href="{% url 'system' homesystem %}" id="tt1" data-toggle="tooltip" title="Direct link to the system overview page for the homesystem in settings, {{ homesystem }}">Home System Page</a></h5>
+    <h5><a href="{% url 'sm_system' homesystem %}" id="tt1" data-toggle="tooltip" title="Direct link to the system overview page for the homesystem in settings, {{ homesystem }}">Home System Page</a></h5>
 
     <p><strong>
         It is currently Eve time {% now 'H:i:s, N j' %}.<br>
@@ -485,14 +485,14 @@ $(document).ready(function() {
                 {% else %}
                     <tr class="closed">
                 {% endif %}
-                    <td id="wid{{ w.id }}"><a href="{% url 'view_wormhole' w.id %}">{{ w.scanid }}</a></td>
-                    <td id="wstart{{ w.id }}"><a href="{% url 'system' w.start %}">{{ w.start }}</a></td>
-                    <td id="wend{{ w.id }}">{% if w.destination == 'Unknown' or w.destination == '' or w.destination == 'Unopened' or w.destination == 'Closed' %}{{ w.destination }}{% else %}<a href="{% url 'system' w.destination %}">{{ w.destination }}</a>{% endif %}</td>
+                    <td id="wid{{ w.id }}"><a href="{% url 'sm_view_wormhole' w.id %}">{{ w.scanid }}</a></td>
+                    <td id="wstart{{ w.id }}"><a href="{% url 'sm_system' w.start %}">{{ w.start }}</a></td>
+                    <td id="wend{{ w.id }}">{% if w.destination == 'Unknown' or w.destination == '' or w.destination == 'Unopened' or w.destination == 'Closed' %}{{ w.destination }}{% else %}<a href="{% url 'sm_system' w.destination %}">{{ w.destination }}</a>{% endif %}</td>
                     <td>{{ w.date|date:'m/d @ H:i' }}</td>
                     <td id="wstatus{{ w.id }}">{{ w.status }}</td>
                     <td id="wotherscanid{{ w.id }}">{% if w.otherscanid %}{{ w.otherscanid }}{% else %}?{% endif %}</td>
                     <td class="countup">{% for k,v in ellapsed_timers.items %}{% if k == w.id %}{{ v }}{% endif %}{% endfor %}</td>
-                    <td id="wlink{{ w.id }}"><a class="label label-info" href="{% url 'edit_wormhole' w.id %}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('wormhole', {{ w.id }});">In line</a></td>
+                    <td id="wlink{{ w.id }}"><a class="label label-info" href="{% url 'sm_edit_wormhole' w.id %}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('wormhole', {{ w.id }});">In line</a></td>
                 </tr>
             {% endfor %}
             <tr>
@@ -534,13 +534,13 @@ $(document).ready(function() {
                 {% else %}
                     <tr class="closed">
                 {% endif %}
-                    <td id="sid{{ s.id }}"><a href="{% url 'view_site' s.id %}">{{ s.scanid }}</a></td>
+                    <td id="sid{{ s.id }}"><a href="{% url 'sm_view_site' s.id %}">{{ s.scanid }}</a></td>
                     <td id="sname{{ s.id }}">{{ s.name }}</td>
                     <td id="stype{{ s.id }}">{{ s.type }}</td>
-                    <td id="swhere{{ s.id }}"><a href="{% url 'system' s.where %}">{{ s.where }}</a></td>
+                    <td id="swhere{{ s.id }}"><a href="{% url 'sm_system' s.where %}">{{ s.where }}</a></td>
                     <td>{% if s.opened %}<span class="g">{{ s.opened }}</span>{% else %}<span class="r">{{ s.opened }}</span>{% endif %}</td>
                     <td>{{ s.date|date:'m/d @ H:i' }}</td>
-                    <td id="slink{{ s.id }}"><a class="label label-info" href="{% url 'edit_site' s.id %}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('site', {{ s.id }});">In line</a></td>
+                    <td id="slink{{ s.id }}"><a class="label label-info" href="{% url 'sm_edit_site' s.id %}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('site', {{ s.id }});">In line</a></td>
                 </tr>
             {% endfor %}
             <tr>
@@ -561,13 +561,13 @@ $(document).ready(function() {
     <br><br><br>
     <p style="font-size: 200%;">
         {% if status and status == 'open' %}
-            <a href="{% url 'view_all' %}" id="tt2" data-toggle="tooltip" title="View this index page in the same format, but only show closed sites and wormholes intead of the open entries">View closed</a>
+            <a href="{% url 'sm_view_all' %}" id="tt2" data-toggle="tooltip" title="View this index page in the same format, but only show closed sites and wormholes intead of the open entries">View closed</a>
         {% else %}
-            <a href="{% url 'index' %}">Back</a>
+            <a href="{% url 'sm_index' %}">Back</a>
         {% endif %}
         <br>
     </p>
-    <a href="{% url 'refresh_graph' %}" id="tt3" data-toggle="tooltip" title="Use this to force the wormhole chain graph to update. This shouldn't ever be needed, but just in case someone makes edits directly on the database, use this page.">Manually refresh graph</a>
+    <a href="{% url 'sm_refresh_graph' %}" id="tt3" data-toggle="tooltip" title="Use this to force the wormhole chain graph to update. This shouldn't ever be needed, but just in case someone makes edits directly on the database, use this page.">Manually refresh graph</a>
 </div>
 </center>
 

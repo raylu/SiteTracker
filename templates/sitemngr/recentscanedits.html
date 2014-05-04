@@ -42,9 +42,9 @@ Recent Edits
                 <tbody>
             {% for s in sites %}
                 <tr>
-                    <td><a href="{% url 'view_site' s.id %}">{{ s.scanid }}</a></td>
+                    <td><a href="{% url 'sm_view_site' s.id %}">{{ s.scanid }}</a></td>
                     <td>{{ s.name }}</td>
-                    <td><a href="{% url 'system' s.where %}">{{ s.where }}</a></td>
+                    <td><a href="{% url 'sm_system' s.where %}">{{ s.where }}</a></td>
                     <td>{{ s.notes }}</td>
                     <td>{{ s.id_changes }}</td>
                 </tr>
@@ -71,9 +71,9 @@ Recent Edits
             <tbody>
             {% for w in wormholes %}
                 <tr>
-                    <td><a href="{% url 'view_wormhole' w.id %}">{{ w.scanid }}</a></td>
-                    <td><a href="{% url 'system' w.start %}">{{ w.start }}</a></td>
-                    <td><a href="{% url 'system' w.destination %}">{{ w.destination }}</a></td>
+                    <td><a href="{% url 'sm_view_wormhole' w.id %}">{{ w.scanid }}</a></td>
+                    <td><a href="{% url 'sm_system' w.start %}">{{ w.start }}</a></td>
+                    <td><a href="{% url 'sm_system' w.destination %}">{{ w.destination }}</a></td>
                     <td>{{ w.notes }}</td>
                     <td>{{ w.id_changes }}</td>
                 </tr>

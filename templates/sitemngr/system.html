@@ -77,21 +77,21 @@ System Info
             {% else %}
             <tr class="closed">
             {% endif %}
-                <td><a href="{% url 'view_wormhole' w.id %}">{{ w.scanid }}</a></td>
+                <td><a href="{% url 'sm_view_wormhole' w.id %}">{{ w.scanid }}</a></td>
                 <td>{{ w.date|date:'H:i, M d, y' }}</td>
                 <td>{{ w.time }}</td>
                 <td>
                     {% if system == w.start %}
                        <i>{{ w.start }}</i>
                     {% else %}
-                        <a href="{% url 'system' w.start %}">{{ w.start }}</a>
+                        <a href="{% url 'sm_system' w.start %}">{{ w.start }}</a>
                     {% endif %}
                 </td>
                 <td>
                     {% if system == w.destination %}
                         <i>{{ w.destination }}</i>
                     {% else %}
-                        <a href="{% url 'system' w.destination %}">{{ w.destination }}</a>
+                        <a href="{% url 'sm_system' w.destination %}">{{ w.destination }}</a>
                     {% endif %}
                 </td>
             </tr>
@@ -119,7 +119,7 @@ System Info
             {% else %}
             <tr class="closed">
             {% endif %}
-                <td><a href="{% url 'view_site' s.id %}">{{ s.scanid }}</a></td>
+                <td><a href="{% url 'sm_view_site' s.id %}">{{ s.scanid }}</a></td>
                 <td>{{ s.date|date:'H:i, M d, y' }}</td>
                 <td>{{ s.name }}</td>
             </tr>
@@ -147,7 +147,7 @@ System Info
             {% else %}
             <tr class="closed">
             {% endif %}
-                <td><a href="{% url 'view_site' s.id %}">{{ s.scanid }}</a></td>
+                <td><a href="{% url 'sm_view_site' s.id %}">{{ s.scanid }}</a></td>
                 <td>{{ s.date|date:'H:i, M d, y' }}</td>
                 <td>{{ s.name }}</td>
             </tr>
@@ -170,10 +170,10 @@ System Info
     </tr>
     {% for w in closedwormholes %}
         <tr>
-            <td><a href="{% url 'edit_wormhole' w.id %}">{{ w.scanid }}</a></td>
+            <td><a href="{% url 'sm_edit_wormhole' w.id %}">{{ w.scanid }}</a></td>
             <td>{{ w.date|date:'H:i, M d, y' }}</td>
             <td>{{ w.time }}</td>
-            <td><a href="{% url 'system' w.destination %}">{{ w.destination }}</a></td>
+            <td><a href="{% url 'sm_system' w.destination %}">{{ w.destination }}</a></td>
         </tr>
     {% endfor %}
     </table>

@@ -260,11 +260,11 @@ def can_view(igb, request=None):
     if request is not None:
         if request.user is not None:
             if request.user.is_active:
-                user = ldap_backend.populate_user(request.user.username)
-                if user is None:
-                    return False
-                if not user.account_status == 'Internal':
-                    return False
+                # user = ldap_backend.populate_user(request.user.username)
+                # if user is None:
+                    # return False
+                # if not user.account_status == 'Internal':
+                    # return False
                 return True
     return igb is not None and igb.is_igb and igb.trusted and igb.alliancename == appSettings.ALLIANCE_NAME
 

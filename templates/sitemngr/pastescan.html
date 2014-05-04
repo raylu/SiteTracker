@@ -51,9 +51,9 @@ Paste
                 <tr>
                     <td>{{ p.scanid }}</td>
                     {% if p.is_site_object %}
-                        <td><a href="{% url 'view_site' p.id %}" {% if newTab %}target="_blank"{% endif %}>Link</a></td>
+                        <td><a href="{% url 'sm_view_site' p.id %}" {% if newTab %}target="_blank"{% endif %}>Link</a></td>
                     {% else %}
-                        <td><a href="{% url 'view_wormhole' p.id %}" {% if newTab %}target="_blank"{% endif %}>Link</a></td>
+                        <td><a href="{% url 'sm_view_wormhole' p.id %}" {% if newTab %}target="_blank"{% endif %}>Link</a></td>
                     {% endif %}
                 </tr>
                 {% endfor %}
@@ -74,7 +74,7 @@ Paste
                 <tr>
                     <td>{{ n.scanid }}
                     </td>
-                    <td><a href="{% url 'lookup' n.scanid %}?system={{ system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
+                    <td><a href="{% url 'sm_lookup' n.scanid %}?system={{ system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -96,9 +96,9 @@ Paste
                     <td>{{ f.scanid }}</td>
                     <td>
                         {% if f.isWormhole %}
-                            <a href="{% url 'add_wormhole' %}?scanid={{ f.scanid }}&timenow={{ timenow }}&start={{ f.system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
+                            <a href="{% url 'sm_add_wormhole' %}?scanid={{ f.scanid }}&timenow={{ timenow }}&start={{ f.system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
                         {% else %}
-                            <a href="{% url 'add_site' %}?scanid={{ f.scanid }}&timenow={{ timenow }}&type={{ f.type }}&name={{ f.name }}&system={{ f.system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
+                            <a href="{% url 'sm_add_site' %}?scanid={{ f.scanid }}&timenow={{ timenow }}&type={{ f.type }}&name={{ f.name }}&system={{ f.system }}" {% if newTab %}target="_blank"{% endif %}>Link</a>
                         {% endif %}
                     </td>
                 </tr>

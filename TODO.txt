@@ -1,7 +1,6 @@
 Edit page show history like view page
 Finish different colored nodes for index page chain graph.
 Overview HS calculation is not working
-Store kspace jumps to trade hubs
 Add time check (>= 7 days) to paste page's calculations
 Code preventing entry of same objects doesn't work
 Add the actual route when calculating distances between systems to the results (already grabbing a copy of the page)

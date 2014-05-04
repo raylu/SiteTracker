@@ -154,7 +154,7 @@ def edit_site(request, siteid):
     if request.method == 'POST':
         p = request.POST
         if util.do_edit_site(p, site, util.get_display_name(eveigb, request)):
-            return redirect('/')
+            return redirect('sm_index')
     return render(request, 'sitemngr/editsite.html', {'displayname': display_name, 'isForm': True, 'site': site, 'finish_msg': 'Store changes back into the database:'})
 
 def add_site(request):
@@ -181,7 +181,7 @@ def add_site(request):
             # check for the same site already in the database and unclosed
             Site.objects.get(scanid=s_scanid, where=s_where, type=s_type, name=s_name)
             messages.add_message(request, messages.INFO, 'That exact site already exists in the database! You can use the masterlist page to find it.')
-            return redirect('/')
+            return redirect('sm_index')
         except Site.DoesNotExist:
             pass
         site = Site(name=s_name, scanid=s_scanid, type=s_type, where=s_where, creator=display_name, date=now, opened=s_opened, closed=s_closed, notes=s_notes)
@@ -191,7 +191,7 @@ def add_site(request):
             return render(request, 'sitemngr/addsite.html', {'displayname': display_name, 'isForm': True,
                  'message': 'Successfully stored the data into the database.', 'finish_msg': 'Store new site into the database:', 'timenow': now.strftime('%m/%d @ %H:%M')})
         else:
-            return redirect('/')
+            return redirect('sm_index')
     # fill in passed information from the paste page
     elif request.method == 'GET':
         g = request.GET
@@ -226,7 +226,7 @@ def edit_wormhole(request, wormholeid):
         p = request.POST
         if util.do_edit_wormhole(p, wormhole, display_name):
             set_dirty()
-            return redirect('/')
+            return redirect('sm_index')
     return render(request, 'sitemngr/editwormhole.html', {'displayname': display_name, 'isForm': True,
           'wormhole': wormhole, 'finish_msg': 'Store changes back into the database'})
 
@@ -254,7 +254,7 @@ def add_wormhole(request):
             # check for the same wormhole already in the database and unclosed
             Wormhole.objects.get(start=s_start, destination=s_destination, opened=True, closed=False)
             messages.add_message(request, messages.INFO, 'That exact wormhole already exists in the database! You can use the masterlist page to find it.')
-            return redirect('/')
+            return redirect('sm_index')
         except Wormhole.DoesNotExist:
             pass
         wormhole = Wormhole(creator=display_name, date=now, scanid=s_scanid, start=s_start, destination=s_destination,
@@ -267,7 +267,7 @@ def add_wormhole(request):
             return render(request, 'sitemngr/addwormhole.html', {'request': request, 'displayname': display_name,
                     'isForm': True, 'message': 'Successfully stored the data into the database.', 'finish_msg': 'Store new site into database:', 'timenow': now.strftime('%m/%d @ %H:%M')})
         else:
-            return redirect('/')
+            return redirect('sm_index')
     # fill in passed information from the paste page
     elif request.method == 'GET':
         g = request.GET
@@ -375,7 +375,7 @@ def paste(request):
                         wormhole.scanid = v
                         wormhole.save()
             set_dirty()
-            return redirect('/')
+            return redirect('sm_index')
         else:
             # Parse data to return to normal paste page
             if 'pastedata' in post and post['pastedata'] and 'system' in post and post['system']:
@@ -594,17 +594,17 @@ def delete_wormhole(request, wormholeid):
     """ Deletes the wormhole and all it's change objects from the database, permanently """
     if not request or not request.user or not request.user.is_staff:
         messages.add_message(request, messages.INFO, 'You do not have access to that page')
-        return redirect('/')
+        return redirect('sm_index')
     try:
         wormhole = Wormhole.objects.get(id=wormholeid)
         for c in WormholeSnapshot.objects.filter(wormhole=wormhole):
             c.delete()
         wormhole.delete()
         messages.add_message(request, messages.INFO, 'Wormhole and its changes permanently deleted from the database')
-        return redirect('/')
+        return redirect('sm_index')
     except Wormhole.DoesNotExist:
         messages.add_message(request, messages.INFO, 'Invalid wormhole id number')
-        return redirect('/')
+        return redirect('sm_index')
 
 # ==============================
 #     Data
@@ -803,27 +803,27 @@ def login_page(request, note=None):
     if request.method == 'POST':
         p = request.POST
         if p['username'] and p['password']:
-            ldap_backend.populate_user(p['username'])
+            # ldap_backend.populate_user(p['username'])
             user = authenticate(username=p['username'], password=p['password'])
             if user is not None:
                 if user.is_active:
                     login(request, user)
-                    return redirect('/')
+                    return redirect('sm_index')
                 else:
                     messages.add_message(request, messages.INFO, 'That account is disabled')
-                    return redirect('/')
+                    return redirect('sm_index')
             else:
                 messages.add_message(request, messages.INFO, 'User not found')
-                return redirect('/')
+                return redirect('sm_index')
         else:
             messages.add_message(request, messages.INFO, 'You must enter both a username and a password')
-            return redirect('/')
+            return redirect('sm_index')
     return render(request, 'sitemngr/login.html', {'note': note, 'displayname': util.get_display_name(None, request)})
 
 def logout_page(request):
     """ If the user is logged into an account, they are logged off """
     logout(request)
-    return redirect('/')
+    return redirect('sm_index')
 
 def create_account(request):
     """
@@ -837,7 +837,7 @@ def create_account(request):
         try:
             if User.objects.get(username__exact=eveigb.charname):
                 messages.add_message(request, messages.INFO, 'You already have an account on this server')
-                return redirect('/')
+                return redirect('sm_index')
         except User.DoesNotExist:
             pass
         p = request.POST
@@ -845,9 +845,9 @@ def create_account(request):
             user = User.objects.create_user(username=eveigb.charname, password=p['password'])
             user.save()
             # messages.add_message(request, messages.INFO, 'Successfully created account on the server')
-            return redirect('/')
+            return redirect('sm_index')
         return login_page(request, 'You must enter a password.')
-    return redirect('/')
+    return redirect('sm_index')
 
 def settings(request):
     """ Settings page for viewing and changing user settings """
@@ -905,7 +905,7 @@ def get_search_results(request, keyword):
 def refresh_graph(request):
     """ A simple redirect used for manually refreshing the wormhole chain graph """
     set_dirty()
-    return redirect('/')
+    return redirect('sm_index')
 
 def mass_close(request):
     """ Close multiple wormholes at once, to be used for deleting entire chains after their connection is set to closed """
@@ -975,7 +975,7 @@ def mark_up_to_date(request):
     if not util.can_view(eveigb, request):
         return no_access(request)
     DatabaseUpToDate(user=util.get_display_name(eveigb, request), date=datetime.utcnow(), by='Manual').save()
-    return redirect('/')
+    return redirect('sm_index')
 
 def system_kills(request, systemid):
     """ Load kills for a system from dotlan """
