@@ -11,12 +11,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
 # sitemngr
-from models import (Site, SiteSnapshot,
+from .models import (Site, SiteSnapshot,
                     Wormhole, WormholeSnapshot,
                     PasteUpdated, Settings,
                     System, DatabaseUpToDate)
-import appSettings
-import util
+from . import appSettings
+from . import util
 
 # evelink
 import evelink
@@ -31,9 +31,9 @@ ldap_backend = LDAPBackend()
 # scripts
 useGraphing = True
 try:
-    import graphcolor
+    from . import graphcolor
 except ImportError:
-    print 'SiteMngr will not use the graphing feature due to the lack of required libraries'
+    print('SiteMngr will not use the graphing feature due to the lack of required libraries')
     useGraphing = False
 
 dirty = True
@@ -127,7 +127,7 @@ def add(request):
     scanid = ''
     if request.method == 'GET':
         g = request.GET
-        if g.has_key('scanid') and g['scanid']:
+        if 'scanid' in g and g['scanid']:
             scanid = g['scanid']
     return render(request, 'sitemngr/add.html', {'displayname': util.get_display_name(eveigb, request), 'scanid': scanid})
 
@@ -294,7 +294,7 @@ def paste(request):
     now = datetime.utcnow()
     if request.method == 'POST':
         post = request.POST
-        if post.has_key('downtime') and post['downtime']:
+        if 'downtime' in post and post['downtime']:
             # After paste and checking after downtime checkbox - prepare data for user to make changes after downtime
             sites = []
             wormholes = []
@@ -320,7 +320,7 @@ def paste(request):
             for site in allSites:
                 sites.append(site)
                 exact_matches = []
-                for i, n in names.iteritems():
+                for i, n in names.items():
                     if n == site.name:
                         exact_matches.append(i)
                 if site.isAnom():
@@ -344,10 +344,10 @@ def paste(request):
                 newids.append(util.SpaceObject(w, 'Wormhole', ''))
             return render(request, 'sitemngr/pastescandowntime.html', {'system': system, 'pastedata': paste_data, 'sites': sites, 'wormholes': wormholes, 'newids': newids,
                            'displayname': display_name, 'newTab': util.get_settings(display_name).editsInNewTabs, 'backgroundimage': util.get_settings(display_name).userBackgroundImage})
-        elif post.has_key('afterdowntime') and post['afterdowntime']:
+        elif 'afterdowntime' in post and post['afterdowntime']:
             # After downtime paste page after submitting database changes
             PasteUpdated(user=display_name, date=datetime.utcnow()).save()
-            for k, v in post.iteritems():
+            for k, v in post.items():
                 if ' ' in k:
                     k = k.split(' ')[0]
                 if ':' in v:
@@ -563,7 +563,7 @@ def lookup(request, scanid):
     system = None
     if request.method == 'GET':
         g = request.GET
-        if g.has_key('system') and g['system']:
+        if 'system' in g and g['system']:
             system = g['system']
     for site in Site.objects.all():
         if site.scanid == scanid:
@@ -683,7 +683,7 @@ def stats(request):
         con[paste.user] += 1
     numContributors = len(con)
     conList = []
-    con = sorted(con.items(), key=lambda kv: kv[1])
+    con = sorted(list(con.items()), key=lambda kv: kv[1])
     for name, count in con:
         conList.append(util.Contributor(name, count))
     return render(request, 'sitemngr/stats.html', {'displayname': util.get_display_name(eveigb, request), 'numSites': numSites,
@@ -706,7 +706,7 @@ def check_kills(request):
         for system in systems:
             retSys.append(util.get_system_ID(system))
         kills = evemap.kills_by_system()[0]
-        for k in kills.iteritems():
+        for k in kills.items():
             if k[0] in retSys:
                 r = util.KillReport(system=util.get_system_name(k[0]), systemid=k[0], npc=k[1]['faction'], ship=k[1]['ship'], pod=k[1]['pod'])
                 reports.append(r)
@@ -785,7 +785,7 @@ def overlay(request):
     # kills in the home system
     kills_npc = kills_ship = kills_pod = 0
     kills = evemap.kills_by_system()[0]
-    for k in kills.iteritems():
+    for k in kills.items():
         if str(k[0]) == appSettings.HOME_SYSTEM_ID:
             kills_npc = k[1]['faction']
             kills_ship = k[1]['ship']
@@ -803,7 +803,7 @@ def login_page(request, note=None):
     if request.method == 'POST':
         p = request.POST
         if p['username'] and p['password']:
-            # ldap_backend.populate_user(p['username'])
+            ldap_backend.populate_user(p['username'])
             user = authenticate(username=p['username'], password=p['password'])
             if user is not None:
                 if user.is_active:
@@ -916,7 +916,7 @@ def mass_close(request):
     data = ''
     if request.method == 'POST':
         p = request.POST
-        for k in p.iterkeys():
+        for k in p.keys():
             if k == 'csrfmiddlewaretoken':
                 continue
             wormhole = Wormhole.objects.get(id=k)

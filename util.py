@@ -5,8 +5,8 @@ from datetime import datetime
 import pytz
 
 # sitemngr
-from models import *
-import appSettings
+from .models import *
+from . import appSettings
 
 # ldap
 from django_auth_ldap.backend import LDAPBackend
@@ -18,7 +18,7 @@ def get_time_difference_formatted(old, recent):
     days = diff.days
     m, s = divmod(diff.seconds, 60)
     h, m = divmod(m, 60)
-    return '%s days, %s hours, %s minutes, and %s seconds' % (days, h, m, s)
+    return '{} days, {} hours, {} minutes, and {} seconds'.format(days, h, m, s)
 
 def get_last_update():
     """ Returns a dict of info for the last time a user made an edit """
@@ -44,14 +44,14 @@ def get_last_update():
     date = None
     try:
         date = sorted(dates)[-1]
-        print date
+        print(date)
     except IndexError:
         # if nothing was added to the list, i.e. new database
-        print 'Last update parse IndexError'
+        print('Last update parse IndexError')
         return {'time': None, 'user': None}
     except TypeError:
         # one of more of the fields was filled, and one or more was None
-        print 'Last update parse TypeError'
+        print('Last update parse TypeError')
         return {'time': None, 'user': None}
     # return the appropriate not None information
     if site and site.date == date:
@@ -82,7 +82,7 @@ def ellapsed_timers():
         m, s = divmod(diff.seconds, 60)
         h, m = divmod(m, 60)
         h += days * 24 if not days > 1 else 0
-        passed = '%s:%s:%s' % (h, m, s)
+        passed = '{}:{}:{}'.format(h, m, s)
         ret[wormhole.id] = passed
     return ret
 
@@ -133,7 +133,7 @@ class SpaceObject:
         self.what = what
         self.name = name
     def __repr__(self):
-        return '<SpaceObject-%s-%s-%s>' % (self.id, self.what, self.name)
+        return '<SpaceObject-{}-{}-{}>'.format(self.id, self.what, self.name)
 
 def is_system_in_chain(system):
     """ Returns if the syetem is directly in the chain """
@@ -162,7 +162,7 @@ def get_jumps_between(start, finish):
     if start == finish:
         return 0
     try:
-        url = 'http://evemaps.dotlan.net/route/%s:%s' % (start, finish)
+        url = 'http://evemaps.dotlan.net/route/{}:{}'.format(start, finish)
         count = 0
         contents = requests.get(url).text
         for line in contents.split('\n'):
@@ -212,7 +212,7 @@ class Result:
         self.link = 'http://tracker.talkinlocal.org/' + link
         self.text = text
     def __repr__(self):
-        return '<Result %s-%s>' % (self.link, self.text)
+        return '<Result {}-{}>'.format(self.link, self.text)
 
 def get_system_name(systemid):
     """ Returns the common name for the system from the Eve API's systemid representation """
@@ -260,11 +260,11 @@ def can_view(igb, request=None):
     if request is not None:
         if request.user is not None:
             if request.user.is_active:
-                # user = ldap_backend.populate_user(request.user.username)
-                # if user is None:
-                    # return False
-                # if not user.account_status == 'Internal':
-                    # return False
+                user = ldap_backend.populate_user(request.user.username)
+                if user is None:
+                    return False
+                if not user.account_status == 'Internal':
+                    return False
                 return True
     return igb is not None and igb.is_igb and igb.trusted and igb.alliancename == appSettings.ALLIANCE_NAME
 
@@ -406,24 +406,24 @@ def do_edit_site(p, site, display_name):
     changedClosed = False
     changedNotes = False
     p = p.copy()
-    if p.has_key('name') and p['name']:
+    if 'name' in p and p['name']:
         if p['name'] != site.name:
             changedName = True
             site.name = p['name']
-    if p.has_key('scanid') and p['scanid']:
+    if 'scanid' in p and p['scanid']:
         p['scanid'] = p['scanid'].upper()
         if p['scanid'] != site.scanid:
             changedScanid = True
             site.scanid = p['scanid'].upper()
-    if p.has_key('type') and p['type']:
+    if 'type' in p and p['type']:
         if p['type'] != site.type:
             changedType = True
             site.type = p['type']
-    if p.has_key('where') and p['where']:
+    if 'where' in p and p['where']:
         if p['where'] != site.where:
             changedWhere = True
             site.where = p['where']
-    if p.has_key('opened') and p['opened']:
+    if 'opened' in p and p['opened']:
         if getBoolean(p['opened']) != site.opened:
             changedOpened = True
             site.opened = getBoolean(p['opened'])
@@ -431,7 +431,7 @@ def do_edit_site(p, site, display_name):
         if site.opened == True:
             site.opened = False
             changedOpened = True
-    if p.has_key('closed') and p['closed']:
+    if 'closed' in p and p['closed']:
         if getBoolean(p['closed']) != site.closed:
             changedClosed = True
             site.closed = getBoolean(p['closed'])
@@ -439,7 +439,7 @@ def do_edit_site(p, site, display_name):
         if site.closed == True:
             site.closed = False
             changedClosed = True 
-    if p.has_key('notes') and p['notes']:
+    if 'notes' in p and p['notes']:
         if p['notes'] != site.notes:
             changedNotes = True
             site.notes = p['notes']
@@ -462,24 +462,24 @@ def do_edit_wormhole(p, wormhole, display_name):
     changedNotes = False
     changedOtherScanid = False
     p = p.copy()
-    if p.has_key('scanid') and p['scanid']:
+    if 'scanid' in p and p['scanid']:
         p['scanid'] = p['scanid'].upper()
         if p['scanid'] != wormhole.scanid:
             changedScanid = True
             wormhole.scanid = p['scanid'].upper()
-    if p.has_key('start') and p['start']:
+    if 'start' in p and p['start']:
         if p['start'] != wormhole.start:
             changedStart = True
             wormhole.start = p['start']
-    if p.has_key('destination') and p['destination']:
+    if 'destination' in p and p['destination']:
         if p['destination'] != wormhole.destination:
             changedDestination = True
             wormhole.destination = p['destination']
-    if p.has_key('status') and p['status']:
+    if 'status' in p and p['status']:
         if p['status'] != wormhole.status:
             changedStatus = True
             wormhole.status = p['status']
-    if p.has_key('opened') and p['opened']:
+    if 'opened' in p and p['opened']:
         if getBoolean(p['opened']) != wormhole.opened:
             changedOpened = True
             wormhole.opened = getBoolean(p['opened'])
@@ -487,7 +487,7 @@ def do_edit_wormhole(p, wormhole, display_name):
         if wormhole.opened == True:
             wormhole.opened = False
             changedOpened = True
-    if p.has_key('closed') and p['closed']:
+    if 'closed' in p and p['closed']:
         if getBoolean(p['closed']) != wormhole.closed:
             changedClosed = True
             wormhole.closed = getBoolean(p['closed'])
@@ -495,11 +495,11 @@ def do_edit_wormhole(p, wormhole, display_name):
         if wormhole.closed == True:
             wormhole.closed = False
             changedClosed = True
-    if p.has_key('notes') and p['notes']:
+    if 'notes' in p and p['notes']:
         if p['notes'] != wormhole.notes:
             changedNotes = True
             wormhole.notes = p['notes']
-    if p.has_key('otherscanid') and p['otherscanid']:
+    if 'otherscanid' in p and p['otherscanid']:
         if p['otherscanid'] != wormhole.otherscanid:
             changedOtherScanid = True
             wormhole.otherscanid = p['otherscanid'].upper()
@@ -519,7 +519,7 @@ class PasteData:
         self.isSite = p_isSite
         self.iswormhole = p_isWormhole
     def __repr__(self):
-        return '<PasteData-%s-%s>' % (self.scanid, self.system)
+        return '<PasteData-{}-{}>'.format(self.scanid, self.system)
 
 class PasteMatch:
     """ Used by the after downtime scan page to match a scanid with its allowed matches """
@@ -529,9 +529,9 @@ class PasteMatch:
         self.p_type = p_type
         self.allowed = allowed
     def __repr__(self):
-        return '<PasteMatch-%s-%s-%s-%s>' % (self.scanid, self.name, self.p_type, self.allowed)
+        return '<PasteMatch-{}-{}-{}-{}>'.format(self.scanid, self.name, self.p_type, self.allowed)
     def as_string(self):
-        return '%s: %s' % (self.scanid, self.name)
+        return '{}: {}'.format(self.scanid, self.name)
 
 class KillReport:
     """ Dynamically constructed class sent to /sitemngr/checkkills """
@@ -542,4 +542,4 @@ class KillReport:
         self.ship = ship
         self.pod = pod
     def __repr__(self):
-        return '<KillReport-%s-%s-%s-%s-%s>' % (self.system, self.systemid, self.npc, self.ship, self.pod)
+        return '<KillReport-{}-{}-{}-{}-{}>'.format(self.system, self.systemid, self.npc, self.ship, self.pod)

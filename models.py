@@ -13,9 +13,9 @@ class Site(models.Model):
     closed = models.BooleanField()
     notes = models.TextField(blank=True, null=True)
     def __repr__(self):
-        return '<Site-%s-%s-%s>' % (self.id, self.scanid, self.where)
+        return '<Site-{}-{}-{}>' % (self.id, self.scanid, self.where)
     def printOut(self):
-        return '{0} [{1}] {2} - {3}'.format(self.scanid, self.type[0], self.name, 'Open' if self.opened else 'Closed')
+        return '{} [{}] {} - {}'.format(self.scanid, self.type[0], self.name, 'Open' if self.opened else 'Closed')
     def is_site_object(self):
         return True
     def is_wormhole_object(self):
@@ -48,7 +48,7 @@ class SiteSnapshot(models.Model):
     notes = models.TextField(blank=True, null=True)
     snappedBy = models.CharField(max_length=100)
     def __repr__(self):
-        return '<SiteSnapshot-%s-%s>' % (self.id, self.site.id)
+        return '<SiteSnapshot-{}-{}>' % (self.id, self.site.id)
 
 class Wormhole(models.Model):
     """ Wormhole object for wormholes in w-space """
@@ -63,9 +63,9 @@ class Wormhole(models.Model):
     notes = models.TextField(blank=True, null=True)
     otherscanid = models.CharField(max_length=10, blank=True, null=True)
     def __repr__(self):
-        return '<Wormhole-%s-%s-%s-%s-%s>' % (self.id, self.scanid, self.start, self.destination, self.status)
+        return '<Wormhole-{}-{}-{}-{}-{}>' % (self.id, self.scanid, self.start, self.destination, self.status)
     def printOut(self):
-        return '{0} {1} > {2} ({3})'.format(self.scanid, self.start, self.destination, self.status)
+        return '{} {} > {} ({})'.format(self.scanid, self.start, self.destination, self.status)
     def is_site_object(self):
         return False
     def is_wormhole_object(self):
@@ -107,7 +107,7 @@ class WormholeSnapshot(models.Model):
     otherscanid = models.CharField(max_length=10, blank=True, null=True)
     snappedBy = models.CharField(max_length=100)
     def __repr__(self):
-        return '<WormholeSnapshot-%s-%s>' % (self.id, self.wormhole.id)
+        return '<WormholeSnapshot-{}-{}>' % (self.id, self.wormhole.id)
 
 class Settings(models.Model):
     """ User settings for sitemngr """
@@ -116,7 +116,7 @@ class Settings(models.Model):
     storeMultiple = models.BooleanField(default=True)
     userBackgroundImage = models.BooleanField(default=True)
     def __repr__(self):
-        return '<Settings-%s>' % self.user
+        return '<Settings-{}>' % self.user
 
 class System(models.Model):
     """ A system in the map """
@@ -132,14 +132,14 @@ class System(models.Model):
     jumps_rens = models.IntegerField(default=-1)
     static = models.CharField(max_length=20)
     def __repr__(self):
-        return '<System-%s-%s>' % (self.name, self.security_level)
+        return '<System-{}-{}>' % (self.name, self.security_level)
 
 class PasteUpdated(models.Model):
     """ Recording when someone uses the paste feature """
     user = models.CharField(max_length=100)
     date = models.DateTimeField()
     def __repr__(self):
-        return '<PasteUpdated-%s-%s>' % (self.user, self.date)
+        return '<PasteUpdated-{}-{}>' % (self.user, self.date)
 
 class DatabaseUpToDate(models.Model):
     """ Represents the database entires for the home system being up to date """
@@ -147,4 +147,4 @@ class DatabaseUpToDate(models.Model):
     date = models.DateTimeField()
     by = models.CharField(max_length=300)
     def __repr__(self):
-        return '<DatabaseUpToDate-%s-%s>' % (self.user, self.date)
+        return '<DatabaseUpToDate-{}-{}>' % (self.user, self.date)
