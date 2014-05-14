@@ -549,6 +549,7 @@ def get_tradehub_jumps(request, system):
             jumps.append([hub, distance])
         if systemObject:
             systemObject.save()
+    jumps.append(['system', system])
     return render(request, 'sitemngr/tradehubjumps.html', dict((x.lower(), y) for x, y in jumps))
 
 # ==============================
