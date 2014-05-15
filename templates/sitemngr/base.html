@@ -58,48 +58,48 @@
             <span class="icon-bar">2</span>
             <span class="icon-bar">3</span>
             </button>
-            <a class="brand" href="{% url 'sm_view_help' %}" style="border-left: 1px solid silver; border-right: 1px solid silver;">SiteMngr - Eve Tracking App</a>
+            <a class="brand" href="{% url 'sm_index' %}" style="border-left: 1px solid silver; border-right: 1px solid silver;">SiteMngr - Eve Tracking App</a>
             <div class="nav-collapse collapse">
                 <ul class="nav">
-                    <li {% if homepage %}class="active"{% endif %}><a href="{% url 'sm_index' %}">Home</a></li>
                     <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Navigation <b class="caret"></b></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Add and Edit <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li class="nav-header">Basic Functions</li>
-                        <li><a href="{% url 'sm_index' %}">Index</a></li>
                         <li><a href="{% url 'sm_add_site' %}">Add site</a></li>
                         <li><a href="{% url 'sm_add_wormhole' %}">Add wormhole</a></li>
                         <li><a href="{% url 'sm_paste' %}">Paste scan data</a></li>
-                        <li><a href="{% url 'sm_output' %}">Output current data</a></li>
-                        <li><a href="{% url 'sm_system_landing' %}">Browse by system</a></li>
                         <li><a href="{% url 'sm_mass_close' %}">Quickly close multiple wormholes</a></li>
-                        {% if eveigb.is_igb and eveigb.trusted %}
-                            <li><a href="{% url 'sm_system' eveigb.solarsystem %}">My current system</a></li>
-                        {% endif %}
-                        <li class="divider"></li>
-                        <li class="nav-header">Extra Features</li>
+                    </ul>
+                    <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">View <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'sm_system_landing' %}">Browse by system</a></li>
                         <li><a href="{% url 'sm_check_kills' %}">Check kills in connected systems</a></li>
+                    </ul>
+                    <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
                         <li><a href="{% url 'sm_recent_scan_edits' %}">Recent scanid changes</a></li>
                         <li><a href="{% url 'sm_mastertable' %}">Master list</a></li>
                         <li><a href="{% url 'sm_stats' %}">Stats</a></li>
-                        <li><a href="{% url 'sm_igb_test' %}">IGB test</a></li>
-                        <li><a href="{% url 'sm_view_help' %}">Help/Guide</a></li>
                         <li><a href="{% url 'sm_changelog' %}">Changelog</a></li>
-                        <li class="divider"></li>
-                        <li class="nav-header">External Links</li>
+                    </ul>
+                    <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">External <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
                         <li><a href="http://auth.talkinlocal.org/">Back to TIL</a></li>
                         <li><a href="http://www.ellatha.com/eve/wormholelist.asp">Wormhole Types</a></li>
                         <li><a href="http://eve-survival.org/wikka.php?wakka=HomePage">Eve Survival</a></li>
+                        <li><a href="http://evemaps.dotlan.net/">Dotlan</a></li>
                     </ul>
                     <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li class="nav-header">Account Control</li>
-                        <li><a href="{% url 'sm_login_page' %}">Login / Create account</a></li>
+                        <li><a href="{% url 'sm_login_page' %}">Login</a></li>
                         {% if not eveigb.is_igb %}
                             <li><a href="{% url 'sm_logout_page' %}">Logout</a></li>
                         {% endif %}
-                        <li><a href="{% url 'sm_settings' %}">User Settings</a></li>
+                        <li><a href="{% url 'sm_settings' %}">Settings</a></li>
                     </ul>
                 </ul>
                 <ul class="nav pull-right">
