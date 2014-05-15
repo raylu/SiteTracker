@@ -9,9 +9,9 @@ System Info
     $(document).ready(function()
     {
         {% if kspace %}
-            $('#jumps').load('/get_tradehub_jumps/{{ system }}/');
+            $('#jumps').load("{% url 'sm_get_tradehub_jumps' system %}");
         {% endif %}
-        $('#kills').load('/system_kills/{{ system }}/');
+        $('#kills').load("{% url 'sm_system_kills' system %}");
     });
 </script>
 {% endblock %}

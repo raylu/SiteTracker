@@ -457,7 +457,7 @@ def system(request, systemid):
     try:
         systemObject = System.objects.get(name=systemid)
     except System.DoesNotExist:
-            return render(request, 'sitemngr/systemnotfound.html', {'system': systemid})
+        return render(request, 'sitemngr/systemnotfound.html', {'system': systemid})
     if request.method == 'POST':
         p = request.POST
         if 'systemnote' in p and systemObject:
@@ -980,6 +980,10 @@ def mark_up_to_date(request):
 
 def system_kills(request, systemid):
     """ Load kills for a system from dotlan """
+    try:
+        System.objects.get(name=systemid)
+    except System.DoesNotExist:
+        return HttpResponse('')
     system_data = util.get_system_information(systemid)
     return render(request, 'sitemngr/systemkills.html', {'npc1': system_data['npckills'][0], 'npc24': system_data['npckills'][1], 
         'ship1': system_data['shipkills'][0], 'ship24': system_data['shipkills'][1], 'pod1': system_data['podkills'][0], 'pod24': system_data['podkills'][1]})
