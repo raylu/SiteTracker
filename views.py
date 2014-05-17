@@ -327,7 +327,8 @@ def paste(request):
                     paste_data.append(util.PasteMatch(scanid=site.scanid, name=site.name, p_type='anom', allowed=[a + ': ' + names[a] for a in new_anoms] if len(exact_matches) == 0 else [e + ':' + names[e] for e in exact_matches]))
                 else:
                     paste_data.append(util.PasteMatch(scanid=site.scanid, name=site.name, p_type='site', allowed=[s + ': ' + names[s] for s in new_sites] if len(exact_matches) == 0 else [e + ':' + names[e] for e in exact_matches]))
-            allWormholes = Wormhole.objects.filter(start=system, closed=False)
+            allWormholes = [w for w in Wormhole.objects.filter(start=system, closed=False)]
+            allWormholes.extend([w for w in Wormhole.objects.filter(destination=system, closed=False)])
             if len(new_wormholes) > 0:
                 for wormhole in allWormholes:
                     wormholes.append(wormhole)

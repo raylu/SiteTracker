@@ -384,11 +384,11 @@ def snapshot(model, display_name):
         Note: The returned snapshot is NOT SAVED!
     """
     if isinstance(model, Site):
-        snap = SiteSnapshot(site=model, date=datetime.utcnow(), user=model.creator, scanid=model.scanid, name=model.name,
+        snap = SiteSnapshot(site=model, date=datetime.now(), user=model.creator, scanid=model.scanid, name=model.name,
             type=model.type, where=model.where, opened=model.opened, closed=model.closed, notes=model.notes, snappedBy=display_name)
         return snap
     elif isinstance(model, Wormhole):
-        snap = WormholeSnapshot(wormhole=model, date=datetime.utcnow(), user=model.creator, scanid=model.scanid,
+        snap = WormholeSnapshot(wormhole=model, date=datetime.now(), user=model.creator, scanid=model.scanid,
             start=model.start, destination=model.destination, status=model.status,
             opened=model.opened, closed=model.closed, notes=model.notes, otherscanid=model.otherscanid, snappedBy=display_name)
         return snap
