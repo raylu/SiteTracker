@@ -162,7 +162,7 @@ def get_jumps_between(start, finish):
     if start == finish:
         return 0
     try:
-        url = 'http://evemaps.dotlan.net/route/{}:{}'.format(start, finish)
+        url = 'http://evemaps.dotlan.net/route/{}:{}'.format(start.replace(' ', '_'), finish.replace(' ', '_'))
         count = 0
         contents = requests.get(url).text
         for line in contents.split('\n'):
