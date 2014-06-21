@@ -42,49 +42,51 @@
 
 <div class="navbar navbar-fixed-top navbar-inverse">
     <div class="navbar-inner">
-        <a class="brand" href="{% url 'sm_index' %}" style="margin-left: 5%;">SiteMngr - Eve Tracking App</a>
-        <div class="nav-collapse collapse">
-            <ul class="nav">
-                <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Add and Edit <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                    <li><a href="{% url 'sm_add_site' %}">Add site</a></li>
-                    <li><a href="{% url 'sm_add_wormhole' %}">Add wormhole</a></li>
-                    <li><a href="{% url 'sm_paste' %}">Paste scan data</a></li>
-                    <li><a href="{% url 'sm_mass_close' %}">Quickly close multiple wormholes</a></li>
+        <div class="container">
+            <a class="brand" href="{% url 'sm_index' %}">SiteMngr - Eve Tracking App</a>
+            <div class="nav-collapse collapse">
+                <ul class="nav">
+                    <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Add and Edit <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'sm_add_site' %}">Add site</a></li>
+                        <li><a href="{% url 'sm_add_wormhole' %}">Add wormhole</a></li>
+                        <li><a href="{% url 'sm_paste' %}">Paste scan data</a></li>
+                        <li><a href="{% url 'sm_mass_close' %}">Quickly close multiple wormholes</a></li>
+                    </ul>
+                    <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">View <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'sm_system_landing' %}">Browse by system</a></li>
+                        <li><a href="{% url 'sm_check_kills' %}">Check kills in connected systems</a></li>
+                    </ul>
+                    <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'sm_recent_scan_edits' %}">Recent scanid changes</a></li>
+                        <li><a href="{% url 'sm_mastertable' %}">Master list</a></li>
+                        <li><a href="{% url 'sm_stats' %}">Stats</a></li>
+                        <li><a href="{% url 'sm_changelog' %}">Changelog</a></li>
+                    </ul>
+                    <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">External <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="http://auth.talkinlocal.org/">Back to TIL</a></li>
+                        <li><a href="http://www.ellatha.com/eve/wormholelist.asp">Wormhole Types</a></li>
+                        <li><a href="http://eve-survival.org/wikka.php?wakka=HomePage">Eve Survival</a></li>
+                        <li><a href="http://evemaps.dotlan.net/">Dotlan</a></li>
+                    </ul>
                 </ul>
-                <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">View <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                    <li><a href="{% url 'sm_system_landing' %}">Browse by system</a></li>
-                    <li><a href="{% url 'sm_check_kills' %}">Check kills in connected systems</a></li>
+                <ul class="nav pull-right">
+                    <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ displayname }} <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'sm_login_page' %}">Login</a></li>
+                        <li><a href="{% url 'sm_logout_page' %}">Logout</a></li>
+                        <li><a href="{% url 'sm_settings' %}">Settings</a></li>
+                    </ul>
                 </ul>
-                <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                    <li><a href="{% url 'sm_recent_scan_edits' %}">Recent scanid changes</a></li>
-                    <li><a href="{% url 'sm_mastertable' %}">Master list</a></li>
-                    <li><a href="{% url 'sm_stats' %}">Stats</a></li>
-                    <li><a href="{% url 'sm_changelog' %}">Changelog</a></li>
-                </ul>
-                <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">External <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                    <li><a href="http://auth.talkinlocal.org/">Back to TIL</a></li>
-                    <li><a href="http://www.ellatha.com/eve/wormholelist.asp">Wormhole Types</a></li>
-                    <li><a href="http://eve-survival.org/wikka.php?wakka=HomePage">Eve Survival</a></li>
-                    <li><a href="http://evemaps.dotlan.net/">Dotlan</a></li>
-                </ul>
-            </ul>
-            <ul class="nav pull-right" style="margin-right: 5%;">
-                <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ displayname }} <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                    <li><a href="{% url 'sm_login_page' %}">Login</a></li>
-                    <li><a href="{% url 'sm_logout_page' %}">Logout</a></li>
-                    <li><a href="{% url 'sm_settings' %}">Settings</a></li>
-                </ul>
-            </ul>
+            </div>
         </div>
     </div>
 </div>
