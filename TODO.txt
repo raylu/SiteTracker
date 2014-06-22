@@ -1,9 +1,0 @@
-Edit page show history like view page
-Finish different colored nodes for index page chain graph.
-Overview HS calculation is not working
-Add time check (>= 7 days) to paste page's calculations
-Code preventing entry of same objects doesn't work
-Add the actual route when calculating distances between systems to the results (already grabbing a copy of the page)
-CSS for index and recent edit pages' table sorting
-Old objects with the same scanid cause the paste page to incorrectly mark them
-After downtime paste page thinks all unnamed signatures are wormholes
