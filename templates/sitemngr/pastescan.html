@@ -51,9 +51,9 @@ Paste
                 <tr>
                     <td>{{ p.scanid }}</td>
                     {% if p.is_site_object %}
-                        <td><a href="{% url 'sm_view_site' p.id %}" {% if newTab %}target="_blank"{% endif %}>Link</a></td>
+                        <td><a href="{% url 'sm_site' p.id %}" {% if newTab %}target="_blank"{% endif %}>Link</a></td>
                     {% else %}
-                        <td><a href="{% url 'sm_view_wormhole' p.id %}" {% if newTab %}target="_blank"{% endif %}>Link</a></td>
+                        <td><a href="{% url 'sm_wormhole' p.id %}" {% if newTab %}target="_blank"{% endif %}>Link</a></td>
                     {% endif %}
                 </tr>
                 {% endfor %}

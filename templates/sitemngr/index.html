@@ -108,7 +108,7 @@ Index
             var end = $('#wend' + n).html().split('"')[5];
             var status = $('#wstatus' + n).html().split('"')[5];
             var otherscanid = $('#wotherscanid' + n).html().split('"')[5];
-            $('#wlink' + n).html('<a class="label label-info" href="/wormhole/' + n + '/edit">Edit</a> <a class="label label-warning" onclick="edit(\'wormhole\', ' + n + ')">In line</a>');
+            $('#wlink' + n).html('<a class="label label-warning" onclick="edit(\'wormhole\', ' + n + ')">Change</a>');
             $('#wid' + n).html('<a href="/wormhole/' + n + '/view">' + scanid + '</a>');
             $('#wstart' + n).html('<a href="/system/' + start +'">' + start + '</a>');
             $('#wend' + n).html('<a href="/system/' + end +'">' + end + '</a>');
@@ -119,7 +119,7 @@ Index
             var scanid = $('#sid' + n).html().split('"')[7];
             var name = $('#sname' + n).html().split('"')[5];
             var type = $('#stype' + n).html().split('"')[5];
-            $('#slink' + n).html('<a class="label label-info" href="/site/' + n + '/edit">Edit</a> <a class="label label-warning" onclick="edit(\'site\', ' + n + ')">In line</a>');
+            $('#slink' + n).html('<a class="label label-warning" onclick="edit(\'site\', ' + n + ')">Change</a>');
             $('#sid' + n).html('<a href="/site/' + n + '/view">' + scanid + '</a>');
             $('#sname' + n).html(name);
             $('#stype' + n).html(type);
@@ -147,7 +147,7 @@ Index
                   otherscanid: otherscanid
               },
               success: function(data) {
-                $('#wlink' + n).html('<a class="label label-info" href="/wormhole/' + n + '/edit">Edit</a> <a class="label label-warning" onclick="edit(\'wormhole\',' + n + ')">In line</a>');
+                $('#wlink' + n).html('<a class="label label-warning" onclick="edit(\'wormhole\',' + n + ')">Change</a>');
                 $('#wid' + n).html('<a href="/wormhole/' + n + '/view">' + scanid.toUpperCase() + '</a>');
                 $('#wstart' + n).html('<a href="/system/' + start +'">' + start + '</a>');
                 $('#wend' + n).html('<a href="/system/' + end +'">' + end + '</a>');
@@ -183,7 +183,7 @@ Index
                     type: type,
                 },
                 success: function(data) {
-                    $('#slink' + n).html('<a class="label label-info" href="/site/' + n + '/edit">Edit</a> <a class="label label-warning" onclick="edit(\'site\',' + n + ')">In line</a>');
+                    $('#slink' + n).html('<a class="label label-warning" onclick="edit(\'site\',' + n + ')">Change</a>');
                     $('#sid' + n).html('<a href="/site/' + n + '/view">' + scanid.toUpperCase() + '</a>');
                     $('#sname' + n).html(name);
                     $('#stype' + n).html(type);
@@ -462,7 +462,7 @@ $(document).ready(function() {
                 <th>Status</th>
                 <th>Opposite ID</th>
                 <th>Ellapsed</th>
-                <th>Edit</th>
+                <th style="border: none;"></th>
             </tr>
         </thead>
         <tbody>
@@ -472,14 +472,14 @@ $(document).ready(function() {
                 {% else %}
                     <tr class="closed">
                 {% endif %}
-                    <td id="wid{{ w.id }}"><a href="{% url 'sm_view_wormhole' w.id %}">{{ w.scanid }}</a></td>
+                    <td id="wid{{ w.id }}"><a href="{% url 'sm_wormhole' w.id %}">{{ w.scanid }}</a></td>
                     <td id="wstart{{ w.id }}"><a href="{% url 'sm_system' w.start %}">{{ w.start }}</a></td>
                     <td id="wend{{ w.id }}">{% if w.destination == 'Unknown' or w.destination == '' or w.destination == 'Unopened' or w.destination == 'Closed' %}{{ w.destination }}{% else %}<a href="{% url 'sm_system' w.destination %}">{{ w.destination }}</a>{% endif %}</td>
                     <td>{{ w.date|date:'m/d @ H:i' }}</td>
                     <td id="wstatus{{ w.id }}">{{ w.status }}</td>
                     <td id="wotherscanid{{ w.id }}">{% if w.otherscanid %}{{ w.otherscanid }}{% else %}?{% endif %}</td>
                     <td class="countup">{% for k,v in ellapsed_timers.items %}{% if k == w.id %}{{ v }}{% endif %}{% endfor %}</td>
-                    <td id="wlink{{ w.id }}"><a class="label label-info" href="{% url 'sm_edit_wormhole' w.id %}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('wormhole', {{ w.id }});">In line</a></td>
+                    <td id="wlink{{ w.id }}"><a class="label label-warning" onclick="edit('wormhole', {{ w.id }});">Change</a></td>
                 </tr>
             {% endfor %}
             <tr>
@@ -508,7 +508,7 @@ $(document).ready(function() {
                 <th>Type</th>
                 <th>Opened</th>
                 <th>Entered</th>
-                <th>Edit</th>
+                <th style="border: none;"></th>
             </tr>
         </thread>
         <tbody>
@@ -520,12 +520,12 @@ $(document).ready(function() {
                 {% else %}
                     <tr class="closed">
                 {% endif %}
-                    <td id="sid{{ s.id }}"><a href="{% url 'sm_view_site' s.id %}">{{ s.scanid }}</a></td>
+                    <td id="sid{{ s.id }}"><a href="{% url 'sm_site' s.id %}">{{ s.scanid }}</a></td>
                     <td id="sname{{ s.id }}">{{ s.name }}</td>
                     <td id="stype{{ s.id }}">{{ s.type }}</td>
                     <td>{% if s.opened %}<span class="g">{{ s.opened }}</span>{% else %}<span class="r">{{ s.opened }}</span>{% endif %}</td>
                     <td>{{ s.date|date:'m/d @ H:i' }}</td>
-                    <td id="slink{{ s.id }}"><a class="label label-info" href="{% url 'sm_edit_site' s.id %}" {% if newTab %}target="_blank"{% endif %}>Edit</a> <a class="label label-warning" onclick="edit('site', {{ s.id }});">In line</a></td>
+                    <td id="slink{{ s.id }}"><a class="label label-warning" onclick="edit('site', {{ s.id }});">Change</a></td>
                 </tr>
             {% endfor %}
             <tr>
