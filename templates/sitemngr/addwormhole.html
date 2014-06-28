@@ -35,10 +35,12 @@ Add Wormhole
 <h1>Add wormhole</h1>
 
 <br>
-{% if message %}
+{% if messages %}
     <div class="alert" id="alert_notices">
         <button type="button" class="close" onclick="$('#alert_notices').fadeOut(250);">&times;</button>
-        {{ message }}
+        {% for message in messages %}
+            {{ message }}<br><br>
+        {% endfor %}
     </div>
 {% endif %}
 
