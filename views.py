@@ -173,7 +173,7 @@ def add_site(request):
         s_scanid = p['scanid'].upper()
         s_name = p['name'] if 'name' in p else 'Unknown'
         s_type = p['type']
-        s_where = p['where'] if 'where' in p else 'Unknown'
+        s_where = util.get_system_proper_name(p['where']) if 'where' in p else 'Unknown'
         s_opened = True if 'opened' in p else False
         s_closed = True if 'closed' in p else False
         s_notes = p['notes'] if 'notes' in p else ''
@@ -196,7 +196,7 @@ def add_site(request):
     elif request.method == 'GET':
         g = request.GET
         g_scanid = g['scanid'] if 'scanid' in g else None
-        g_system = g['system'] if 'system' in g else None
+        g_system = util.get_system_proper_name(g['system']) if 'system' in g else None
         g_type = g['type'] if 'type' in g else None
         g_name = g['name'] if 'name' in g else None
     return render(request, 'sitemngr/addsite.html', {'request': request, 'displayname': display_name,
@@ -244,8 +244,8 @@ def add_wormhole(request):
     if request.method == 'POST':
         p = request.POST
         s_scanid = p['scanid'].upper()
-        s_start = p['start'] if 'start' in p else 'Unknown'
-        s_destination = p['destination'] if 'destination' in p else 'Unknown'
+        s_start = util.get_system_proper_name(p['start']) if 'start' in p else 'Unknown'
+        s_destination = util.get_system_proper_name(p['destination']) if 'destination' in p else 'Unknown'
         s_status = p['status']
         s_opened = True if 'opened' in p else False
         s_closed = True if 'closed' in p else False
@@ -272,8 +272,8 @@ def add_wormhole(request):
     elif request.method == 'GET':
         g = request.GET
         g_scanid = g['scanid'] if 'scanid' in g else None
-        g_start = g['start'] if 'start' in g else None
-        g_end = g['end'] if 'end' in g else None
+        g_start = util.get_system_proper_name(g['start']) if 'start' in g else None
+        g_end = util.get_system_proper_name(g['end']) if 'end' in g else None
         g_name = g['name'] if 'name' in g else None
     return render(request, 'sitemngr/addwormhole.html', {'request': request, 'displayname': display_name,
                  'isForm': True, 'finish_msg': 'Store new wormhole into the database:', 'g_scanid': g_scanid, 'g_start': g_start, 'g_end': g_end, 'g_name': g_name, 'timenow': now.strftime('%m/%d @ %H:%M')})

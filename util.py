@@ -228,6 +228,13 @@ def get_system_ID(systemname):
     except System.DoesNotExist:
         return 'null'
 
+def get_system_proper_name(systemname):
+    """ Returns the proper in-game name of a system (proper capitalization) """
+    try:
+        return System.objects.get(name__iexact=systemname).name
+    except:
+        return systemname
+
 class Contributor:
     """ Object for use by the stats page """
     def __init__(self, name, points):
@@ -420,9 +427,9 @@ def do_edit_site(p, site, display_name):
             changedType = True
             site.type = p['type']
     if 'where' in p and p['where']:
-        if p['where'] != site.where:
+        if get_system_proper_name(p['where']) != site.where:
             changedWhere = True
-            site.where = p['where']
+            site.where = get_system_proper_name(p['where'])
     if 'opened' in p and p['opened']:
         if getBoolean(p['opened']) != site.opened:
             changedOpened = True
@@ -468,13 +475,13 @@ def do_edit_wormhole(p, wormhole, display_name):
             changedScanid = True
             wormhole.scanid = p['scanid'].upper()
     if 'start' in p and p['start']:
-        if p['start'] != wormhole.start:
+        if get_system_proper_name(p['start']) != wormhole.start:
             changedStart = True
-            wormhole.start = p['start']
+            wormhole.start = get_system_proper_name(p['start'])
     if 'destination' in p and p['destination']:
-        if p['destination'] != wormhole.destination:
+        if get_system_proper_name(p['destination']) != wormhole.destination:
             changedDestination = True
-            wormhole.destination = p['destination']
+            wormhole.destination = get_system_proper_name(p['destination'])
     if 'status' in p and p['status']:
         if p['status'] != wormhole.status:
             changedStatus = True
