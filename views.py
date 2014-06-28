@@ -252,7 +252,7 @@ def add_wormhole(request):
         s_notes = p['notes'] if 'notes' in p else ''
         try:
             # check for the same wormhole already in the database and unclosed
-            Wormhole.objects.get(start=s_start, destination=s_destination, opened=True, closed=False)
+            Wormhole.objects.get(start=s_start, destination=s_destination, opened=s_opened, closed=s_closed)
             messages.add_message(request, messages.INFO, 'That exact wormhole already exists in the database! You can use the masterlist page to find it.')
             return redirect('sm_index')
         except Wormhole.DoesNotExist:
