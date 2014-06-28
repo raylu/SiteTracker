@@ -780,7 +780,7 @@ def overlay(request):
                 obj = System.objects.get(name=system)
                 if obj:
                     status = obj.security_level
-                    if status and status > 0.45:
+                    if status and float(status) > 0.45:
                         hs.append(system)
             except System.DoesNotExist:
                 continue
