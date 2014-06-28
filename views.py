@@ -157,6 +157,18 @@ def edit_site(request, siteid):
             return redirect('sm_index')
     return render(request, 'sitemngr/editsite.html', {'displayname': display_name, 'isForm': True, 'site': site, 'finish_msg': 'Store changes back into the database:'})
 
+def close_site(request, site_id):
+    """ Close the site and redirect to the index page """
+    eveigb = None
+    if not util.can_view(eveigb, request):
+        return no_access(request)
+    site = Site.objects.get(id=site_id)
+    snap = util.snapshot(site, util.get_display_name(eveigb, request))
+    snap.save()
+    site.closed = True
+    site.save()
+    return redirect('sm_index')
+
 def add_site(request):
     """ Add a site to the databse """
     eveigb = None
@@ -229,6 +241,18 @@ def edit_wormhole(request, wormholeid):
             return redirect('sm_index')
     return render(request, 'sitemngr/editwormhole.html', {'displayname': display_name, 'isForm': True,
           'wormhole': wormhole, 'finish_msg': 'Store changes back into the database'})
+
+def close_wormhole(request, wormhole_id):
+    """ Close the wormhole and redirect to the index page """
+    eveigb = None
+    if not util.can_view(eveigb, request):
+        return no_access(request)
+    wormhole = Wormhole.objects.get(id=wormhole_id)
+    snap = util.snapshot(wormhole, util.get_display_name(eveigb, request))
+    snap.save()
+    wormhole.closed = True
+    wormhole.save()
+    return redirect('sm_index')
 
 def add_wormhole(request):
     """ Add a wormhole to the databse """

@@ -205,7 +205,7 @@ Index
     }
     function checkNew(type) {
         if (type === 'wormhole') {
-            if ($('#w_new_scanid').val().length== 3 && $('#w_new_start').val().length > 0 && $('#w_new_end').val().length > 0)
+            if ($('#w_new_scanid').val().length == 3 && $('#w_new_start').val().length > 0 && $('#w_new_end').val().length > 0)
                 $('#w_new_submit').removeAttr("disabled");
             else
                 $('#w_new_submit').attr('disabled', 'disabled');
@@ -216,6 +216,14 @@ Index
             else
                 $('#s_new_submit').attr('disabled', 'disabled');   
         }
+    }
+    function updateModal(type, id) {
+        $("#clickedType").text(type);
+        $("#clickedID").text(id);
+        $("#modal_message_final").text(type);
+    }
+    function performClose() {
+        window.location = "/" + $("#clickedType").text() + "/" + $("#clickedID").text() + "/close";
     }
 </script>
 {% endblock %}
@@ -307,7 +315,7 @@ Index
 </div>
 
 <p><strong>
-    It is currently Eve time {% now 'H:i:s, N j' %}.<br>
+    This page loaded at Eve time {% now 'H:i:s, N j' %}.<br>
     Last edit: {{ last_update_diff }} ago, by {{ last_update_user }}<br>
     Up to date: {{ last_up_to_date_diff }} ago, by {{ last_up_to_date_user }}<br>
 </strong></p>
@@ -463,6 +471,7 @@ $(document).ready(function() {
                 <th>Opposite ID</th>
                 <th>Ellapsed</th>
                 <th style="border: none;"></th>
+                <th style="border: none;"></th>
             </tr>
         </thead>
         <tbody>
@@ -480,6 +489,7 @@ $(document).ready(function() {
                     <td id="wotherscanid{{ w.id }}">{% if w.otherscanid %}{{ w.otherscanid }}{% else %}?{% endif %}</td>
                     <td class="countup">{% for k,v in ellapsed_timers.items %}{% if k == w.id %}{{ v }}{% endif %}{% endfor %}</td>
                     <td id="wlink{{ w.id }}"><a class="label label-warning" onclick="edit('wormhole', {{ w.id }});">Change</a></td>
+                    <td><a href="#myModal" role="button" class="label label-info" data-toggle="modal" onclick="updateModal('wormhole', '{{ w.id }}');">Close</a><td>
                 </tr>
             {% endfor %}
             <tr>
@@ -509,6 +519,7 @@ $(document).ready(function() {
                 <th>Opened</th>
                 <th>Entered</th>
                 <th style="border: none;"></th>
+                <th style="border: none;"></th>
             </tr>
         </thread>
         <tbody>
@@ -526,6 +537,7 @@ $(document).ready(function() {
                     <td>{% if s.opened %}<span class="g">{{ s.opened }}</span>{% else %}<span class="r">{{ s.opened }}</span>{% endif %}</td>
                     <td>{{ s.date|date:'m/d @ H:i' }}</td>
                     <td id="slink{{ s.id }}"><a class="label label-warning" onclick="edit('site', {{ s.id }});">Change</a></td>
+                    <td><a href="#myModal" role="button" class="label label-info" data-toggle="modal" onclick="updateModal('site', '{{ s.id }}');">Close</a><td>
                 </tr>
             {% endfor %}
             <tr>
@@ -553,6 +565,25 @@ $(document).ready(function() {
     </p>
     <a href="{% url 'sm_refresh_graph' %}" id="tt3" data-toggle="tooltip" title="Use this to force the wormhole chain graph to update. This shouldn't ever be needed, but just in case someone makes edits directly on the database, use this page.">Manually refresh graph</a>
 </div>
+
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">Are you sure?</h3>
+    </div>
+    <div class="modal-body">
+        <p>Are you sure that you want to close this <span id="modal_message_final"></span>?</p>
+    </div>
+    <div class="modal_info" hidden>
+        <label id="clickedType"></label>
+        <label id="clickedID"></label>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">No</button>
+        <button class="btn btn-primary" onclick="performClose();">Yes</button>
+    </div>
+</div>
+
 </center>
 
 {% endblock %}
