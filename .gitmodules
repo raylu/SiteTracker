@@ -1,0 +1,3 @@
+[submodule "evelink"]
+	path = evelink
+	url = https://github.com/Celeo/evelink.git
