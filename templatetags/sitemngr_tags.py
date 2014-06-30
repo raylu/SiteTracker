@@ -14,9 +14,9 @@ def graphname(value):
     else:
         s = System.objects.get(name=value)
         status = float(s.security_level)
-        if status > 0.45:
+        if status >= 0.45:
             return '{} (H)'.format(value)
-        elif status > 0.1:
+        elif status > 0.0:
             return '{} (L)'.format(value)
         else:
             return '{} (N)'.format(value)
