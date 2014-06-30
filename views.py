@@ -1,6 +1,7 @@
-from datetime import datetime
-import re
 from collections import Counter
+from datetime import datetime
+import json
+import re
 
 # Django
 from django.shortcuts import render, get_object_or_404, redirect
@@ -668,6 +669,47 @@ def recent_scan_edits(request):
         if count == int(appSettings.RECENT_EDITS_LIMIT) + 1:
             break
     return render(request, 'sitemngr/recentscanedits.html', {'displayname': util.get_display_name(eveigb, request), 'sites': sites, 'wormholes': wormholes})
+
+def graph(request):
+    def append_connection(connections, wh):
+        for c in connections:
+            if c['name'] == wh.start:
+                c['connections'].append({
+                    'name': wh.destination,
+                    'connections': [],
+                    'mass': wh.get_type_js(),
+                })
+                return True
+            if append_connection(c['connections'], wh):
+                return True
+        return False
+
+    wormholes = list(Wormhole.objects.filter(closed=False))
+    chains = []
+    for wh in wormholes:
+        if wh.start == appSettings.HOME_SYSTEM:
+            chain = {
+                'name': wh.start,
+                'connections': [],
+            }
+            chains.append(chain)
+            break
+
+    while wormholes:
+        while True:
+            changed = False
+            for i, wh in enumerate(wormholes):
+                if append_connection(chains, wh):
+                    wormholes.pop(i)
+                    changed = True
+            if not changed or not wormholes:
+                break
+        if wormholes:
+            chains.append({
+                'name': wormholes[0].start,
+                'connections': [],
+            })
+    return HttpResponse(json.dumps(chains), mimetype='application/json')
 
 # ==============================
 #     Output

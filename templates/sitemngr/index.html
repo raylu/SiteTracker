@@ -226,6 +226,8 @@ Index
         window.location = "/" + $("#clickedType").text() + "/" + $("#clickedID").text() + "/close";
     }
 </script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/kineticjs/5.0.6/kinetic.min.js"></script>
+<script src="{% static 'graph.js' %}"></script>
 {% endblock %}
 
 {% block extraCSS %}
@@ -271,7 +273,7 @@ Index
 
 <div class="btn-group" id="button_nav">
     <button id="b_nav_tables" class="btn btn-inverse active" onclick="toggleSection('tables');" data-toggle="button">Toggle tables (t)</button>
-    <button id="b_nav_graph" class="btn btn-inverse" onclick="toggleSection('graph');" data-toggle="button">Toggle graph (g)</button>
+    <button id="b_nav_graph" class="btn btn-inverse active" onclick="toggleSection('graph');" data-toggle="button">Toggle graph (g)</button>
     <button id="b_nav_overview" class="btn btn-inverse" onclick="toggleSection('overlay');" data-toggle="button">Show Overview (o)</button>
     <button id="b_nav_search" class="btn btn-inverse" onclick="toggleSection('search');" data-toggle="button">System Search (s)</button>
     <button id="b_nav_paste" class="btn btn-inverse" onclick="toggleSection('index_paste');" data-toggle="button">Paste (p)</button>
@@ -286,9 +288,7 @@ Index
 <div id="overlay" style="width: 100%; border: 1px solid black; display: none;">
     <span style="color: gray; text-align: left;">Loading ...</span>
 </div>
-<div id="graph" style="border: 1px solid gray; display: none;">
-<!-- TODO GRAPHING -->
-</div>
+<div id="graph" style="border: 1px solid gray;"></div>
 <div id="index_paste" style="border: 1px solid gray; display: none;">
     <h4>This is the same thing as the paste page, without having to load that separate page before pasting.</h4>
     <form action="{% url 'sm_paste' %}" method="POST">
@@ -321,7 +321,6 @@ Index
 </div>
 
 <div id="tables">
-
     <h1 id="tt5" data-toggle="tooltip" title="Wormholes start in one system and lead to another - the method of transportantion for those living in wormhole-space.">{% if status and status == 'open' %}{% else %}Closed {% endif %}Wormholes</h1>
     <table id="wormholetable" class="hovertable">
         <thead>
