@@ -676,6 +676,7 @@ def graph(request):
             if c['name'] == wh.start:
                 c['connections'].append({
                     'name': wh.destination,
+                    'class': format_class(wh.destination, wh.dest_class, wh.dest_sec),
                     'connections': [],
                     'mass': wh.get_type_js(),
                 })
@@ -684,12 +685,31 @@ def graph(request):
                 return True
         return False
 
-    wormholes = list(Wormhole.objects.filter(closed=False))
+    def format_class(system, clazz, security):
+        if util.is_system_wspace(system):
+            return clazz or util.get_wormhole_class(system)
+        if security >= 0.45:
+            return 'highsec'
+        elif security > 0.0:
+            return 'lowsec'
+        else:
+            return 'nullsec'
+
+    wormholes = list(Wormhole.objects.raw('''
+        SELECT wormhole.id, start, destination, status,
+            start_system.clazz AS start_class, start_system.security_level AS start_sec,
+            dest_system.clazz AS dest_class, dest_system.security_level AS dest_sec
+        FROM sitemngr_wormhole AS wormhole
+        LEFT JOIN sitemngr_system AS start_system ON wormhole.start = start_system.name
+        LEFT JOIN sitemngr_system AS dest_system ON wormhole.destination = dest_system.name
+        WHERE NOT wormhole.closed
+    '''))
     chains = []
     for wh in wormholes:
         if wh.start == appSettings.HOME_SYSTEM:
             chain = {
                 'name': wh.start,
+                'class': format_class(wh.start, wh.start_class, wh.start_sec),
                 'connections': [],
             }
             chains.append(chain)
@@ -705,8 +725,10 @@ def graph(request):
             if not changed or not wormholes:
                 break
         if wormholes:
+            wh = wormholes[0]
             chains.append({
-                'name': wormholes[0].start,
+                'name': wh.start,
+                'class': format_class(wh.start, wh.start_class, wh.start_sec),
                 'connections': [],
             })
     return HttpResponse(json.dumps(chains), mimetype='application/json')

@@ -36,13 +36,25 @@ $(function() {
         }
         return [newLines || 1, newCols + 1];
     }
+
+	var class_color = {
+		'highsec': '#040',
+		'lowsec': '#440',
+		'nullsec': '#400',
+		1: '#135',
+		2: '#124',
+		3: '#122',
+		4: '#114',
+		5: '#113',
+		6: '#112',
+	}
     function drawSystem(system, x, y) {
         var rect = new Kinetic.Rect({
             'x': x - rectWidth / 2,
             'y': y - rectWidth / 1.75 / 2,
             'width': rectWidth,
             'height': rectWidth / 1.75,
-            'fill': '#222',
+            'fill': class_color[system['class']],
             'stroke': '#777',
             'strokeWidth': 2,
         });
