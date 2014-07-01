@@ -681,6 +681,14 @@ def graph(request):
                     'mass': wh.get_type_js(),
                 })
                 return True
+            if c['name'] == wh.destination:
+                c['connections'].append({
+                    'name': wh.start,
+                    'class': format_class(wh.start, wh.start_class, wh.start_sec),
+                    'connections': [],
+                    'mass': wh.get_type_js(),
+                })
+                return True
             if append_connection(c['connections'], wh):
                 return True
         return False
@@ -688,6 +696,7 @@ def graph(request):
     def format_class(system, clazz, security):
         if util.is_system_wspace(system):
             return clazz or util.get_wormhole_class(system)
+        security = float(security) # u'-0.0450979985632\r'
         if security >= 0.45:
             return 'highsec'
         elif security > 0.0:
