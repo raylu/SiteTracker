@@ -1,0 +1,8 @@
+input[type="text"] {
+    text-align: center;
+    width: 75%;
+}
+
+#w_new_scanid, #w_new_otherscanid, #s_new_scanid, .uppercase {
+    text-transform: uppercase;
+}
